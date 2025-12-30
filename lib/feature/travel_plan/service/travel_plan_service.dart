@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
 
@@ -17,10 +18,25 @@ class TravelPlanService {
       final plans = <TravelPlan>[];
 
       for (final key in box.keys) {
-        final planData = box.get(key);
-        if (planData != null) {
-          final plan = TravelPlan.fromJson(Map<String, dynamic>.from(planData));
-          plans.add(plan);
+        try {
+          final planData = box.get(key);
+          if (planData != null) {
+            final Map<String, dynamic> jsonMap;
+            if (planData is String) {
+              jsonMap = json.decode(planData);
+            } else if (planData is Map) {
+              jsonMap = Map<String, dynamic>.from(planData);
+            } else {
+              _logger.w('Unexpected data type for key $key: ${planData.runtimeType}');
+              continue;
+            }
+
+            final plan = TravelPlan.fromJson(jsonMap);
+            plans.add(plan);
+          }
+        } catch (e) {
+          _logger.e('Failed to parse travel plan for key $key: $e');
+          continue;
         }
       }
 
@@ -40,7 +56,17 @@ class TravelPlanService {
       final planData = box.get(planId);
 
       if (planData != null) {
-        return TravelPlan.fromJson(Map<String, dynamic>.from(planData));
+        final Map<String, dynamic> jsonMap;
+        if (planData is String) {
+          jsonMap = json.decode(planData);
+        } else if (planData is Map) {
+          jsonMap = Map<String, dynamic>.from(planData);
+        } else {
+          _logger.w('Unexpected data type for planId $planId: ${planData.runtimeType}');
+          return null;
+        }
+
+        return TravelPlan.fromJson(jsonMap);
       }
       return null;
     } catch (e) {
@@ -52,10 +78,14 @@ class TravelPlanService {
   Future<void> saveTravelPlan(TravelPlan plan) async {
     try {
       final box = await _storageService.openBox(_boxName);
-      await box.put(plan.id, plan.toJson());
+
+      final jsonMap = plan.toJson();
+      final jsonString = json.encode(jsonMap);
+
+      await box.put(plan.id, jsonString);
       _logger.d('Saved travel plan: ${plan.title}');
-    } catch (e) {
-      _logger.e('Failed to save travel plan: $e');
+    } catch (e, stackTrace) {
+      _logger.e('Failed to save travel plan: $e', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
@@ -64,10 +94,14 @@ class TravelPlanService {
     try {
       final updatedPlan = plan.copyWith(updatedAt: DateTime.now());
       final box = await _storageService.openBox(_boxName);
-      await box.put(plan.id, updatedPlan.toJson());
+
+      final jsonMap = updatedPlan.toJson();
+      final jsonString = json.encode(jsonMap);
+
+      await box.put(plan.id, jsonString);
       _logger.d('Updated travel plan: ${plan.title}');
-    } catch (e) {
-      _logger.e('Failed to update travel plan: $e');
+    } catch (e, stackTrace) {
+      _logger.e('Failed to update travel plan: $e', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
@@ -102,5 +136,16 @@ class TravelPlanService {
 
   Future<void> exportTravelPlan(TravelPlan plan) async {
     _logger.i('Exporting travel plan: ${plan.title}');
+  }
+
+  Future<void> clearAllPlans() async {
+    try {
+      final box = await _storageService.openBox(_boxName);
+      await box.clear();
+      _logger.d('Cleared all travel plans');
+    } catch (e) {
+      _logger.e('Failed to clear travel plans: $e');
+      rethrow;
+    }
   }
 }

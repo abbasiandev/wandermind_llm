@@ -75,7 +75,7 @@ class _BudgetInputState extends State<BudgetInput> {
         Row(
           children: [
             Expanded(
-              flex: 3,
+              flex: 2,
               child: TextFormField(
                 controller: _controller,
                 keyboardType: TextInputType.number,
@@ -126,17 +126,22 @@ class _BudgetInputState extends State<BudgetInput> {
               ),
             ),
             const SizedBox(width: 12),
-            Expanded(
-              flex: 1,
+            SizedBox(
+              width: 90,
               child: DropdownButtonFormField<String>(
                 value: _selectedCurrency,
                 decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  isDense: true,
                 ),
+                isExpanded: true,
                 items: _currencies.map((currency) {
                   return DropdownMenuItem(
                     value: currency,
-                    child: Text(currency),
+                    child: Text(
+                      currency,
+                      style: const TextStyle(fontSize: 14),
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {

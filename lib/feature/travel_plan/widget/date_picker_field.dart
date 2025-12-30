@@ -68,11 +68,27 @@ class DatePickerField extends StatelessWidget {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final now = DateTime.now();
+    final effectiveFirstDate = firstDate ?? now;
+    final effectiveLastDate = lastDate ?? now.add(const Duration(days: 365 * 2));
+
+    DateTime initialDate;
+    if (value != null &&
+        !value!.isBefore(effectiveFirstDate) &&
+        !value!.isAfter(effectiveLastDate)) {
+      initialDate = value!;
+    } else if (firstDate != null && !firstDate!.isBefore(effectiveFirstDate)) {
+      initialDate = firstDate!;
+    } else {
+      // Use the later of today or firstDate
+      initialDate = now.isAfter(effectiveFirstDate) ? now : effectiveFirstDate;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: value ?? DateTime.now(),
-      firstDate: firstDate ?? DateTime.now(),
-      lastDate: lastDate ?? DateTime.now().add(const Duration(days: 365 * 2)),
+      initialDate: initialDate,
+      firstDate: effectiveFirstDate,
+      lastDate: effectiveLastDate,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(

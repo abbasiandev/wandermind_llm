@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "dev.abbasian.wandermind_llm"
-    compileSdk = 34
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -25,25 +25,27 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
-        targetSdk = 34
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
 
-        multiDexEnabled true
-        javaMaxHeapSize "4g"
+        multiDexEnabled = true
+        // Note: javaMaxHeapSize is not a valid property here
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
-                    minifyEnabled false
-            shrinkResources false
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
-    packagingOptions {
-        pickFirst '**/libc++_shared.so'
-        pickFirst '**/libjsc.so'
+    packaging {
+        jniLibs {
+            pickFirsts.add("**/libc++_shared.so")
+            pickFirsts.add("**/libjsc.so")
+        }
     }
 }
 
