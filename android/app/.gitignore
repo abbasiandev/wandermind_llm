@@ -1,0 +1,15 @@
+# Android build outputs
+build/
+.gradle/
+.cxx/
+
+# Native build artifacts
+src/main/cpp/llama.cpp/
+*.so
+*.o
+*.a
+
+# IDE
+.idea/
+*.iml
+local.properties
