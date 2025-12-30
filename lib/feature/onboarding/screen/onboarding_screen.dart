@@ -58,7 +58,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
             Align(
               alignment: Alignment.topRight,
               child: Padding(
@@ -70,7 +69,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
 
-            // Pages
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -84,7 +82,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
 
-            // Page indicator
             Padding(
               padding: const EdgeInsets.all(24),
               child: Row(
@@ -96,7 +93,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
 
-            // Navigation buttons
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
               child: Row(
@@ -203,7 +199,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _finishOnboarding() {
-    // Save onboarding completed state
     // ref.read(sharedPreferencesProvider).setBool('onboarding_completed', true);
 
     // Navigate to home

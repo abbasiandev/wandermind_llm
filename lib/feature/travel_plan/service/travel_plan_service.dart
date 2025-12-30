@@ -24,7 +24,6 @@ class TravelPlanService {
         }
       }
 
-      // Sort by creation date (newest first)
       plans.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       _logger.d('Retrieved ${plans.length} travel plans');
@@ -102,8 +101,6 @@ class TravelPlanService {
   }
 
   Future<void> exportTravelPlan(TravelPlan plan) async {
-    // Implementation for exporting travel plan to PDF or other formats
     _logger.i('Exporting travel plan: ${plan.title}');
-    // This would integrate with a PDF generation library
   }
 }

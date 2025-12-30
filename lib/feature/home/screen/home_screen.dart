@@ -24,7 +24,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize LLM on app start
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeLLM();
     });
@@ -57,17 +56,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with location
               HomeHeader(locationData: locationAsync.value),
 
               const SizedBox(height: 20),
 
-              // LLM Status Card
               LLMStatusCard(llmState: llmState),
 
               const SizedBox(height: 24),
 
-              // Quick Actions
               Text(
                 'Quick Actions',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -84,7 +80,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               const SizedBox(height: 24),
 
-              // Recent Travel Plans
               Text(
                 'Recent Travel Plans',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(

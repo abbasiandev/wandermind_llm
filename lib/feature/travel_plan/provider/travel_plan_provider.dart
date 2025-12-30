@@ -8,13 +8,11 @@ import '../service/travel_plan_service.dart';
 part 'travel_plan_provider.g.dart';
 part 'travel_plan_provider.freezed.dart';
 
-// Service
 final travelPlanServiceProvider = Provider<TravelPlanService>((ref) {
   final storageService = ref.watch(storageServiceProvider);
   return TravelPlanService(storageService);
 });
 
-// Travel Plans List
 @riverpod
 class TravelPlansController extends _$TravelPlansController {
   @override
@@ -42,7 +40,6 @@ class TravelPlansController extends _$TravelPlansController {
   }
 }
 
-// Current Travel Plan (for editing/viewing)
 @riverpod
 class CurrentTravelPlanController extends _$CurrentTravelPlanController {
   @override
@@ -60,7 +57,6 @@ class CurrentTravelPlanController extends _$CurrentTravelPlanController {
 
   void updateCurrentPlan(TravelPlan updatedPlan) {
     state = updatedPlan;
-    // Also update in storage
     ref.read(travelPlansControllerProvider.notifier).updateTravelPlan(updatedPlan);
   }
 
@@ -95,7 +91,6 @@ class CurrentTravelPlanController extends _$CurrentTravelPlanController {
   }
 }
 
-// Travel Plan Creation State
 @riverpod
 class TravelPlanCreationController extends _$TravelPlanCreationController {
   @override

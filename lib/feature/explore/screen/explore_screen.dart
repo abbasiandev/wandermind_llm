@@ -88,7 +88,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       ),
       body: Column(
         children: [
-          // Search Bar
           Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
@@ -114,7 +113,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             ),
           ),
 
-          // Category Filter
           SizedBox(
             height: 50,
             child: ListView.builder(
@@ -144,7 +142,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
           const SizedBox(height: 16),
 
-          // Destinations Grid
           Expanded(
             child: filteredDestinations.isEmpty
                 ? _buildEmptyState()
@@ -175,14 +172,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   List<Destination> _getFilteredDestinations() {
     var filtered = _destinations;
 
-    // Filter by category
     if (_selectedCategory != 'All') {
       filtered = filtered
           .where((d) => d.category == _selectedCategory)
           .toList();
     }
 
-    // Filter by search
     if (_searchController.text.isNotEmpty) {
       final query = _searchController.text.toLowerCase();
       filtered = filtered

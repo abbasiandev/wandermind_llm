@@ -6,12 +6,10 @@ import '../service/llm_service.dart';
 
 part 'llm_provider.g.dart';
 
-// LLM Service Provider
 final llmServiceProvider = Provider<LLMService>((ref) {
   return LLMService();
 });
 
-// LLM State Controller
 @riverpod
 class LLMController extends _$LLMController {
   @override
@@ -25,7 +23,6 @@ class LLMController extends _$LLMController {
     try {
       final service = ref.read(llmServiceProvider);
 
-      // Update progress during initialization
       await for (final progress in service.initializeModel()) {
         state = state.copyWith(initializationProgress: progress);
       }
@@ -124,8 +121,6 @@ Please provide a detailed itinerary with daily activities, estimated costs, and 
       double budget,
       List<String> interests,
       ) {
-    // For now, create a structured plan
-    // In production with a real LLM, you'd parse JSON response
     return _createFallbackTravelPlan(
       destination,
       startDate,

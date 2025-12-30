@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../feature/home/screen/home_screen.dart';
@@ -13,7 +13,7 @@ import '../../feature/travel_plan/screen/travel_plan_screen.dart';
 import '../widget/bottom_navigation_shell.dart';
 
 class AppRouter {
-  static GoRouter createRouter(WidgetRef ref) {
+  static GoRouter createRouter() {
     return GoRouter(
       initialLocation: '/',
       routes: [
@@ -40,28 +40,6 @@ class AppRouter {
             GoRoute(
               path: '/plans',
               builder: (context, state) => const TravelPlanScreen(),
-              routes: [
-                GoRoute(
-                  path: '/create',
-                  builder: (context, state) => const CreatePlanScreen(),
-                ),
-                GoRoute(
-                  path: '/:planId',
-                  builder: (context, state) {
-                    final planId = state.pathParameters['planId']!;
-                    return PlanDetailScreen(planId: planId);
-                  },
-                  routes: [
-                    GoRoute(
-                      path: '/edit',
-                      builder: (context, state) {
-                        final planId = state.pathParameters['planId']!;
-                        return CreatePlanScreen(planId: planId);
-                      },
-                    ),
-                  ],
-                ),
-              ],
             ),
 
             GoRoute(
@@ -87,8 +65,22 @@ class AppRouter {
             final planId = state.pathParameters['planId']!;
             return PlanDetailScreen(planId: planId);
           },
+          routes: [
+            GoRoute(
+              path: 'edit',
+              builder: (context, state) {
+                final planId = state.pathParameters['planId']!;
+                return CreatePlanScreen(planId: planId);
+              },
+            ),
+          ],
         ),
       ],
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(
+          child: Text('Page not found: ${state.uri.path}'),
+        ),
+      ),
     );
   }
 }

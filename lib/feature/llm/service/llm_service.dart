@@ -14,11 +14,9 @@ class LLMService {
       yield 0.1;
       _logger.i('Starting LLM initialization...');
 
-      // Simulate initialization steps
       await Future.delayed(const Duration(seconds: 1));
       yield 0.3;
 
-      // Check if model exists locally
       final modelPath = await _getModelPath();
       yield 0.5;
 
@@ -31,7 +29,6 @@ class LLMService {
         yield 0.8;
       }
 
-      // Load the model (simulated)
       _logger.i('Loading model...');
       await Future.delayed(const Duration(seconds: 1));
       yield 0.95;
@@ -54,10 +51,8 @@ class LLMService {
     try {
       _logger.d('Generating response for prompt: ${prompt.length > 50 ? prompt.substring(0, 50) : prompt}...');
 
-      // Simulate AI processing time
       await Future.delayed(const Duration(seconds: 2));
 
-      // Generate mock response based on prompt content
       final response = _generateMockResponse(prompt);
 
       _logger.d('Response generated successfully');
@@ -74,7 +69,6 @@ class LLMService {
   }
 
   Future<void> _downloadModel(String modelPath) async {
-    // Simulate model download
     _logger.i('Simulating model download...');
 
     final modelDir = Directory(modelPath.substring(0, modelPath.lastIndexOf('/')));
@@ -82,20 +76,15 @@ class LLMService {
       await modelDir.create(recursive: true);
     }
 
-    // Create a placeholder file
     final file = File(modelPath);
     await file.writeAsString('wandermind_model_v1.0');
 
-    // Simulate download time
     await Future.delayed(const Duration(seconds: 2));
 
     _logger.i('Model download completed (simulated)');
   }
 
   String _generateMockResponse(String prompt) {
-    // This is a mock response generator
-    // In production, this would be replaced with actual LLM inference
-
     final lowerPrompt = prompt.toLowerCase();
 
     if (lowerPrompt.contains('travel') || lowerPrompt.contains('plan') || lowerPrompt.contains('itinerary')) {

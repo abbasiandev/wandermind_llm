@@ -88,7 +88,6 @@ class _AdditionalRequirementsInputState
 
         const SizedBox(height: 12),
 
-        // Toggle suggestions
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -111,7 +110,6 @@ class _AdditionalRequirementsInputState
           ],
         ),
 
-        // Quick suggestions
         if (_showSuggestions) ...[
           const SizedBox(height: 8),
           Wrap(
@@ -125,15 +123,13 @@ class _AdditionalRequirementsInputState
                 onSelected: (selected) {
                   String currentText = _controller.text;
                   if (selected) {
-                    // Add suggestion
+
                     if (currentText.isNotEmpty) {
                       currentText += currentText.endsWith('.') ? ' ' : '. ';
                     }
                     currentText += suggestion;
                   } else {
-                    // Remove suggestion
                     currentText = currentText.replaceAll(suggestion, '').trim();
-                    // Clean up multiple spaces and dots
                     currentText = currentText.replaceAll(RegExp(r'\s+'), ' ');
                     currentText = currentText.replaceAll(RegExp(r'\.+'), '.');
                     currentText = currentText.replaceAll('. .', '.');
@@ -149,7 +145,6 @@ class _AdditionalRequirementsInputState
 
         const SizedBox(height: 12),
 
-        // Examples section
         ExpansionTile(
           title: Text(
             'Need inspiration? See examples',

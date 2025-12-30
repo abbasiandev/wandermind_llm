@@ -19,7 +19,7 @@ class LLMStatusCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Icon(Icons.check_circle, color: AppColors.success),
+              const Icon(Icons.check_circle, color: AppColors.success),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
