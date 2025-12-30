@@ -359,7 +359,9 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
                       : Icon(isEditing ? Icons.save : Icons.create),
                   label: Text(
                     _isCreating
-                        ? 'Creating your perfect trip...'
+                        ? ref.watch(lLMControllerProvider).isGenerating
+                            ? 'AI is generating your plan...'
+                            : 'Preparing your trip...'
                         : (isEditing ? 'Update Plan' : 'Create Travel Plan'),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -417,9 +419,13 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
   Future<void> _createTravelPlan() async {
     if (!_canCreatePlan()) return;
 
+    // Show immediate feedback
     setState(() {
       _isCreating = true;
     });
+
+    // Force UI update to show "Creating..." immediately
+    await Future.delayed(Duration(milliseconds: 100));
 
     try {
       final creationState = ref.read(travelPlanCreationControllerProvider);

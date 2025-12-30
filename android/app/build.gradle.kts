@@ -30,7 +30,30 @@ android {
         versionName = "1.0"
 
         multiDexEnabled = true
-        // Note: javaMaxHeapSize is not a valid property here
+        
+        // NDK configuration for native llama.cpp
+        // Only build for ARM 64-bit (modern Android devices)
+        ndk {
+            abiFilters.clear()
+            abiFilters.add("arm64-v8a")
+        }
+        
+        externalNativeBuild {
+            cmake {
+                cppFlags.add("-std=c++17")
+                arguments.addAll(listOf(
+                    "-DANDROID_STL=c++_shared",
+                    "-DANDROID_ABI=arm64-v8a"
+                ))
+            }
+        }
+    }
+    
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 
     buildTypes {

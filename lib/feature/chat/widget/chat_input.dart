@@ -29,21 +29,35 @@ class _ChatInputState extends State<ChatInput> {
   void initState() {
     super.initState();
     _controller.text = widget.message;
-    _controller.addListener(() {
+    _controller.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    // Only notify if the text is different from the widget's message
+    // to prevent circular updates
+    if (_controller.text != widget.message) {
       widget.onMessageChanged(_controller.text);
-    });
+    }
   }
 
   @override
   void didUpdateWidget(ChatInput oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.message != oldWidget.message) {
+    // Update the controller text only if the message changed externally
+    // and it's different from the current controller text
+    if (widget.message != oldWidget.message && 
+        widget.message != _controller.text) {
+      // Temporarily remove listener to prevent circular updates
+      _controller.removeListener(_onTextChanged);
       _controller.text = widget.message;
+      // Re-add listener after update
+      _controller.addListener(_onTextChanged);
     }
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_onTextChanged);
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();

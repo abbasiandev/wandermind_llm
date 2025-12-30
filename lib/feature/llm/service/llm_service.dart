@@ -1,44 +1,95 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:logger/logger.dart';
+
+import 'model_downloader_service.dart';
+import 'llama_cpp_service.dart';
 
 class LLMService {
   static final Logger _logger = Logger();
+
+  final ModelDownloaderService _downloaderService;
+  final LlamaCppService _llamaService;
+
   bool _isInitialized = false;
+  String _currentModel = 'tinyllama';
+
+  // Constructor with dependency injection
+  LLMService({
+    ModelDownloaderService? downloaderService,
+    LlamaCppService? llamaService,
+  })  : _downloaderService = downloaderService ?? ModelDownloaderService(),
+        _llamaService = llamaService ?? LlamaCppService();
 
   bool get isInitialized => _isInitialized;
 
-  Stream<double> initializeModel() async* {
+  String get currentModel => _currentModel;
+
+  Stream<double> initializeModel({String? modelKey}) async* {
     try {
+      final selectedModel = modelKey ?? _currentModel;
       yield 0.1;
-      _logger.i('Starting LLM initialization...');
+      _logger.i('Starting LLM initialization for model: $selectedModel');
 
-      await Future.delayed(const Duration(seconds: 1));
-      yield 0.3;
+      final isDownloaded =
+          await _downloaderService.isModelDownloaded(selectedModel);
+      yield 0.2;
 
-      final modelPath = await _getModelPath();
-      yield 0.5;
+      if (!isDownloaded) {
+        _logger.i('Model not found, downloading...');
 
-      if (!await File(modelPath).exists()) {
-        _logger.i('Model not found locally, downloading...');
-        await _downloadModel(modelPath);
-        yield 0.8;
+        // Create a stream controller to emit progress updates
+        final progressController = StreamController<double>();
+        
+        // Start the download in a separate async operation
+        final downloadFuture = _downloaderService.downloadModel(
+          selectedModel,
+          onProgress: (progress) {
+            // Emit progress updates immediately: 0.2 to 0.7 range for download
+            progressController.add(0.2 + (progress * 0.5));
+            _logger.d(
+                'Download progress: ${(progress * 100).toStringAsFixed(1)}%');
+          },
+          onComplete: () {
+            _logger.i('Download completed');
+            progressController.close();
+          },
+          onError: (error) {
+            _logger.e('Download error: $error');
+            progressController.addError(error);
+            progressController.close();
+          },
+        );
+
+        // Stream the progress updates as they come
+        await for (final progress in progressController.stream) {
+          yield progress;
+        }
+        
+        // Wait for download to complete
+        await downloadFuture;
+        yield 0.7;
       } else {
-        _logger.i('Model found locally');
-        yield 0.8;
+        _logger.i('Model already downloaded');
+        yield 0.7;
       }
 
-      _logger.i('Loading model...');
-      await Future.delayed(const Duration(seconds: 1));
+      _logger.i('Loading model into memory...');
+      final modelPath = await _downloaderService.getModelPath(selectedModel);
+
+      await _llamaService.loadModel(
+        modelPath,
+        contextSize: 2048,
+        threads: 4,
+      );
       yield 0.95;
 
+      _currentModel = selectedModel;
       _isInitialized = true;
       _logger.i('LLM initialization completed');
       yield 1.0;
-
     } catch (e) {
       _logger.e('Failed to initialize LLM: $e');
+      _isInitialized = false;
       rethrow;
     }
   }
@@ -49,11 +100,14 @@ class LLMService {
     }
 
     try {
-      _logger.d('Generating response for prompt: ${prompt.length > 50 ? prompt.substring(0, 50) : prompt}...');
+      _logger.d('Generating response...');
 
-      await Future.delayed(const Duration(seconds: 2));
-
-      final response = _generateMockResponse(prompt);
+      final enhancedPrompt = _enhancePromptForTravel(prompt);
+      final response = await _llamaService.generateText(
+        enhancedPrompt,
+        maxTokens: 512,
+        temperature: 0.7,
+      );
 
       _logger.d('Response generated successfully');
       return response;
@@ -63,133 +117,77 @@ class LLMService {
     }
   }
 
-  Future<String> _getModelPath() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    return '${appDir.path}/models/wandermind-model.bin';
-  }
-
-  Future<void> _downloadModel(String modelPath) async {
-    _logger.i('Simulating model download...');
-
-    final modelDir = Directory(modelPath.substring(0, modelPath.lastIndexOf('/')));
-    if (!await modelDir.exists()) {
-      await modelDir.create(recursive: true);
+  Stream<String> generateResponseStream(String prompt) async* {
+    if (!_isInitialized) {
+      throw Exception('LLM not initialized');
     }
 
-    final file = File(modelPath);
-    await file.writeAsString('wandermind_model_v1.0');
+    try {
+      _logger.d('Generating streaming response...');
 
-    await Future.delayed(const Duration(seconds: 2));
-
-    _logger.i('Model download completed (simulated)');
+      final enhancedPrompt = _enhancePromptForTravel(prompt);
+      await for (final chunk in _llamaService.generateTextStream(
+        enhancedPrompt,
+        maxTokens: 512,
+        temperature: 0.7,
+      )) {
+        yield chunk;
+      }
+    } catch (e) {
+      _logger.e('Failed to generate streaming response: $e');
+      rethrow;
+    }
   }
 
-  String _generateMockResponse(String prompt) {
-    final lowerPrompt = prompt.toLowerCase();
+  String _enhancePromptForTravel(String originalPrompt) {
+    return '''
+<|system|>
+You are WanderMind, an expert AI travel assistant. You specialize in creating detailed, personalized travel plans and providing helpful travel advice. Your responses should be practical, budget-conscious, culturally sensitive, safety-focused, and engaging.
+</|system|>
 
-    if (lowerPrompt.contains('travel') || lowerPrompt.contains('plan') || lowerPrompt.contains('itinerary')) {
-      return '''
-I'd be happy to help you plan your trip! Based on your requirements, here's what I recommend:
+<|user|>
+$originalPrompt
+</|user|>
 
-**Travel Planning Tips:**
-
-1. **Best Time to Visit**: Research the climate and peak tourist seasons for your destination
-2. **Budget Planning**: Set aside 10-15% extra for unexpected expenses
-3. **Accommodation**: Book in advance for better rates, especially during peak season
-4. **Transportation**: Consider local public transport options to save money
-5. **Activities**: Mix popular attractions with off-the-beaten-path experiences
-
-**Important Considerations:**
-- Check visa requirements and travel advisories
-- Get travel insurance
-- Make copies of important documents
-- Learn basic phrases in the local language
-- Research local customs and etiquette
-
-Would you like me to create a detailed itinerary for a specific destination?
+<|assistant|>
 ''';
-    } else if (lowerPrompt.contains('destination') || lowerPrompt.contains('where')) {
-      return '''
-Great question! Here are some amazing destinations to consider:
+  }
 
-**Beach Destinations:**
-- Bali, Indonesia: Perfect blend of culture, beaches, and adventure
-- Maldives: Luxury paradise for relaxation
-- Santorini, Greece: Stunning sunsets and white architecture
+  Future<List<String>> getAvailableModels() async {
+    return ModelDownloaderService.availableModels.keys.toList();
+  }
 
-**City Breaks:**
-- Tokyo, Japan: Modern technology meets ancient traditions
-- Paris, France: Art, culture, and world-class cuisine
-- New York, USA: The city that never sleeps
+  Future<bool> isModelDownloaded(String modelKey) async {
+    return await _downloaderService.isModelDownloaded(modelKey);
+  }
 
-**Adventure Destinations:**
-- New Zealand: Adventure sports and stunning landscapes
-- Iceland: Unique natural phenomena and outdoor activities
-- Peru: Ancient ruins and diverse ecosystems
+  Future<ModelInfo> getModelInfo(String modelKey) async {
+    return ModelDownloaderService.availableModels[modelKey]!;
+  }
 
-What type of experience are you looking for?
-''';
-    } else if (lowerPrompt.contains('budget')) {
-      return '''
-Budget planning is crucial for a successful trip! Here's how to manage your travel budget:
-
-**Budget Breakdown (General Guidelines):**
-- Accommodation: 30-35% of total budget
-- Food & Dining: 25-30%
-- Activities & Entertainment: 20-25%
-- Transportation: 15-20%
-- Miscellaneous: 5-10%
-
-**Money-Saving Tips:**
-1. Travel during shoulder season
-2. Book flights in advance or use flight comparison tools
-3. Stay in budget accommodations or hostels
-4. Cook some meals yourself
-5. Use public transportation
-6. Look for free activities and attractions
-7. Get a local SIM card instead of roaming
-
-What's your budget range for the trip?
-''';
-    } else if (lowerPrompt.contains('food') || lowerPrompt.contains('cuisine')) {
-      return '''
-Food is such an important part of travel! Here are my recommendations:
-
-**Food Tips:**
-1. **Try Local Cuisine**: Don't stick to familiar foods - be adventurous!
-2. **Street Food**: Often the most authentic and affordable option
-3. **Local Markets**: Great for fresh produce and local specialties
-4. **Avoid Tourist Traps**: Eat where locals eat
-5. **Dietary Restrictions**: Research local options beforehand
-
-**Must-Try Experiences:**
-- Take a cooking class
-- Visit local food markets
-- Join a food tour
-- Try regional specialties
-- Visit family-owned restaurants
-
-Would you like specific restaurant recommendations for a particular destination?
-''';
-    } else {
-      return '''
-Thank you for your question! As your AI travel assistant, I'm here to help with:
-
-- Creating personalized travel itineraries
-- Suggesting destinations based on your interests
-- Budget planning and optimization
-- Travel tips and recommendations
-- Cultural insights and local customs
-- Activity suggestions
-- Accommodation and transportation advice
-
-What would you like to know about your travel plans?
-''';
+  Future<void> changeModel(String modelKey) async {
+    if (_isInitialized) {
+      await _llamaService.unloadModel();
+      _isInitialized = false;
     }
+
+    _currentModel = modelKey;
+  }
+
+  Future<void> deleteModel(String modelKey) async {
+    if (modelKey == _currentModel && _isInitialized) {
+      await _llamaService.unloadModel();
+      _isInitialized = false;
+    }
+
+    await _downloaderService.deleteModel(modelKey);
   }
 
   Future<void> dispose() async {
-    _isInitialized = false;
+    if (_isInitialized) {
+      await _llamaService.unloadModel();
+      _isInitialized = false;
+    }
     _logger.i('LLM service disposed');
   }
 }

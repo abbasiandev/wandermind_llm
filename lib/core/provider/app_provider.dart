@@ -10,6 +10,7 @@ import '../routing/app_router.dart';
 import '../service/storage_service.dart';
 import '../service/connectivity_service.dart';
 import '../../feature/location/service/location_service.dart';
+import 'llm_di_provider.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences must be initialized in main.dart');
@@ -54,6 +55,9 @@ final appInitializationProvider = FutureProvider<void>((ref) async {
   final prefs = await SharedPreferences.getInstance();
 
   await ref.read(storageServiceProvider).initialize();
+  
+  // Keep LLM service alive throughout app lifecycle
+  ref.read(keepAliveLLMServiceProvider);
 });
 
 final initializedSharedPreferencesProvider = Provider<SharedPreferences>((ref) {

@@ -2,13 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/model/app_model.dart';
-import '../service/llm_service.dart';
+import '../../../core/provider/llm_di_provider.dart';
+import '../service/smart_travel_service.dart';
 
 part 'llm_provider.g.dart';
 
-final llmServiceProvider = Provider<LLMService>((ref) {
-  return LLMService();
-});
+// Remove old provider - now using DI provider from llm_di_provider.dart
 
 @riverpod
 class LLMController extends _$LLMController {
@@ -21,9 +20,12 @@ class LLMController extends _$LLMController {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final service = ref.read(llmServiceProvider);
+      // Use DI provider instead of direct instantiation
+      final service = ref.read(keepAliveLLMServiceProvider);
 
       await for (final progress in service.initializeModel()) {
+        // Update state for each progress change
+        // Progress is already throttled at the download service level
         state = state.copyWith(initializationProgress: progress);
       }
 
@@ -48,7 +50,8 @@ class LLMController extends _$LLMController {
     state = state.copyWith(isGenerating: true, error: null);
 
     try {
-      final service = ref.read(llmServiceProvider);
+      // Use DI provider for consistent service instance
+      final service = ref.read(keepAliveLLMServiceProvider);
       final response = await service.generateResponse(prompt);
 
       state = state.copyWith(isGenerating: false);
@@ -70,24 +73,35 @@ class LLMController extends _$LLMController {
     required List<String> interests,
     String? additionalRequirements,
   }) async {
-    final prompt = _buildTravelPlanPrompt(
-      destination: destination,
-      startDate: startDate,
-      endDate: endDate,
-      budget: budget,
-      interests: interests,
-      additionalRequirements: additionalRequirements,
-    );
+    if (!state.isInitialized) {
+      throw Exception('LLM not initialized');
+    }
 
-    final response = await generateResponse(prompt);
-    return _parseTravelPlanResponse(
-      response,
-      destination,
-      startDate,
-      endDate,
-      budget,
-      interests,
-    );
+    state = state.copyWith(isGenerating: true, error: null);
+
+    try {
+      // Use Smart Travel Service for fast generation with offline data
+      final llmService = ref.read(keepAliveLLMServiceProvider);
+      final smartService = SmartTravelService(llmService);
+      
+      final plan = await smartService.generateSmartTravelPlan(
+        destination: destination,
+        startDate: startDate,
+        endDate: endDate,
+        budget: budget,
+        interests: interests,
+        additionalRequirements: additionalRequirements,
+      );
+      
+      state = state.copyWith(isGenerating: false);
+      return plan;
+    } catch (e) {
+      state = state.copyWith(
+        isGenerating: false,
+        error: 'Failed to generate travel plan: $e',
+      );
+      rethrow;
+    }
   }
 
   String _buildTravelPlanPrompt({

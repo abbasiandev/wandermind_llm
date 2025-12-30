@@ -6,7 +6,7 @@ part of 'llm_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lLMControllerHash() => r'1db992e95a14a63f99c77b1fb47a46e5c44710b3';
+String _$lLMControllerHash() => r'adbb3e5ed3e46f12e1c1504b9653e1e5577fc7ae';
 
 /// See also [LLMController].
 @ProviderFor(LLMController)
