@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/model/app_model.dart';
@@ -5,12 +6,12 @@ import '../service/llm_service.dart';
 
 part 'llm_provider.g.dart';
 
-// LLM Service
+// LLM Service Provider
 final llmServiceProvider = Provider<LLMService>((ref) {
   return LLMService();
 });
 
-// LLM State
+// LLM State Controller
 @riverpod
 class LLMController extends _$LLMController {
   @override
@@ -82,7 +83,14 @@ class LLMController extends _$LLMController {
     );
 
     final response = await generateResponse(prompt);
-    return _parseTravelPlanResponse(response, destination, startDate, endDate, budget, interests);
+    return _parseTravelPlanResponse(
+      response,
+      destination,
+      startDate,
+      endDate,
+      budget,
+      interests,
+    );
   }
 
   String _buildTravelPlanPrompt({
@@ -104,42 +112,7 @@ Start Date: ${startDate.toIso8601String().split('T')[0]}
 End Date: ${endDate.toIso8601String().split('T')[0]}
 ${additionalRequirements != null ? 'Additional Requirements: $additionalRequirements' : ''}
 
-Please provide a detailed itinerary in JSON format with the following structure:
-{
-  "title": "Trip title",
-  "overview": "Brief overview of the trip",
-  "days": [
-    {
-      "dayNumber": 1,
-      "date": "YYYY-MM-DD",
-      "overview": "Day overview",
-      "estimatedCost": 0.0,
-      "activities": [
-        {
-          "title": "Activity title",
-          "description": "Detailed description",
-          "location": "Specific location",
-          "startTime": "HH:mm",
-          "endTime": "HH:mm",
-          "type": "sightseeing|food|shopping|entertainment|transportation|accommodation|adventure|relaxation|culture|nightlife",
-          "cost": 0.0,
-          "tips": ["tip1", "tip2"]
-        }
-      ]
-    }
-  ],
-  "totalEstimatedCost": 0.0,
-  "generalTips": ["tip1", "tip2"],
-  "budgetBreakdown": {
-    "accommodation": 0.0,
-    "food": 0.0,
-    "transportation": 0.0,
-    "activities": 0.0,
-    "miscellaneous": 0.0
-  }
-}
-
-Make sure the plan is realistic, within budget, and aligns with the specified interests.
+Please provide a detailed itinerary with daily activities, estimated costs, and travel tips.
 ''';
   }
 
@@ -151,27 +124,15 @@ Make sure the plan is realistic, within budget, and aligns with the specified in
       double budget,
       List<String> interests,
       ) {
-    // This is a simplified parser. In a real implementation, you'd use proper JSON parsing
-    // and handle various response formats from the LLM
-
-    try {
-      // Extract JSON from response if wrapped in markdown or other text
-      final jsonStart = response.indexOf('{');
-      final jsonEnd = response.lastIndexOf('}');
-
-      if (jsonStart == -1 || jsonEnd == -1) {
-        throw Exception('No valid JSON found in response');
-      }
-
-      final jsonString = response.substring(jsonStart, jsonEnd + 1);
-      // Parse and convert to TravelPlan object
-      // This would need proper implementation based on your JSON structure
-
-      return _createFallbackTravelPlan(destination, startDate, endDate, budget, interests);
-    } catch (e) {
-      // Fallback to a basic plan if parsing fails
-      return _createFallbackTravelPlan(destination, startDate, endDate, budget, interests);
-    }
+    // For now, create a structured plan
+    // In production with a real LLM, you'd parse JSON response
+    return _createFallbackTravelPlan(
+      destination,
+      startDate,
+      endDate,
+      budget,
+      interests,
+    );
   }
 
   TravelPlan _createFallbackTravelPlan(
