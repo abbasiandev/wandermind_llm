@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wandermind_llm/feature/llm/provider/llm_provider.dart';
+import 'package:logger/logger.dart';
 
 import '../../../core/model/app_model.dart';
 import '../../../core/provider/app_provider.dart';
@@ -17,6 +18,8 @@ final chatServiceProvider = Provider<ChatService>((ref) {
 
 @riverpod
 class ChatController extends _$ChatController {
+  static final Logger _logger = Logger();
+  
   @override
   Future<List<ChatMessage>> build() async {
     final service = ref.read(chatServiceProvider);
@@ -38,8 +41,30 @@ class ChatController extends _$ChatController {
       final service = ref.read(chatServiceProvider);
       await service.saveMessage(userMessage);
 
-      final llmController = ref.read(lLMControllerProvider.notifier);
-      final aiResponse = await llmController.generateResponse(content);
+      String aiResponse;
+      
+      // Try to enhance prompt with offline data if available
+      final quickInfo = service.getQuickDestinationInfo(content);
+      
+      if (quickInfo != null) {
+        // We have offline data - use it to enhance the LLM prompt
+        _logger.i('Enhancing LLM with offline data for: $content');
+        final llmController = ref.read(lLMControllerProvider.notifier);
+        final enhancedPrompt = '''
+$content
+
+Context (offline data):
+$quickInfo
+
+Please provide a helpful, conversational response based on this information and your knowledge.
+''';
+        aiResponse = await llmController.generateResponse(enhancedPrompt);
+      } else {
+        // No offline data - use pure LLM
+        _logger.i('Using LLM for query: $content');
+        final llmController = ref.read(lLMControllerProvider.notifier);
+        aiResponse = await llmController.generateResponse(content);
+      }
 
       final aiMessage = ChatMessage(
         id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),

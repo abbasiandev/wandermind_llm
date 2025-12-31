@@ -230,16 +230,36 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             style: Theme.of(context).textTheme.bodyLarge,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildSuggestionChip('Plan a trip to Tokyo'),
-              _buildSuggestionChip('Best time to visit Europe'),
-              _buildSuggestionChip('Budget travel tips'),
-              _buildSuggestionChip('Solo travel advice'),
-            ],
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Column(
+                children: [
+                  Text(
+                    '💡 Try asking me:',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _buildSuggestionChip('How to get from Dubai Airport to my hotel?'),
+                      _buildSuggestionChip('What are the best places to visit in Dubai?'),
+                      _buildSuggestionChip('How much does a trip to Japan cost?'),
+                      _buildSuggestionChip('Best transportation in Tokyo?'),
+                      _buildSuggestionChip('What should I pack for a beach vacation?'),
+                      _buildSuggestionChip('Best time to visit Europe?'),
+                      _buildSuggestionChip('Tips for solo female travelers'),
+                      _buildSuggestionChip('Cultural etiquette in Arab countries'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -248,9 +268,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Widget _buildSuggestionChip(String suggestion) {
     return ActionChip(
-      label: Text(suggestion),
-      onPressed: () {
+      label: Text(
+        suggestion,
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      onPressed: () async {
         ref.read(chatInputControllerProvider.notifier).updateMessage(suggestion);
+        // Auto-send the message
+        await ref.read(chatControllerProvider.notifier).sendMessage(suggestion);
+        ref.read(chatInputControllerProvider.notifier).clearMessage();
       },
     );
   }

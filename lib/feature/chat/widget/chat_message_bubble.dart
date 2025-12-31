@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
@@ -58,6 +59,13 @@ class ChatMessageBubble extends StatelessWidget {
                     _buildTravelPlanPreview(context)
                   else
                     _buildTextMessage(context, isUser),
+
+                  // Show route button for AI responses with routing info
+                  if (!isUser && _isRoutingResponse(message.content))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: _buildRouteButton(context),
+                    ),
 
                   if (!isUser)
                     Row(
@@ -178,5 +186,45 @@ class ChatMessageBubble extends StatelessWidget {
     } else {
       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
     }
+  }
+
+  bool _isRoutingResponse(String content) {
+    final routingKeywords = [
+      'route',
+      'get from',
+      'how to get',
+      'directions',
+      'navigate',
+      'transportation',
+      'taxi',
+      'metro',
+      'bus',
+      'show route on map',
+      'airport to',
+    ];
+    
+    final contentLower = content.toLowerCase();
+    return routingKeywords.any((keyword) => contentLower.contains(keyword));
+  }
+
+  Widget _buildRouteButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          context.push('/route');
+        },
+        icon: const Icon(Icons.map, size: 18),
+        label: const Text('Show Route on Map'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(color: AppColors.primary),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
+        ),
+      ),
+    );
   }
 }

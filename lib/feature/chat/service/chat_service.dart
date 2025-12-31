@@ -2,6 +2,7 @@ import 'package:logger/logger.dart';
 
 import '../../../core/model/app_model.dart';
 import '../../../core/service/storage_service.dart';
+import '../../../core/data/travel_knowledge_base.dart';
 
 class ChatService {
   static final Logger _logger = Logger();
@@ -68,5 +69,77 @@ class ChatService {
       _logger.e('Failed to search messages: $e');
       return [];
     }
+  }
+
+  /// Get quick information about a destination from offline data
+  /// Returns null if no offline data is available
+  String? getQuickDestinationInfo(String query) {
+    try {
+      // Try to extract destination from query
+      final destinations = [
+        'dubai', 'abu dhabi', 'cairo', 'marrakech', 'doha', 'amman',
+        'paris', 'tokyo', 'new york', 'london', 'rome'
+      ];
+      
+      final queryLower = query.toLowerCase();
+      
+      for (final destination in destinations) {
+        if (queryLower.contains(destination)) {
+          final info = TravelKnowledgeBase.getDestinationInfo(destination);
+          if (info != null) {
+            // Build a quick response
+            final buffer = StringBuffer();
+            buffer.writeln('${info.name}, ${info.country}');
+            buffer.writeln();
+            buffer.writeln(info.description);
+            buffer.writeln();
+            buffer.writeln('💰 Estimated daily costs:');
+            buffer.writeln('• Accommodation: \$${info.avgAccommodationPerDay.toInt()}');
+            buffer.writeln('• Food: \$${info.avgFoodPerDay.toInt()}');
+            buffer.writeln('• Transport: \$${info.avgTransportPerDay.toInt()}');
+            buffer.writeln('• Activities: \$${info.avgActivitiesPerDay.toInt()}');
+            buffer.writeln();
+            buffer.writeln('🎯 Top activities:');
+            final topActivities = info.activities.take(3);
+            for (final activity in topActivities) {
+              buffer.writeln('• ${activity.title} (\$${activity.cost.toInt()})');
+            }
+            buffer.writeln();
+            buffer.writeln('💡 Pro tip: ${info.tips.first}');
+            
+            return buffer.toString();
+          }
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      _logger.e('Failed to get quick destination info: $e');
+      return null;
+    }
+  }
+  
+  /// Check if a query is asking about a specific destination
+  bool isDestinationQuery(String query) {
+    final queryLower = query.toLowerCase();
+    final destinationKeywords = [
+      'tell me about',
+      'what about',
+      'information about',
+      'info about',
+      'plan a trip to',
+      'plan a trip',
+      'plan to',
+      'plan trip to',
+      'planning to',
+      'visit',
+      'travel to',
+      'traveling to',
+      'going to',
+      'trip to',
+      'about',
+    ];
+    
+    return destinationKeywords.any((keyword) => queryLower.contains(keyword));
   }
 }
