@@ -1,12 +1,23 @@
-import 'dart:math' as math;
 import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 
 import '../model/route_models.dart';
+import 'smart_routing_service.dart';
 
 class RouteCalculationService {
   static final Logger _logger = Logger();
   final Distance _distance = const Distance();
+  final SmartRoutingService _routingService;
+  bool _initialized = false;
+
+  RouteCalculationService({SmartRoutingService? routingService})
+      : _routingService = routingService ?? SmartRoutingService();
+
+  Future<void> initialize() async {
+    if (_initialized) return;
+    await _routingService.initialize();
+    _initialized = true;
+  }
 
   Future<List<RouteResult>> calculateRoutes({
     required LatLng start,
@@ -14,164 +25,56 @@ class RouteCalculationService {
     List<Waypoint> waypoints = const [],
     RoutePreferences? preferences,
   }) async {
+    await initialize();
+    
     _logger.i('Calculating routes from $start to $end');
 
     final prefs = preferences ?? const RoutePreferences();
-    final routes = <RouteResult>[];
 
     try {
+      final waypointLocations = waypoints.map((w) => w.location).toList();
+      
+      final routes = await _routingService.getAlternativeRoutes(
+        start: start,
+        end: end,
+        waypoints: waypointLocations,
+        alternatives: 2,
+      );
 
-      if (!prefs.avoidHighways) {
-        final fastest = await _calculateFastestRoute(start, end, waypoints, prefs);
-        routes.add(fastest);
+      if (routes.isNotEmpty) {
+        _logger.i('Calculated ${routes.length} route options');
+        return routes;
       }
 
-      final shortest = await _calculateShortestRoute(start, end, waypoints, prefs);
-      routes.add(shortest);
-
-      if (prefs.avoidHighways || prefs.avoidTolls) {
-        final balanced = await _calculateBalancedRoute(start, end, waypoints, prefs);
-        routes.add(balanced);
-      }
-
-      _logger.i('Calculated ${routes.length} route options');
-      return routes;
+      throw Exception('No routes returned');
     } catch (e) {
       _logger.e('Error calculating routes: $e');
+      _logger.w('Falling back to simple route calculation');
 
-      return [_createStraightLineRoute(start, end, waypoints)];
+      return [await _calculateFallbackRoute(start, end, waypoints, prefs)];
     }
   }
 
-  Future<RouteResult> _calculateFastestRoute(
+  Future<RouteResult> _calculateFallbackRoute(
     LatLng start,
     LatLng end,
     List<Waypoint> waypoints,
     RoutePreferences prefs,
   ) async {
-
-    final points = <LatLng>[start];
-
-    for (final waypoint in waypoints) {
-      points.addAll(_generateIntermediatePoints(
-        points.last,
-        waypoint.location,
-        speedFactor: 1.2,
-      ));
+    _logger.i('Using fallback route calculation');
+    
+    try {
+      final route = await _routingService.getRoute(
+        start: start,
+        end: end,
+        waypoints: waypoints.map((w) => w.location).toList(),
+        type: prefs.preferredType,
+      );
+      return route;
+    } catch (e) {
+      _logger.e('Fallback route also failed: $e');
+      return _createStraightLineRoute(start, end, waypoints);
     }
-
-    points.addAll(_generateIntermediatePoints(
-      points.last,
-      end,
-      speedFactor: 1.2,
-    ));
-
-    final distance = _calculateTotalDistance(points);
-    final duration = _estimateDuration(distance, averageSpeedKmh: 50);
-
-    return RouteResult(
-      points: points,
-      distanceMeters: distance,
-      durationSeconds: duration,
-      type: RouteType.fastest,
-      name: 'Fastest Route',
-    );
-  }
-
-  Future<RouteResult> _calculateShortestRoute(
-    LatLng start,
-    LatLng end,
-    List<Waypoint> waypoints,
-    RoutePreferences prefs,
-  ) async {
-    final points = <LatLng>[start];
-
-    for (final waypoint in waypoints) {
-      points.addAll(_generateIntermediatePoints(
-        points.last,
-        waypoint.location,
-        speedFactor: 0.8,
-      ));
-    }
-
-    points.addAll(_generateIntermediatePoints(
-      points.last,
-      end,
-      speedFactor: 0.8,
-    ));
-
-    final distance = _calculateTotalDistance(points);
-    final duration = _estimateDuration(distance, averageSpeedKmh: 35);
-
-    return RouteResult(
-      points: points,
-      distanceMeters: distance,
-      durationSeconds: duration,
-      type: RouteType.shortest,
-      name: 'Shortest Route',
-    );
-  }
-
-  Future<RouteResult> _calculateBalancedRoute(
-    LatLng start,
-    LatLng end,
-    List<Waypoint> waypoints,
-    RoutePreferences prefs,
-  ) async {
-    final points = <LatLng>[start];
-
-    for (final waypoint in waypoints) {
-      points.addAll(_generateIntermediatePoints(
-        points.last,
-        waypoint.location,
-        speedFactor: 1.0,
-        avoidHighways: prefs.avoidHighways,
-      ));
-    }
-
-    points.addAll(_generateIntermediatePoints(
-      points.last,
-      end,
-      speedFactor: 1.0,
-      avoidHighways: prefs.avoidHighways,
-    ));
-
-    final distance = _calculateTotalDistance(points);
-    final duration = _estimateDuration(distance, averageSpeedKmh: 40);
-
-    return RouteResult(
-      points: points,
-      distanceMeters: distance,
-      durationSeconds: duration,
-      type: RouteType.balanced,
-      name: prefs.avoidHighways ? 'No Highways' : 'Balanced Route',
-    );
-  }
-
-  List<LatLng> _generateIntermediatePoints(
-    LatLng start,
-    LatLng end, {
-    double speedFactor = 1.0,
-    bool avoidHighways = false,
-  }) {
-    final points = <LatLng>[];
-    final distance = _distance(start, end);
-
-    final numPoints = (distance / 500).ceil().clamp(2, 20);
-
-    for (int i = 1; i <= numPoints; i++) {
-      final t = i / numPoints;
-
-      final curveFactor = avoidHighways ? 0.0002 : 0.0001;
-      final curve = math.sin(t * math.pi) * curveFactor * speedFactor;
-
-      final lat = start.latitude + (end.latitude - start.latitude) * t + curve;
-      final lng = start.longitude + (end.longitude - start.longitude) * t + curve;
-
-      points.add(LatLng(lat, lng));
-    }
-
-    return points;
   }
 
   RouteResult _createStraightLineRoute(
@@ -179,23 +82,45 @@ class RouteCalculationService {
     LatLng end,
     List<Waypoint> waypoints,
   ) {
+    _logger.w('Creating straight-line fallback route');
+    
     final points = <LatLng>[start];
-
+    
     for (final waypoint in waypoints) {
       points.add(waypoint.location);
     }
-
+    
     points.add(end);
 
     final distance = _calculateTotalDistance(points);
     final duration = _estimateDuration(distance, averageSpeedKmh: 40);
 
+    final steps = [
+      NavigationStep(
+        index: 0,
+        location: start,
+        distanceMeters: distance,
+        durationSeconds: duration,
+        instruction: 'Head towards destination',
+        maneuver: ManeuverType.depart,
+      ),
+      NavigationStep(
+        index: 1,
+        location: end,
+        distanceMeters: 0,
+        durationSeconds: 0,
+        instruction: 'You have arrived at your destination',
+        maneuver: ManeuverType.arrive,
+      ),
+    ];
+
     return RouteResult(
       points: points,
       distanceMeters: distance,
       durationSeconds: duration,
-      type: RouteType.balanced,
-      name: 'Direct Route',
+      type: RouteType.fastest,
+      name: 'Direct Route (Offline)',
+      steps: steps,
     );
   }
 
@@ -211,5 +136,9 @@ class RouteCalculationService {
     final distanceKm = distanceMeters / 1000;
     final hours = distanceKm / averageSpeedKmh;
     return hours * 3600;
+  }
+
+  void dispose() {
+    _routingService.dispose();
   }
 }

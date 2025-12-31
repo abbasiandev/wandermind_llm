@@ -12,6 +12,7 @@ class RouteResult with _$RouteResult {
     required double durationSeconds,
     required RouteType type,
     String? name,
+    @Default([]) List<NavigationStep> steps,
   }) = _RouteResult;
 
   factory RouteResult.fromJson(Map<String, dynamic> json) =>
@@ -22,6 +23,72 @@ enum RouteType {
   fastest,
   shortest,
   balanced,
+}
+
+@freezed
+class NavigationStep with _$NavigationStep {
+  const factory NavigationStep({
+    required int index,
+    required LatLng location,
+    required double distanceMeters,
+    required double durationSeconds,
+    required String instruction,
+    required ManeuverType maneuver,
+    String? streetName,
+    String? destination,
+    int? exitNumber,
+    @Default(0.0) double bearing,
+  }) = _NavigationStep;
+
+  factory NavigationStep.fromJson(Map<String, dynamic> json) =>
+      _$NavigationStepFromJson(json);
+}
+
+enum ManeuverType {
+  depart,
+  turn,
+  newName,
+  continueRoute,
+  merge,
+  onRamp,
+  offRamp,
+  fork,
+  endOfRoad,
+  useLane,
+  continueUturn,
+  continueLeft,
+  continueRight,
+  keepLeft,
+  keepRight,
+  turnLeft,
+  turnRight,
+  turnSlightLeft,
+  turnSlightRight,
+  turnSharpLeft,
+  turnSharpRight,
+  uTurn,
+  arrive,
+  roundabout,
+  rotary,
+}
+
+@freezed
+class NavigationState with _$NavigationState {
+  const factory NavigationState({
+    required bool isNavigating,
+    NavigationStep? currentStep,
+    NavigationStep? nextStep,
+    @Default(0) int currentStepIndex,
+    @Default(0.0) double distanceToNextStep,
+    @Default(0.0) double totalDistanceRemaining,
+    @Default(0.0) double totalDurationRemaining,
+    @Default(false) bool isOffRoute,
+    @Default(false) bool isRerouting,
+    DateTime? lastUpdateTime,
+  }) = _NavigationState;
+
+  factory NavigationState.fromJson(Map<String, dynamic> json) =>
+      _$NavigationStateFromJson(json);
 }
 
 @freezed

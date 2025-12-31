@@ -25,6 +25,7 @@ mixin _$RouteResult {
   double get durationSeconds => throw _privateConstructorUsedError;
   RouteType get type => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
+  List<NavigationStep> get steps => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,7 +44,8 @@ abstract class $RouteResultCopyWith<$Res> {
       double distanceMeters,
       double durationSeconds,
       RouteType type,
-      String? name});
+      String? name,
+      List<NavigationStep> steps});
 }
 
 /// @nodoc
@@ -64,6 +66,7 @@ class _$RouteResultCopyWithImpl<$Res, $Val extends RouteResult>
     Object? durationSeconds = null,
     Object? type = null,
     Object? name = freezed,
+    Object? steps = null,
   }) {
     return _then(_value.copyWith(
       points: null == points
@@ -86,6 +89,10 @@ class _$RouteResultCopyWithImpl<$Res, $Val extends RouteResult>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      steps: null == steps
+          ? _value.steps
+          : steps // ignore: cast_nullable_to_non_nullable
+              as List<NavigationStep>,
     ) as $Val);
   }
 }
@@ -103,7 +110,8 @@ abstract class _$$RouteResultImplCopyWith<$Res>
       double distanceMeters,
       double durationSeconds,
       RouteType type,
-      String? name});
+      String? name,
+      List<NavigationStep> steps});
 }
 
 /// @nodoc
@@ -122,6 +130,7 @@ class __$$RouteResultImplCopyWithImpl<$Res>
     Object? durationSeconds = null,
     Object? type = null,
     Object? name = freezed,
+    Object? steps = null,
   }) {
     return _then(_$RouteResultImpl(
       points: null == points
@@ -144,6 +153,10 @@ class __$$RouteResultImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
+      steps: null == steps
+          ? _value._steps
+          : steps // ignore: cast_nullable_to_non_nullable
+              as List<NavigationStep>,
     ));
   }
 }
@@ -156,8 +169,10 @@ class _$RouteResultImpl implements _RouteResult {
       required this.distanceMeters,
       required this.durationSeconds,
       required this.type,
-      this.name})
-      : _points = points;
+      this.name,
+      final List<NavigationStep> steps = const []})
+      : _points = points,
+        _steps = steps;
 
   factory _$RouteResultImpl.fromJson(Map<String, dynamic> json) =>
       _$$RouteResultImplFromJson(json);
@@ -178,10 +193,18 @@ class _$RouteResultImpl implements _RouteResult {
   final RouteType type;
   @override
   final String? name;
+  final List<NavigationStep> _steps;
+  @override
+  @JsonKey()
+  List<NavigationStep> get steps {
+    if (_steps is EqualUnmodifiableListView) return _steps;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_steps);
+  }
 
   @override
   String toString() {
-    return 'RouteResult(points: $points, distanceMeters: $distanceMeters, durationSeconds: $durationSeconds, type: $type, name: $name)';
+    return 'RouteResult(points: $points, distanceMeters: $distanceMeters, durationSeconds: $durationSeconds, type: $type, name: $name, steps: $steps)';
   }
 
   @override
@@ -195,7 +218,8 @@ class _$RouteResultImpl implements _RouteResult {
             (identical(other.durationSeconds, durationSeconds) ||
                 other.durationSeconds == durationSeconds) &&
             (identical(other.type, type) || other.type == type) &&
-            (identical(other.name, name) || other.name == name));
+            (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality().equals(other._steps, _steps));
   }
 
   @JsonKey(ignore: true)
@@ -206,7 +230,8 @@ class _$RouteResultImpl implements _RouteResult {
       distanceMeters,
       durationSeconds,
       type,
-      name);
+      name,
+      const DeepCollectionEquality().hash(_steps));
 
   @JsonKey(ignore: true)
   @override
@@ -228,7 +253,8 @@ abstract class _RouteResult implements RouteResult {
       required final double distanceMeters,
       required final double durationSeconds,
       required final RouteType type,
-      final String? name}) = _$RouteResultImpl;
+      final String? name,
+      final List<NavigationStep> steps}) = _$RouteResultImpl;
 
   factory _RouteResult.fromJson(Map<String, dynamic> json) =
       _$RouteResultImpl.fromJson;
@@ -244,8 +270,731 @@ abstract class _RouteResult implements RouteResult {
   @override
   String? get name;
   @override
+  List<NavigationStep> get steps;
+  @override
   @JsonKey(ignore: true)
   _$$RouteResultImplCopyWith<_$RouteResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+NavigationStep _$NavigationStepFromJson(Map<String, dynamic> json) {
+  return _NavigationStep.fromJson(json);
+}
+
+/// @nodoc
+mixin _$NavigationStep {
+  int get index => throw _privateConstructorUsedError;
+  LatLng get location => throw _privateConstructorUsedError;
+  double get distanceMeters => throw _privateConstructorUsedError;
+  double get durationSeconds => throw _privateConstructorUsedError;
+  String get instruction => throw _privateConstructorUsedError;
+  ManeuverType get maneuver => throw _privateConstructorUsedError;
+  String? get streetName => throw _privateConstructorUsedError;
+  String? get destination => throw _privateConstructorUsedError;
+  int? get exitNumber => throw _privateConstructorUsedError;
+  double get bearing => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $NavigationStepCopyWith<NavigationStep> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $NavigationStepCopyWith<$Res> {
+  factory $NavigationStepCopyWith(
+          NavigationStep value, $Res Function(NavigationStep) then) =
+      _$NavigationStepCopyWithImpl<$Res, NavigationStep>;
+  @useResult
+  $Res call(
+      {int index,
+      LatLng location,
+      double distanceMeters,
+      double durationSeconds,
+      String instruction,
+      ManeuverType maneuver,
+      String? streetName,
+      String? destination,
+      int? exitNumber,
+      double bearing});
+}
+
+/// @nodoc
+class _$NavigationStepCopyWithImpl<$Res, $Val extends NavigationStep>
+    implements $NavigationStepCopyWith<$Res> {
+  _$NavigationStepCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? index = null,
+    Object? location = null,
+    Object? distanceMeters = null,
+    Object? durationSeconds = null,
+    Object? instruction = null,
+    Object? maneuver = null,
+    Object? streetName = freezed,
+    Object? destination = freezed,
+    Object? exitNumber = freezed,
+    Object? bearing = null,
+  }) {
+    return _then(_value.copyWith(
+      index: null == index
+          ? _value.index
+          : index // ignore: cast_nullable_to_non_nullable
+              as int,
+      location: null == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as LatLng,
+      distanceMeters: null == distanceMeters
+          ? _value.distanceMeters
+          : distanceMeters // ignore: cast_nullable_to_non_nullable
+              as double,
+      durationSeconds: null == durationSeconds
+          ? _value.durationSeconds
+          : durationSeconds // ignore: cast_nullable_to_non_nullable
+              as double,
+      instruction: null == instruction
+          ? _value.instruction
+          : instruction // ignore: cast_nullable_to_non_nullable
+              as String,
+      maneuver: null == maneuver
+          ? _value.maneuver
+          : maneuver // ignore: cast_nullable_to_non_nullable
+              as ManeuverType,
+      streetName: freezed == streetName
+          ? _value.streetName
+          : streetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      destination: freezed == destination
+          ? _value.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as String?,
+      exitNumber: freezed == exitNumber
+          ? _value.exitNumber
+          : exitNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      bearing: null == bearing
+          ? _value.bearing
+          : bearing // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$NavigationStepImplCopyWith<$Res>
+    implements $NavigationStepCopyWith<$Res> {
+  factory _$$NavigationStepImplCopyWith(_$NavigationStepImpl value,
+          $Res Function(_$NavigationStepImpl) then) =
+      __$$NavigationStepImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int index,
+      LatLng location,
+      double distanceMeters,
+      double durationSeconds,
+      String instruction,
+      ManeuverType maneuver,
+      String? streetName,
+      String? destination,
+      int? exitNumber,
+      double bearing});
+}
+
+/// @nodoc
+class __$$NavigationStepImplCopyWithImpl<$Res>
+    extends _$NavigationStepCopyWithImpl<$Res, _$NavigationStepImpl>
+    implements _$$NavigationStepImplCopyWith<$Res> {
+  __$$NavigationStepImplCopyWithImpl(
+      _$NavigationStepImpl _value, $Res Function(_$NavigationStepImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? index = null,
+    Object? location = null,
+    Object? distanceMeters = null,
+    Object? durationSeconds = null,
+    Object? instruction = null,
+    Object? maneuver = null,
+    Object? streetName = freezed,
+    Object? destination = freezed,
+    Object? exitNumber = freezed,
+    Object? bearing = null,
+  }) {
+    return _then(_$NavigationStepImpl(
+      index: null == index
+          ? _value.index
+          : index // ignore: cast_nullable_to_non_nullable
+              as int,
+      location: null == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as LatLng,
+      distanceMeters: null == distanceMeters
+          ? _value.distanceMeters
+          : distanceMeters // ignore: cast_nullable_to_non_nullable
+              as double,
+      durationSeconds: null == durationSeconds
+          ? _value.durationSeconds
+          : durationSeconds // ignore: cast_nullable_to_non_nullable
+              as double,
+      instruction: null == instruction
+          ? _value.instruction
+          : instruction // ignore: cast_nullable_to_non_nullable
+              as String,
+      maneuver: null == maneuver
+          ? _value.maneuver
+          : maneuver // ignore: cast_nullable_to_non_nullable
+              as ManeuverType,
+      streetName: freezed == streetName
+          ? _value.streetName
+          : streetName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      destination: freezed == destination
+          ? _value.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as String?,
+      exitNumber: freezed == exitNumber
+          ? _value.exitNumber
+          : exitNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      bearing: null == bearing
+          ? _value.bearing
+          : bearing // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$NavigationStepImpl implements _NavigationStep {
+  const _$NavigationStepImpl(
+      {required this.index,
+      required this.location,
+      required this.distanceMeters,
+      required this.durationSeconds,
+      required this.instruction,
+      required this.maneuver,
+      this.streetName,
+      this.destination,
+      this.exitNumber,
+      this.bearing = 0.0});
+
+  factory _$NavigationStepImpl.fromJson(Map<String, dynamic> json) =>
+      _$$NavigationStepImplFromJson(json);
+
+  @override
+  final int index;
+  @override
+  final LatLng location;
+  @override
+  final double distanceMeters;
+  @override
+  final double durationSeconds;
+  @override
+  final String instruction;
+  @override
+  final ManeuverType maneuver;
+  @override
+  final String? streetName;
+  @override
+  final String? destination;
+  @override
+  final int? exitNumber;
+  @override
+  @JsonKey()
+  final double bearing;
+
+  @override
+  String toString() {
+    return 'NavigationStep(index: $index, location: $location, distanceMeters: $distanceMeters, durationSeconds: $durationSeconds, instruction: $instruction, maneuver: $maneuver, streetName: $streetName, destination: $destination, exitNumber: $exitNumber, bearing: $bearing)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$NavigationStepImpl &&
+            (identical(other.index, index) || other.index == index) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.distanceMeters, distanceMeters) ||
+                other.distanceMeters == distanceMeters) &&
+            (identical(other.durationSeconds, durationSeconds) ||
+                other.durationSeconds == durationSeconds) &&
+            (identical(other.instruction, instruction) ||
+                other.instruction == instruction) &&
+            (identical(other.maneuver, maneuver) ||
+                other.maneuver == maneuver) &&
+            (identical(other.streetName, streetName) ||
+                other.streetName == streetName) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination) &&
+            (identical(other.exitNumber, exitNumber) ||
+                other.exitNumber == exitNumber) &&
+            (identical(other.bearing, bearing) || other.bearing == bearing));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      index,
+      location,
+      distanceMeters,
+      durationSeconds,
+      instruction,
+      maneuver,
+      streetName,
+      destination,
+      exitNumber,
+      bearing);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$NavigationStepImplCopyWith<_$NavigationStepImpl> get copyWith =>
+      __$$NavigationStepImplCopyWithImpl<_$NavigationStepImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$NavigationStepImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _NavigationStep implements NavigationStep {
+  const factory _NavigationStep(
+      {required final int index,
+      required final LatLng location,
+      required final double distanceMeters,
+      required final double durationSeconds,
+      required final String instruction,
+      required final ManeuverType maneuver,
+      final String? streetName,
+      final String? destination,
+      final int? exitNumber,
+      final double bearing}) = _$NavigationStepImpl;
+
+  factory _NavigationStep.fromJson(Map<String, dynamic> json) =
+      _$NavigationStepImpl.fromJson;
+
+  @override
+  int get index;
+  @override
+  LatLng get location;
+  @override
+  double get distanceMeters;
+  @override
+  double get durationSeconds;
+  @override
+  String get instruction;
+  @override
+  ManeuverType get maneuver;
+  @override
+  String? get streetName;
+  @override
+  String? get destination;
+  @override
+  int? get exitNumber;
+  @override
+  double get bearing;
+  @override
+  @JsonKey(ignore: true)
+  _$$NavigationStepImplCopyWith<_$NavigationStepImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+NavigationState _$NavigationStateFromJson(Map<String, dynamic> json) {
+  return _NavigationState.fromJson(json);
+}
+
+/// @nodoc
+mixin _$NavigationState {
+  bool get isNavigating => throw _privateConstructorUsedError;
+  NavigationStep? get currentStep => throw _privateConstructorUsedError;
+  NavigationStep? get nextStep => throw _privateConstructorUsedError;
+  int get currentStepIndex => throw _privateConstructorUsedError;
+  double get distanceToNextStep => throw _privateConstructorUsedError;
+  double get totalDistanceRemaining => throw _privateConstructorUsedError;
+  double get totalDurationRemaining => throw _privateConstructorUsedError;
+  bool get isOffRoute => throw _privateConstructorUsedError;
+  bool get isRerouting => throw _privateConstructorUsedError;
+  DateTime? get lastUpdateTime => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $NavigationStateCopyWith<NavigationState> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $NavigationStateCopyWith<$Res> {
+  factory $NavigationStateCopyWith(
+          NavigationState value, $Res Function(NavigationState) then) =
+      _$NavigationStateCopyWithImpl<$Res, NavigationState>;
+  @useResult
+  $Res call(
+      {bool isNavigating,
+      NavigationStep? currentStep,
+      NavigationStep? nextStep,
+      int currentStepIndex,
+      double distanceToNextStep,
+      double totalDistanceRemaining,
+      double totalDurationRemaining,
+      bool isOffRoute,
+      bool isRerouting,
+      DateTime? lastUpdateTime});
+
+  $NavigationStepCopyWith<$Res>? get currentStep;
+  $NavigationStepCopyWith<$Res>? get nextStep;
+}
+
+/// @nodoc
+class _$NavigationStateCopyWithImpl<$Res, $Val extends NavigationState>
+    implements $NavigationStateCopyWith<$Res> {
+  _$NavigationStateCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? isNavigating = null,
+    Object? currentStep = freezed,
+    Object? nextStep = freezed,
+    Object? currentStepIndex = null,
+    Object? distanceToNextStep = null,
+    Object? totalDistanceRemaining = null,
+    Object? totalDurationRemaining = null,
+    Object? isOffRoute = null,
+    Object? isRerouting = null,
+    Object? lastUpdateTime = freezed,
+  }) {
+    return _then(_value.copyWith(
+      isNavigating: null == isNavigating
+          ? _value.isNavigating
+          : isNavigating // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentStep: freezed == currentStep
+          ? _value.currentStep
+          : currentStep // ignore: cast_nullable_to_non_nullable
+              as NavigationStep?,
+      nextStep: freezed == nextStep
+          ? _value.nextStep
+          : nextStep // ignore: cast_nullable_to_non_nullable
+              as NavigationStep?,
+      currentStepIndex: null == currentStepIndex
+          ? _value.currentStepIndex
+          : currentStepIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      distanceToNextStep: null == distanceToNextStep
+          ? _value.distanceToNextStep
+          : distanceToNextStep // ignore: cast_nullable_to_non_nullable
+              as double,
+      totalDistanceRemaining: null == totalDistanceRemaining
+          ? _value.totalDistanceRemaining
+          : totalDistanceRemaining // ignore: cast_nullable_to_non_nullable
+              as double,
+      totalDurationRemaining: null == totalDurationRemaining
+          ? _value.totalDurationRemaining
+          : totalDurationRemaining // ignore: cast_nullable_to_non_nullable
+              as double,
+      isOffRoute: null == isOffRoute
+          ? _value.isOffRoute
+          : isOffRoute // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isRerouting: null == isRerouting
+          ? _value.isRerouting
+          : isRerouting // ignore: cast_nullable_to_non_nullable
+              as bool,
+      lastUpdateTime: freezed == lastUpdateTime
+          ? _value.lastUpdateTime
+          : lastUpdateTime // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $NavigationStepCopyWith<$Res>? get currentStep {
+    if (_value.currentStep == null) {
+      return null;
+    }
+
+    return $NavigationStepCopyWith<$Res>(_value.currentStep!, (value) {
+      return _then(_value.copyWith(currentStep: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $NavigationStepCopyWith<$Res>? get nextStep {
+    if (_value.nextStep == null) {
+      return null;
+    }
+
+    return $NavigationStepCopyWith<$Res>(_value.nextStep!, (value) {
+      return _then(_value.copyWith(nextStep: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$NavigationStateImplCopyWith<$Res>
+    implements $NavigationStateCopyWith<$Res> {
+  factory _$$NavigationStateImplCopyWith(_$NavigationStateImpl value,
+          $Res Function(_$NavigationStateImpl) then) =
+      __$$NavigationStateImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {bool isNavigating,
+      NavigationStep? currentStep,
+      NavigationStep? nextStep,
+      int currentStepIndex,
+      double distanceToNextStep,
+      double totalDistanceRemaining,
+      double totalDurationRemaining,
+      bool isOffRoute,
+      bool isRerouting,
+      DateTime? lastUpdateTime});
+
+  @override
+  $NavigationStepCopyWith<$Res>? get currentStep;
+  @override
+  $NavigationStepCopyWith<$Res>? get nextStep;
+}
+
+/// @nodoc
+class __$$NavigationStateImplCopyWithImpl<$Res>
+    extends _$NavigationStateCopyWithImpl<$Res, _$NavigationStateImpl>
+    implements _$$NavigationStateImplCopyWith<$Res> {
+  __$$NavigationStateImplCopyWithImpl(
+      _$NavigationStateImpl _value, $Res Function(_$NavigationStateImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? isNavigating = null,
+    Object? currentStep = freezed,
+    Object? nextStep = freezed,
+    Object? currentStepIndex = null,
+    Object? distanceToNextStep = null,
+    Object? totalDistanceRemaining = null,
+    Object? totalDurationRemaining = null,
+    Object? isOffRoute = null,
+    Object? isRerouting = null,
+    Object? lastUpdateTime = freezed,
+  }) {
+    return _then(_$NavigationStateImpl(
+      isNavigating: null == isNavigating
+          ? _value.isNavigating
+          : isNavigating // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentStep: freezed == currentStep
+          ? _value.currentStep
+          : currentStep // ignore: cast_nullable_to_non_nullable
+              as NavigationStep?,
+      nextStep: freezed == nextStep
+          ? _value.nextStep
+          : nextStep // ignore: cast_nullable_to_non_nullable
+              as NavigationStep?,
+      currentStepIndex: null == currentStepIndex
+          ? _value.currentStepIndex
+          : currentStepIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      distanceToNextStep: null == distanceToNextStep
+          ? _value.distanceToNextStep
+          : distanceToNextStep // ignore: cast_nullable_to_non_nullable
+              as double,
+      totalDistanceRemaining: null == totalDistanceRemaining
+          ? _value.totalDistanceRemaining
+          : totalDistanceRemaining // ignore: cast_nullable_to_non_nullable
+              as double,
+      totalDurationRemaining: null == totalDurationRemaining
+          ? _value.totalDurationRemaining
+          : totalDurationRemaining // ignore: cast_nullable_to_non_nullable
+              as double,
+      isOffRoute: null == isOffRoute
+          ? _value.isOffRoute
+          : isOffRoute // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isRerouting: null == isRerouting
+          ? _value.isRerouting
+          : isRerouting // ignore: cast_nullable_to_non_nullable
+              as bool,
+      lastUpdateTime: freezed == lastUpdateTime
+          ? _value.lastUpdateTime
+          : lastUpdateTime // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$NavigationStateImpl implements _NavigationState {
+  const _$NavigationStateImpl(
+      {required this.isNavigating,
+      this.currentStep,
+      this.nextStep,
+      this.currentStepIndex = 0,
+      this.distanceToNextStep = 0.0,
+      this.totalDistanceRemaining = 0.0,
+      this.totalDurationRemaining = 0.0,
+      this.isOffRoute = false,
+      this.isRerouting = false,
+      this.lastUpdateTime});
+
+  factory _$NavigationStateImpl.fromJson(Map<String, dynamic> json) =>
+      _$$NavigationStateImplFromJson(json);
+
+  @override
+  final bool isNavigating;
+  @override
+  final NavigationStep? currentStep;
+  @override
+  final NavigationStep? nextStep;
+  @override
+  @JsonKey()
+  final int currentStepIndex;
+  @override
+  @JsonKey()
+  final double distanceToNextStep;
+  @override
+  @JsonKey()
+  final double totalDistanceRemaining;
+  @override
+  @JsonKey()
+  final double totalDurationRemaining;
+  @override
+  @JsonKey()
+  final bool isOffRoute;
+  @override
+  @JsonKey()
+  final bool isRerouting;
+  @override
+  final DateTime? lastUpdateTime;
+
+  @override
+  String toString() {
+    return 'NavigationState(isNavigating: $isNavigating, currentStep: $currentStep, nextStep: $nextStep, currentStepIndex: $currentStepIndex, distanceToNextStep: $distanceToNextStep, totalDistanceRemaining: $totalDistanceRemaining, totalDurationRemaining: $totalDurationRemaining, isOffRoute: $isOffRoute, isRerouting: $isRerouting, lastUpdateTime: $lastUpdateTime)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$NavigationStateImpl &&
+            (identical(other.isNavigating, isNavigating) ||
+                other.isNavigating == isNavigating) &&
+            (identical(other.currentStep, currentStep) ||
+                other.currentStep == currentStep) &&
+            (identical(other.nextStep, nextStep) ||
+                other.nextStep == nextStep) &&
+            (identical(other.currentStepIndex, currentStepIndex) ||
+                other.currentStepIndex == currentStepIndex) &&
+            (identical(other.distanceToNextStep, distanceToNextStep) ||
+                other.distanceToNextStep == distanceToNextStep) &&
+            (identical(other.totalDistanceRemaining, totalDistanceRemaining) ||
+                other.totalDistanceRemaining == totalDistanceRemaining) &&
+            (identical(other.totalDurationRemaining, totalDurationRemaining) ||
+                other.totalDurationRemaining == totalDurationRemaining) &&
+            (identical(other.isOffRoute, isOffRoute) ||
+                other.isOffRoute == isOffRoute) &&
+            (identical(other.isRerouting, isRerouting) ||
+                other.isRerouting == isRerouting) &&
+            (identical(other.lastUpdateTime, lastUpdateTime) ||
+                other.lastUpdateTime == lastUpdateTime));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      isNavigating,
+      currentStep,
+      nextStep,
+      currentStepIndex,
+      distanceToNextStep,
+      totalDistanceRemaining,
+      totalDurationRemaining,
+      isOffRoute,
+      isRerouting,
+      lastUpdateTime);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$NavigationStateImplCopyWith<_$NavigationStateImpl> get copyWith =>
+      __$$NavigationStateImplCopyWithImpl<_$NavigationStateImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$NavigationStateImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _NavigationState implements NavigationState {
+  const factory _NavigationState(
+      {required final bool isNavigating,
+      final NavigationStep? currentStep,
+      final NavigationStep? nextStep,
+      final int currentStepIndex,
+      final double distanceToNextStep,
+      final double totalDistanceRemaining,
+      final double totalDurationRemaining,
+      final bool isOffRoute,
+      final bool isRerouting,
+      final DateTime? lastUpdateTime}) = _$NavigationStateImpl;
+
+  factory _NavigationState.fromJson(Map<String, dynamic> json) =
+      _$NavigationStateImpl.fromJson;
+
+  @override
+  bool get isNavigating;
+  @override
+  NavigationStep? get currentStep;
+  @override
+  NavigationStep? get nextStep;
+  @override
+  int get currentStepIndex;
+  @override
+  double get distanceToNextStep;
+  @override
+  double get totalDistanceRemaining;
+  @override
+  double get totalDurationRemaining;
+  @override
+  bool get isOffRoute;
+  @override
+  bool get isRerouting;
+  @override
+  DateTime? get lastUpdateTime;
+  @override
+  @JsonKey(ignore: true)
+  _$$NavigationStateImplCopyWith<_$NavigationStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

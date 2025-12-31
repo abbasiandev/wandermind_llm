@@ -3,12 +3,63 @@ import 'package:latlong2/latlong.dart';
 
 import '../model/route_models.dart';
 import '../service/route_calculation_service.dart';
+import '../service/navigation_service.dart';
 
 part 'route_provider.g.dart';
 
 @riverpod
 RouteCalculationService routeCalculationService(RouteCalculationServiceRef ref) {
-  return RouteCalculationService();
+  final service = RouteCalculationService();
+  ref.onDispose(() => service.dispose());
+  return service;
+}
+
+@riverpod
+NavigationService navigationService(NavigationServiceRef ref) {
+  final service = NavigationService();
+  ref.onDispose(() => service.dispose());
+  return service;
+}
+
+@riverpod
+class NavigationStateNotifier extends _$NavigationStateNotifier {
+  @override
+  NavigationState build() {
+    final service = ref.watch(navigationServiceProvider);
+    
+    ref.listen(navigationServiceProvider, (previous, next) {
+      next.navigationStateStream.listen((state) {
+        this.state = state;
+      });
+    });
+    
+    return const NavigationState(isNavigating: false);
+  }
+
+  void startNavigation(RouteResult route) {
+    final service = ref.read(navigationServiceProvider);
+    service.startNavigation(route);
+  }
+
+  void stopNavigation() {
+    final service = ref.read(navigationServiceProvider);
+    service.stopNavigation();
+  }
+
+  Future<void> updateLocation(LatLng location) async {
+    final service = ref.read(navigationServiceProvider);
+    await service.updateLocation(location);
+  }
+
+  String getVoiceInstruction() {
+    final service = ref.read(navigationServiceProvider);
+    return service.getVoiceInstruction();
+  }
+
+  bool shouldAnnounce(double previousDistance, double currentDistance) {
+    final service = ref.read(navigationServiceProvider);
+    return service.shouldAnnounceInstruction(previousDistance, currentDistance);
+  }
 }
 
 @riverpod
