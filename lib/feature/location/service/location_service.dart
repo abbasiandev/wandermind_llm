@@ -24,43 +24,69 @@ class LocationService {
 
   Future<LocationData> getCurrentLocation() async {
     try {
+      // Check service first - this is quick
       final serviceEnabled = await isLocationServiceEnabled();
       if (!serviceEnabled) {
+        _logger.w('Location services are disabled');
         throw Exception('Location services are disabled');
       }
 
+      // Check permissions
       LocationPermission permission = await checkPermission();
+      _logger.d('Current permission: $permission');
+      
       if (permission == LocationPermission.denied) {
+        _logger.i('Requesting location permission...');
         permission = await requestPermission();
         if (permission == LocationPermission.denied) {
+          _logger.w('Location permissions are denied');
           throw Exception('Location permissions are denied');
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
+        _logger.w('Location permissions are permanently denied');
         throw Exception('Location permissions are permanently denied');
       }
 
+      _logger.d('Getting position...');
       final position = await _geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 30),
+          timeLimit: Duration(seconds: 10),
         ),
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw Exception('Location request timed out. Please check your GPS signal.');
+        },
       );
 
-      final address = await getAddressFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+      _logger.d('Position acquired: ${position.latitude}, ${position.longitude}');
+      
+      // Try to get address, but don't fail if geocoding fails
+      String address = 'Location: ${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}';
+      try {
+        final geocodedAddress = await getAddressFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+        if (geocodedAddress != null && geocodedAddress.isNotEmpty) {
+          address = geocodedAddress;
+        }
+      } catch (e) {
+        _logger.w('Failed to geocode address, using coordinates: $e');
+        // Continue with coordinate-based address
+      }
 
       final locationData = LocationData(
         latitude: position.latitude,
         longitude: position.longitude,
-        address: address ?? 'Unknown location',
+        address: address,
         timestamp: DateTime.now(),
       );
 
-      _logger.d('Got current location: ${locationData.address}');
+      _logger.i('Got current location: ${locationData.address}');
       return locationData;
 
     } catch (e) {
@@ -90,7 +116,14 @@ class LocationService {
 
   Future<String?> getAddressFromCoordinates(double lat, double lng) async {
     try {
-      final placemarks = await placemarkFromCoordinates(lat, lng);
+      final placemarks = await placemarkFromCoordinates(lat, lng).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          _logger.w('Geocoding timeout, skipping address lookup');
+          return [];
+        },
+      );
+      
       if (placemarks.isNotEmpty) {
         final placemark = placemarks.first;
         final addressComponents = [
@@ -100,11 +133,14 @@ class LocationService {
           placemark.country,
         ].where((component) => component != null && component.isNotEmpty);
 
-        return addressComponents.join(', ');
+        final address = addressComponents.join(', ');
+        if (address.isNotEmpty) {
+          return address;
+        }
       }
       return null;
     } catch (e) {
-      _logger.e('Failed to get address from coordinates: $e');
+      _logger.w('Failed to get address from coordinates (non-critical): $e');
       return null;
     }
   }
