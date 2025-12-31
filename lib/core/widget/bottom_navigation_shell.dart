@@ -38,10 +38,10 @@ class _BottomNavigationShellState extends State<BottomNavigationShell> {
       selectedIcon: Icons.map,
     ),
     NavigationItem(
-      path: '/explore',
-      label: 'Explore',
-      icon: Icons.explore_outlined,
-      selectedIcon: Icons.explore,
+      path: '/route',
+      label: 'Route',
+      icon: Icons.directions_outlined,
+      selectedIcon: Icons.directions,
     ),
     NavigationItem(
       path: '/settings',

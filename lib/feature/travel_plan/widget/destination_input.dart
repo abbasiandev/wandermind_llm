@@ -41,8 +41,16 @@ class _DestinationInputState extends State<DestinationInput> {
   @override
   void didUpdateWidget(DestinationInput oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.value != oldWidget.value) {
-      _controller.text = widget.value;
+    if (widget.value != oldWidget.value && widget.value != _controller.text) {
+      // Update controller without triggering onChanged listener
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _controller.value = _controller.value.copyWith(
+            text: widget.value,
+            selection: TextSelection.collapsed(offset: widget.value.length),
+          );
+        }
+      });
     }
   }
 

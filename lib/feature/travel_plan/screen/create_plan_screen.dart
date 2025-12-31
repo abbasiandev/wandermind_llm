@@ -449,19 +449,31 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
       ref.read(travelPlanCreationControllerProvider.notifier).reset();
 
       if (mounted) {
-        context.go('/plan/${plan.id}');
+        final planId = plan.id;
+        final destination = plan.destination;
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Travel plan for ${plan.destination} created successfully!'),
+                'Travel plan for $destination created successfully!'),
             backgroundColor: AppColors.success,
             action: SnackBarAction(
               label: 'View',
               textColor: Colors.white,
-              onPressed: () => context.go('/plan/${plan.id}'),
+              onPressed: () {
+                // Use navigator instead of context.go to avoid unmounted context issues
+                Navigator.of(context).pushReplacementNamed('/plan/$planId');
+              },
             ),
           ),
         );
+        
+        // Navigate after a short delay to allow snackbar to show
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            context.go('/plan/$planId');
+          }
+        });
       }
     } catch (e) {
       if (mounted) {

@@ -5,7 +5,33 @@ class TravelKnowledgeBase {
   /// Get destination information
   static DestinationInfo? getDestinationInfo(String destination) {
     final normalized = destination.toLowerCase().trim();
-    return _destinations[normalized];
+    
+    // Direct match
+    if (_destinations.containsKey(normalized)) {
+      return _destinations[normalized];
+    }
+    
+    // Try matching just the city name (handle "Dubai, UAE" → "dubai")
+    for (final entry in _destinations.entries) {
+      final cityName = entry.key;
+      // Check if destination starts with city name (e.g., "dubai, uae" starts with "dubai")
+      if (normalized.startsWith(cityName) || 
+          normalized.contains(cityName)) {
+        return entry.value;
+      }
+    }
+    
+    // Try matching with country name included
+    for (final entry in _destinations.entries) {
+      final info = entry.value;
+      final fullName = '${info.name.toLowerCase()}, ${info.country.toLowerCase()}';
+      if (normalized == fullName || 
+          normalized.startsWith(info.name.toLowerCase())) {
+        return entry.value;
+      }
+    }
+    
+    return null;
   }
   
   /// Get activities for a destination

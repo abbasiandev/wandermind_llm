@@ -10,7 +10,6 @@ import '../../location/provider/location_provider.dart';
 import '../../travel_plan/provider/travel_plan_provider.dart';
 import '../widget/home_header.dart';
 import '../widget/llm_status_card.dart';
-import '../widget/quick_action.dart';
 import '../widget/recent_plan.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -61,22 +60,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 20),
 
               LLMStatusCard(llmState: llmState),
-
-              const SizedBox(height: 24),
-
-              Text(
-                'Quick Actions',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              QuickActions(
-                onCreatePlan: () => context.go('/create-plan'),
-                onChat: () => context.go('/chat'),
-                onExplore: () => context.go('/explore'),
-                onSettings: () => context.go('/settings'),
-              ),
 
               const SizedBox(height: 24),
 

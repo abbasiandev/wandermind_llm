@@ -6,7 +6,7 @@ import '../../feature/chat/screen/chat_screen.dart';
 import '../../feature/travel_plan/screen/create_plan_screen.dart';
 
 import '../../feature/travel_plan/screen/plan_detail_screen.dart';
-import '../../feature/explore/screen/explore_screen.dart';
+import '../../feature/route/screen/route_screen.dart';
 import '../../feature/setting/screen/setting_screen.dart';
 import '../../feature/onboarding/screen/onboarding_screen.dart';
 import '../../feature/travel_plan/screen/travel_plan_screen.dart';
@@ -43,8 +43,15 @@ class AppRouter {
             ),
 
             GoRoute(
-              path: '/explore',
-              builder: (context, state) => const ExploreScreen(),
+              path: '/route',
+              builder: (context, state) {
+                final startLocation = state.uri.queryParameters['start'];
+                final endLocation = state.uri.queryParameters['end'];
+                return RouteScreen(
+                  startLocation: startLocation,
+                  endLocation: endLocation,
+                );
+              },
             ),
 
             GoRoute(
