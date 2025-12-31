@@ -31,13 +31,6 @@ android {
 
         multiDexEnabled = true
         
-        // NDK configuration for native llama.cpp
-        // Only build for ARM 64-bit (modern Android devices)
-        ndk {
-            abiFilters.clear()
-            abiFilters.add("arm64-v8a")
-        }
-        
         externalNativeBuild {
             cmake {
                 cppFlags.add("-std=c++17")

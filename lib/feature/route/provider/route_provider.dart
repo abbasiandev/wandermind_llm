@@ -25,8 +25,6 @@ NavigationService navigationService(NavigationServiceRef ref) {
 class NavigationStateNotifier extends _$NavigationStateNotifier {
   @override
   NavigationState build() {
-    final service = ref.watch(navigationServiceProvider);
-    
     ref.listen(navigationServiceProvider, (previous, next) {
       next.navigationStateStream.listen((state) {
         this.state = state;

@@ -19,6 +19,8 @@ class DebugRouteWidget extends ConsumerWidget {
       );
     }
 
+    final routeData = route!;
+
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
@@ -32,27 +34,27 @@ class DebugRouteWidget extends ConsumerWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            Text('Name: ${route.name ?? "Unknown"}'),
-            Text('Points: ${route.points.length}'),
-            Text('Steps: ${route.steps.length}'),
-            Text('Distance: ${(route.distanceMeters / 1000).toStringAsFixed(2)} km'),
-            Text('Duration: ${(route.durationSeconds / 60).toStringAsFixed(0)} min'),
+            Text('Name: ${routeData.name ?? "Unknown"}'),
+            Text('Points: ${routeData.points.length}'),
+            Text('Steps: ${routeData.steps.length}'),
+            Text('Distance: ${(routeData.distanceMeters / 1000).toStringAsFixed(2)} km'),
+            Text('Duration: ${(routeData.durationSeconds / 60).toStringAsFixed(0)} min'),
             const SizedBox(height: 8),
-            if (route.points.length > 0) ...[
-              Text('First point: ${route.points.first.latitude.toStringAsFixed(5)}, ${route.points.first.longitude.toStringAsFixed(5)}'),
-              Text('Last point: ${route.points.last.latitude.toStringAsFixed(5)}, ${route.points.last.longitude.toStringAsFixed(5)}'),
+            if (routeData.points.isNotEmpty) ...[
+              Text('First point: ${routeData.points.first.latitude.toStringAsFixed(5)}, ${routeData.points.first.longitude.toStringAsFixed(5)}'),
+              Text('Last point: ${routeData.points.last.latitude.toStringAsFixed(5)}, ${routeData.points.last.longitude.toStringAsFixed(5)}'),
             ],
             const SizedBox(height: 8),
-            if (route.steps.isNotEmpty) ...[
+            if (routeData.steps.isNotEmpty) ...[
               const Text('Steps:', style: TextStyle(fontWeight: FontWeight.bold)),
-              ...route.steps.take(3).map((step) => Padding(
+              ...routeData.steps.take(3).map((step) => Padding(
                 padding: const EdgeInsets.only(left: 16, top: 4),
                 child: Text('${step.index + 1}. ${step.instruction}'),
               )),
-              if (route.steps.length > 3)
+              if (routeData.steps.length > 3)
                 Padding(
                   padding: const EdgeInsets.only(left: 16, top: 4),
-                  child: Text('... and ${route.steps.length - 3} more steps'),
+                  child: Text('... and ${routeData.steps.length - 3} more steps'),
                 ),
             ],
           ],

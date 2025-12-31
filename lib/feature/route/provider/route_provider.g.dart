@@ -41,7 +41,7 @@ final navigationServiceProvider =
 
 typedef NavigationServiceRef = AutoDisposeProviderRef<NavigationService>;
 String _$navigationStateNotifierHash() =>
-    r'123464708ed0f39fa2b4c2eb0ed1ffb83ea684a6';
+    r'cb3b5f311ea74b031eeed549cbad7624683edc6c';
 
 /// See also [NavigationStateNotifier].
 @ProviderFor(NavigationStateNotifier)
