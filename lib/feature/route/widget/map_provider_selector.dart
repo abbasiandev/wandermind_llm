@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/config/map_config.dart';
 import '../../../core/theme/app_color.dart';
 
-/// Widget to select map provider
 class MapProviderSelector extends ConsumerStatefulWidget {
   final Function()? onProviderChanged;
 
@@ -25,7 +24,7 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -36,7 +35,7 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+
           Row(
             children: [
               const Icon(Icons.map, color: AppColors.primary),
@@ -64,14 +63,12 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
           ),
           const SizedBox(height: 24),
 
-          // Provider options
           ...MapConfig.availableProviders.map((provider) {
             return _buildProviderOption(provider);
           }).toList(),
 
           const SizedBox(height: 16),
 
-          // Info
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -98,10 +95,9 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
 
-          // Apply button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -129,7 +125,7 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
     switch (provider) {
       case MapProvider.mapbox:
         icon = Icons.layers;
-        subtitle = isDisabled 
+        subtitle = isDisabled
             ? 'Requires token in .env file'
             : 'Beautiful, detailed maps';
         break;
@@ -222,11 +218,11 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
 
   Future<void> _applySelection() async {
     await MapConfig.setPreferredProvider(_selectedProvider);
-    
+
     if (mounted) {
       Navigator.pop(context);
       widget.onProviderChanged?.call();
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

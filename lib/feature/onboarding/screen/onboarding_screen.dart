@@ -199,9 +199,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _finishOnboarding() {
-    // ref.read(sharedPreferencesProvider).setBool('onboarding_completed', true);
 
-    // Navigate to home
     context.go('/');
   }
 }

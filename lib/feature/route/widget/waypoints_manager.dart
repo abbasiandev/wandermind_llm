@@ -5,7 +5,6 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/theme/app_color.dart';
 import '../model/route_models.dart';
 
-/// Widget for managing waypoints in a route
 class WaypointsManager extends ConsumerStatefulWidget {
   final List<Waypoint> waypoints;
   final Function(List<Waypoint>) onWaypointsChanged;
@@ -56,7 +55,7 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
   void _removeWaypoint(String id) {
     setState(() {
       _waypoints.removeWhere((w) => w.id == id);
-      // Reorder remaining waypoints
+
       for (int i = 0; i < _waypoints.length; i++) {
         _waypoints[i] = _waypoints[i].copyWith(
           order: i,
@@ -74,8 +73,7 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       }
       final item = _waypoints.removeAt(oldIndex);
       _waypoints.insert(newIndex, item);
-      
-      // Update order numbers
+
       for (int i = 0; i < _waypoints.length; i++) {
         _waypoints[i] = _waypoints[i].copyWith(
           order: i,
@@ -87,7 +85,7 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
   }
 
   void _optimizeRoute() {
-    // Simple optimization: sort by proximity (greedy algorithm)
+
     if (_waypoints.length <= 1) return;
 
     setState(() {
@@ -96,7 +94,7 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
 
       while (remaining.isNotEmpty) {
         final current = optimized.last;
-        // Find closest waypoint
+
         remaining.sort((a, b) {
           final distA = const Distance()(current.location, a.location);
           final distB = const Distance()(current.location, b.location);
@@ -106,7 +104,7 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       }
 
       _waypoints = optimized;
-      // Update order
+
       for (int i = 0; i < _waypoints.length; i++) {
         _waypoints[i] = _waypoints[i].copyWith(order: i);
       }
@@ -132,7 +130,7 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Header
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
@@ -160,8 +158,7 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
             ],
           ),
         ),
-        
-        // Waypoints list
+
         SizedBox(
           height: 200,
           child: ReorderableListView.builder(

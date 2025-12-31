@@ -33,8 +33,7 @@ class _ChatInputState extends State<ChatInput> {
   }
 
   void _onTextChanged() {
-    // Only notify if the text is different from the widget's message
-    // to prevent circular updates
+
     if (_controller.text != widget.message) {
       widget.onMessageChanged(_controller.text);
     }
@@ -43,14 +42,13 @@ class _ChatInputState extends State<ChatInput> {
   @override
   void didUpdateWidget(ChatInput oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Update the controller text only if the message changed externally
-    // and it's different from the current controller text
-    if (widget.message != oldWidget.message && 
+
+    if (widget.message != oldWidget.message &&
         widget.message != _controller.text) {
-      // Temporarily remove listener to prevent circular updates
+
       _controller.removeListener(_onTextChanged);
       _controller.text = widget.message;
-      // Re-add listener after update
+
       _controller.addListener(_onTextChanged);
     }
   }
@@ -90,7 +88,7 @@ class _ChatInputState extends State<ChatInput> {
       ),
       child: Row(
         children: [
-          // Attachment button (future feature)
+
           IconButton(
             onPressed: widget.enabled ? _showAttachmentOptions : null,
             icon: const Icon(Icons.attach_file),
@@ -99,7 +97,6 @@ class _ChatInputState extends State<ChatInput> {
 
           const SizedBox(width: 8),
 
-          // Text input
           Expanded(
             child: TextField(
               controller: _controller,
@@ -134,7 +131,6 @@ class _ChatInputState extends State<ChatInput> {
 
           const SizedBox(width: 8),
 
-          // Send button
           FloatingActionButton.small(
             onPressed: canSend ? _sendMessage : null,
             backgroundColor: canSend
@@ -164,7 +160,7 @@ class _ChatInputState extends State<ChatInput> {
               title: const Text('Photo'),
               onTap: () {
                 Navigator.pop(context);
-                // Implement photo attachment
+
                 _showComingSoonSnackBar('Photo attachment');
               },
             ),
@@ -173,7 +169,7 @@ class _ChatInputState extends State<ChatInput> {
               title: const Text('Location'),
               onTap: () {
                 Navigator.pop(context);
-                // Implement location sharing
+
                 _showComingSoonSnackBar('Location sharing');
               },
             ),
@@ -182,7 +178,7 @@ class _ChatInputState extends State<ChatInput> {
               title: const Text('Document'),
               onTap: () {
                 Navigator.pop(context);
-                // Implement document attachment
+
                 _showComingSoonSnackBar('Document attachment');
               },
             ),

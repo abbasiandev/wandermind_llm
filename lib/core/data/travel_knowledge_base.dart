@@ -1,56 +1,48 @@
-/// Offline travel knowledge base
-/// Pre-loaded data for instant access without LLM generation
+
 class TravelKnowledgeBase {
-  
-  /// Get destination information
+
   static DestinationInfo? getDestinationInfo(String destination) {
     final normalized = destination.toLowerCase().trim();
-    
-    // Direct match
+
     if (_destinations.containsKey(normalized)) {
       return _destinations[normalized];
     }
-    
-    // Try matching just the city name (handle "Dubai, UAE" → "dubai")
+
     for (final entry in _destinations.entries) {
       final cityName = entry.key;
-      // Check if destination starts with city name (e.g., "dubai, uae" starts with "dubai")
-      if (normalized.startsWith(cityName) || 
+
+      if (normalized.startsWith(cityName) ||
           normalized.contains(cityName)) {
         return entry.value;
       }
     }
-    
-    // Try matching with country name included
+
     for (final entry in _destinations.entries) {
       final info = entry.value;
       final fullName = '${info.name.toLowerCase()}, ${info.country.toLowerCase()}';
-      if (normalized == fullName || 
+      if (normalized == fullName ||
           normalized.startsWith(info.name.toLowerCase())) {
         return entry.value;
       }
     }
-    
+
     return null;
   }
-  
-  /// Get activities for a destination
+
   static List<ActivityTemplate> getActivitiesForDestination(
     String destination,
     List<String> interests,
   ) {
     final info = getDestinationInfo(destination);
     if (info == null) return [];
-    
-    // Filter by interests
+
     return info.activities.where((activity) {
-      return interests.any((interest) => 
+      return interests.any((interest) =>
         activity.categories.contains(interest.toLowerCase())
       );
     }).toList();
   }
-  
-  /// Get budget estimates
+
   static BudgetEstimate getBudgetEstimate(String destination, int days) {
     final info = getDestinationInfo(destination);
     if (info == null) {
@@ -62,26 +54,24 @@ class TravelKnowledgeBase {
         total: 140.0 * days,
       );
     }
-    
+
     return BudgetEstimate(
       accommodation: info.avgAccommodationPerDay * days,
       food: info.avgFoodPerDay * days,
       transport: info.avgTransportPerDay * days,
       activities: info.avgActivitiesPerDay * days,
-      total: (info.avgAccommodationPerDay + 
-              info.avgFoodPerDay + 
-              info.avgTransportPerDay + 
+      total: (info.avgAccommodationPerDay +
+              info.avgFoodPerDay +
+              info.avgTransportPerDay +
               info.avgActivitiesPerDay) * days,
     );
   }
-  
-  /// Get travel tips
+
   static List<String> getTravelTips(String destination) {
     final info = getDestinationInfo(destination);
     return info?.tips ?? _generalTips;
   }
-  
-  /// Offline destination database
+
   static final Map<String, DestinationInfo> _destinations = {
     'paris': DestinationInfo(
       name: 'Paris',
@@ -141,7 +131,7 @@ class TravelKnowledgeBase {
         'Try local bakeries for affordable authentic meals',
       ],
     ),
-    
+
     'tokyo': DestinationInfo(
       name: 'Tokyo',
       country: 'Japan',
@@ -200,7 +190,7 @@ class TravelKnowledgeBase {
         'Try convenience store food - surprisingly good and cheap',
       ],
     ),
-    
+
     'new york': DestinationInfo(
       name: 'New York',
       country: 'USA',
@@ -259,7 +249,7 @@ class TravelKnowledgeBase {
         'Pizza slices and food carts offer affordable eats',
       ],
     ),
-    
+
     'london': DestinationInfo(
       name: 'London',
       country: 'UK',
@@ -318,7 +308,7 @@ class TravelKnowledgeBase {
         'Pubs offer affordable lunch deals',
       ],
     ),
-    
+
     'rome': DestinationInfo(
       name: 'Rome',
       country: 'Italy',
@@ -377,9 +367,7 @@ class TravelKnowledgeBase {
         'Gelato should cost €2-3 per scoop - avoid tourist traps',
       ],
     ),
-    
-    // Arab Countries
-    
+
     'dubai': DestinationInfo(
       name: 'Dubai',
       country: 'United Arab Emirates',
@@ -464,7 +452,7 @@ class TravelKnowledgeBase {
         'Stay hydrated - summers are extremely hot',
       ],
     ),
-    
+
     'abu dhabi': DestinationInfo(
       name: 'Abu Dhabi',
       country: 'United Arab Emirates',
@@ -532,7 +520,7 @@ class TravelKnowledgeBase {
         'Many attractions close during prayer times',
       ],
     ),
-    
+
     'cairo': DestinationInfo(
       name: 'Cairo',
       country: 'Egypt',
@@ -601,7 +589,7 @@ class TravelKnowledgeBase {
         'Carry small bills - change can be hard to get',
       ],
     ),
-    
+
     'marrakech': DestinationInfo(
       name: 'Marrakech',
       country: 'Morocco',
@@ -669,7 +657,7 @@ class TravelKnowledgeBase {
         'Learn basic French or Arabic phrases - helpful for shopping',
       ],
     ),
-    
+
     'doha': DestinationInfo(
       name: 'Doha',
       country: 'Qatar',
@@ -737,7 +725,7 @@ class TravelKnowledgeBase {
         'Friday is weekend - some places have reduced hours',
       ],
     ),
-    
+
     'amman': DestinationInfo(
       name: 'Amman',
       country: 'Jordan',
@@ -806,7 +794,7 @@ class TravelKnowledgeBase {
       ],
     ),
   };
-  
+
   static final List<String> _generalTips = [
     'Research local customs and etiquette',
     'Download offline maps before traveling',
@@ -843,7 +831,7 @@ class DestinationInfo {
 class ActivityTemplate {
   final String title;
   final String description;
-  final int duration; // hours
+  final int duration;
   final double cost;
   final List<String> categories;
   final String bestTimeOfDay;

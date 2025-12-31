@@ -162,27 +162,27 @@ class _AdditionalRequirementsInputState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildExampleItem(
-                    '📍 Accessibility needs',
+                    ' Accessibility needs',
                     '"Need wheelchair accessible hotels and attractions. Prefer ground floor rooms."',
                   ),
                   const Divider(),
                   _buildExampleItem(
-                    '👨‍👩‍👧‍👦 Family travel',
+                    '‍‍‍ Family travel',
                     '"Traveling with 2 kids (ages 5 and 8). Need child-friendly activities and restaurants."',
                   ),
                   const Divider(),
                   _buildExampleItem(
-                    '🌱 Dietary restrictions',
+                    ' Dietary restrictions',
                     '"Vegetarian diet. Looking for authentic local vegetarian cuisine recommendations."',
                   ),
                   const Divider(),
                   _buildExampleItem(
-                    '💰 Budget-conscious',
+                    ' Budget-conscious',
                     '"Looking for free or low-cost activities. Prefer public transportation and street food."',
                   ),
                   const Divider(),
                   _buildExampleItem(
-                    '📸 Photography focus',
+                    ' Photography focus',
                     '"Passionate about photography. Interested in sunrise/sunset spots and unique architecture."',
                   ),
                 ],

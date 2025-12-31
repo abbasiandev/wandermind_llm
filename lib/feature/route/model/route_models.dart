@@ -4,7 +4,6 @@ import 'package:latlong2/latlong.dart';
 part 'route_models.freezed.dart';
 part 'route_models.g.dart';
 
-/// Route calculation result
 @freezed
 class RouteResult with _$RouteResult {
   const factory RouteResult({
@@ -19,14 +18,12 @@ class RouteResult with _$RouteResult {
       _$RouteResultFromJson(json);
 }
 
-/// Type of route
 enum RouteType {
   fastest,
   shortest,
   balanced,
 }
 
-/// Route preferences
 @freezed
 class RoutePreferences with _$RoutePreferences {
   const factory RoutePreferences({
@@ -41,7 +38,6 @@ class RoutePreferences with _$RoutePreferences {
       _$RoutePreferencesFromJson(json);
 }
 
-/// Waypoint in a route
 @freezed
 class Waypoint with _$Waypoint {
   const factory Waypoint({
@@ -57,7 +53,6 @@ class Waypoint with _$Waypoint {
       _$WaypointFromJson(json);
 }
 
-/// Complete route with waypoints
 @freezed
 class RouteWithWaypoints with _$RouteWithWaypoints {
   const factory RouteWithWaypoints({

@@ -41,8 +41,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
     super.initState();
     _startController.text = widget.startLocation ?? 'Current Location';
     _endController.text = widget.endLocation ?? '';
-    
-    // Initialize location when screen opens
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(locationControllerProvider.notifier).getCurrentLocation();
     });
@@ -82,7 +81,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       ),
       body: Column(
         children: [
-          // Search/Input section (hide when navigating)
+
           if (!_isNavigating)
             Container(
             padding: const EdgeInsets.all(16),
@@ -98,7 +97,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
             ),
             child: Column(
               children: [
-                // Start location
+
                 TextField(
                   controller: _startController,
                   decoration: InputDecoration(
@@ -118,7 +117,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // End location
+
                 TextField(
                   controller: _endController,
                   decoration: InputDecoration(
@@ -133,13 +132,13 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Route button
+
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: _showRoute,
-                        icon: _isCalculatingRoutes 
+                        icon: _isCalculatingRoutes
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
@@ -180,8 +179,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
               ],
             ),
           ),
-          
-          // Waypoints section (collapsible)
+
           if (_showWaypoints)
             Container(
               decoration: BoxDecoration(
@@ -200,12 +198,11 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                   ref.read(routeManagerProvider.notifier).updateWaypoints(waypoints);
                 },
                 onWaypointTap: (location) {
-                  // Center map on waypoint
+
                 },
               ),
             ),
-          
-          // Route options selector
+
           if (ref.watch(routeManagerProvider)?.alternativeRoutes.isNotEmpty ?? false)
             RouteOptionsSelector(
               routes: ref.watch(routeManagerProvider)!.alternativeRoutes,
@@ -214,8 +211,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                 ref.read(routeManagerProvider.notifier).selectRoute(route);
               },
             ),
-          
-          // Map section
+
           Expanded(
             child: locationAsync.when(
               data: (location) {
@@ -235,9 +231,9 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () async {
-                            // Request location permission
+
                             await ref.read(locationPermissionControllerProvider.notifier).requestPermission();
-                            // Then get current location
+
                             await ref.read(locationControllerProvider.notifier).getCurrentLocation();
                           },
                           icon: const Icon(Icons.location_on),
@@ -247,7 +243,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                     ),
                   );
                 }
-                
+
                 return RouteMapWidget(
                   destination: _destinationLocation,
                   onMapTap: (point) {
@@ -278,7 +274,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                 final isServiceDisabled = errorMessage.contains('Location services are disabled');
                 final isPermissionDenied = errorMessage.contains('permissions are denied');
                 final isPermissionDeniedForever = errorMessage.contains('permanently denied');
-                
+
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
@@ -318,7 +314,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                         if (isServiceDisabled)
                           ElevatedButton.icon(
                             onPressed: () async {
-                              // Guide user to open settings
+
                               await Geolocator.openLocationSettings();
                             },
                             icon: const Icon(Icons.settings),
@@ -327,7 +323,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                         else if (isPermissionDeniedForever)
                           ElevatedButton.icon(
                             onPressed: () async {
-                              // Guide user to app settings
+
                               await Geolocator.openAppSettings();
                             },
                             icon: const Icon(Icons.settings),
@@ -354,7 +350,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
               },
             ),
           ),
-          // Route info panel (hide when navigating)
+
           if (!_isNavigating && _startController.text.isNotEmpty && _endController.text.isNotEmpty)
             _buildRouteInfoPanel(),
         ],
@@ -404,7 +400,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
           ),
           const SizedBox(height: 12),
           const Text(
-            '💡 Tip: Offline routing uses pre-downloaded map data. For live traffic updates, connect to the internet.',
+            ' Tip: Offline routing uses pre-downloaded map data. For live traffic updates, connect to the internet.',
             style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
           ),
         ],
@@ -430,9 +426,9 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       isScrollControlled: true,
       builder: (context) => MapProviderSelector(
         onProviderChanged: () {
-          // Force map to reload with new provider
+
           setState(() {
-            // This will trigger rebuild and map will use new provider
+
           });
         },
       ),
@@ -444,7 +440,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       context: context,
       isScrollControlled: true,
       builder: (context) => RoutePreferencesSheet(
-        initialPreferences: ref.read(routeManagerProvider)?.preferences ?? 
+        initialPreferences: ref.read(routeManagerProvider)?.preferences ??
             const RoutePreferences(),
         onApply: (preferences) {
           ref.read(routeManagerProvider.notifier).updatePreferences(preferences);
@@ -461,8 +457,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       );
       return;
     }
-    
-    // If destination is not set from map tap, try to parse from text
+
     if (_destinationLocation == null) {
       final parts = _endController.text.split(',');
       if (parts.length == 2) {
@@ -475,35 +470,34 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
         }
       }
     }
-    
+
     if (_destinationLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please tap on map or enter valid coordinates')),
       );
       return;
     }
-    
+
     await _calculateRoutes();
   }
-  
+
   Future<void> _calculateRoutes() async {
     final location = await ref.read(locationControllerProvider.future);
     if (location == null || _destinationLocation == null) return;
-    
+
     setState(() {
       _isCalculatingRoutes = true;
     });
-    
+
     try {
-      // Set route in provider
+
       ref.read(routeManagerProvider.notifier).setRoute(
         LatLng(location.latitude, location.longitude),
         _destinationLocation!,
       );
-      
-      // Calculate routes
+
       await ref.read(routeManagerProvider.notifier).calculateRoutes();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

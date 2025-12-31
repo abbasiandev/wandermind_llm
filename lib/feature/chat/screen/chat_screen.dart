@@ -83,7 +83,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       body: Column(
         children: [
-          // LLM Status Bar
+
           if (!llmState.isInitialized)
             Container(
               width: double.infinity,
@@ -123,7 +123,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             ),
 
-          // Chat Messages
           Expanded(
             child: chatAsync.when(
               data: (messages) {
@@ -131,7 +130,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   return _buildEmptyChat();
                 }
 
-                // Auto-scroll to bottom when new messages arrive
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _scrollToBottom();
                 });
@@ -189,7 +187,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
 
-          // Chat Input
           ChatInput(
             message: chatInputState.message,
             isLoading: chatInputState.isLoading || llmState.isGenerating,
@@ -236,7 +233,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: Column(
                 children: [
                   Text(
-                    '💡 Try asking me:',
+                    ' Try asking me:',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -274,7 +271,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       onPressed: () async {
         ref.read(chatInputControllerProvider.notifier).updateMessage(suggestion);
-        // Auto-send the message
+
         await ref.read(chatControllerProvider.notifier).sendMessage(suggestion);
         ref.read(chatInputControllerProvider.notifier).clearMessage();
       },
@@ -305,7 +302,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _exportChat() {
-    // Implementation for exporting chat history
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Export feature coming soon!')),
     );

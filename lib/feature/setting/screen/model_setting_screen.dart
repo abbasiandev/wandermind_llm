@@ -235,7 +235,6 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
       final llmService = ref.read(llmServiceProvider);
       await llmService.changeModel(modelKey);
 
-      // Initialize with new model
       await ref.read(lLMControllerProvider.notifier).initializeLLM();
 
       if (mounted) {

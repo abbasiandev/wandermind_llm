@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:logger/logger.dart';
 
-/// Mock LLM service for testing and development when native libraries are not available
-/// This provides realistic travel planning responses without requiring llama.cpp
 class MockLLMService {
   static final Logger _logger = Logger();
   bool _isLoaded = false;
@@ -33,11 +31,9 @@ class MockLLMService {
     }
 
     _logger.d('Mock LLM: Generating response for prompt');
-    
-    // Simulate processing time
+
     await Future.delayed(const Duration(seconds: 2));
 
-    // Generate contextual response based on prompt keywords
     return _generateMockResponse(prompt);
   }
 
@@ -55,7 +51,6 @@ class MockLLMService {
     final response = _generateMockResponse(prompt);
     final words = response.split(' ');
 
-    // Stream word by word to simulate real LLM streaming
     for (var i = 0; i < words.length; i++) {
       await Future.delayed(const Duration(milliseconds: 50));
       yield words[i] + (i < words.length - 1 ? ' ' : '');
@@ -65,7 +60,6 @@ class MockLLMService {
   String _generateMockResponse(String prompt) {
     final lowerPrompt = prompt.toLowerCase();
 
-    // Travel planning related responses
     if (lowerPrompt.contains('travel plan') || lowerPrompt.contains('trip')) {
       return _getTravelPlanResponse(prompt);
     } else if (lowerPrompt.contains('budget')) {
@@ -147,7 +141,7 @@ To give you specific timing advice, please tell me which destination you're inte
   String _getAccommodationResponse(String prompt) {
     return '''Let me help you find the right accommodation! Here are your main options:
 
-**Hotels**: 
+**Hotels**:
 - Professional service, amenities
 - Good for business or comfort-focused travelers
 - Range from budget to luxury

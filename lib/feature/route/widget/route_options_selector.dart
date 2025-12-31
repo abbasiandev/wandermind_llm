@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_color.dart';
 import '../model/route_models.dart';
 
-/// Widget to select between multiple route options
 class RouteOptionsSelector extends ConsumerStatefulWidget {
   final List<RouteResult> routes;
   final RouteResult? selectedRoute;
@@ -39,7 +38,7 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
         itemBuilder: (context, index) {
           final route = widget.routes[index];
           final isSelected = widget.selectedRoute?.type == route.type;
-          
+
           return Padding(
             padding: const EdgeInsets.only(right: 12),
             child: _buildRouteCard(route, isSelected),
@@ -52,10 +51,10 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
   Widget _buildRouteCard(RouteResult route, bool isSelected) {
     final distanceKm = (route.distanceMeters / 1000).toStringAsFixed(1);
     final durationMin = (route.durationSeconds / 60).ceil();
-    
+
     IconData icon;
     Color color;
-    
+
     switch (route.type) {
       case RouteType.fastest:
         icon = Icons.speed;
@@ -103,7 +102,7 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
+
             Row(
               children: [
                 Icon(
@@ -133,8 +132,7 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
               ],
             ),
             const SizedBox(height: 8),
-            
-            // Distance
+
             Row(
               children: [
                 Icon(
@@ -153,8 +151,7 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
               ],
             ),
             const SizedBox(height: 4),
-            
-            // Duration
+
             Row(
               children: [
                 Icon(

@@ -38,7 +38,7 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
   }
 
   void _loadExistingPlan() {
-    // Implementation for loading existing plan data
+
   }
 
   @override
@@ -170,7 +170,7 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
                         if (date != null) {
                           final endDate = creationState.endDate;
                           if (endDate != null && date.isAfter(endDate)) {
-                            // Auto-adjust end date if start date is after end date
+
                             ref
                                 .read(travelPlanCreationControllerProvider
                                     .notifier)
@@ -419,12 +419,10 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
   Future<void> _createTravelPlan() async {
     if (!_canCreatePlan()) return;
 
-    // Show immediate feedback
     setState(() {
       _isCreating = true;
     });
 
-    // Force UI update to show "Creating..." immediately
     await Future.delayed(Duration(milliseconds: 100));
 
     try {
@@ -451,7 +449,7 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
       if (mounted) {
         final planId = plan.id;
         final destination = plan.destination;
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -461,14 +459,13 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
               label: 'View',
               textColor: Colors.white,
               onPressed: () {
-                // Use navigator instead of context.go to avoid unmounted context issues
+
                 Navigator.of(context).pushReplacementNamed('/plan/$planId');
               },
             ),
           ),
         );
-        
-        // Navigate after a short delay to allow snackbar to show
+
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             context.go('/plan/$planId');

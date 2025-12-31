@@ -11,7 +11,6 @@ import 'core/widget/app_lifecycle_observer.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize map configuration (Mapbox or OSM)
   await MapConfig.initialize();
 
   await Hive.initFlutter();
@@ -35,7 +34,6 @@ class WanderMindApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
 
-    // Wrap with lifecycle manager for proper resource cleanup
     return AppLifecycleManager(
       child: MaterialApp.router(
         title: 'WanderMind LLM',

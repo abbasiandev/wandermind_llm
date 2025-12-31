@@ -166,7 +166,6 @@ class InterestsSelector extends StatelessWidget {
 
         const SizedBox(height: 12),
 
-        // Selection indicator
         Row(
           children: [
             Icon(
@@ -178,7 +177,7 @@ class InterestsSelector extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              '${selectedInterests.length} selected ${selectedInterests.length >= 3 ? '✓' : '(minimum 3)'}',
+              '${selectedInterests.length} selected ${selectedInterests.length >= 3 ? '' : '(minimum 3)'}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: selectedInterests.length >= 3
                     ? AppColors.success

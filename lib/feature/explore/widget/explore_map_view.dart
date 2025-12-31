@@ -3,8 +3,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../core/widget/map_widget.dart';
 
-/// Example implementation of MapWidget for the explore screen
-/// This shows how to integrate the free OpenStreetMap into your app
 class ExploreMapView extends StatefulWidget {
   final double? latitude;
   final double? longitude;
@@ -28,13 +26,12 @@ class _ExploreMapViewState extends State<ExploreMapView> {
   @override
   void initState() {
     super.initState();
-    // Default to San Francisco if no location provided
+
     _center = LatLng(
       widget.latitude ?? 37.7749,
       widget.longitude ?? -122.4194,
     );
-    
-    // Add marker if location is provided
+
     if (widget.latitude != null && widget.longitude != null) {
       _markers = [
         Marker(
@@ -77,7 +74,7 @@ class _ExploreMapViewState extends State<ExploreMapView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Map header
+
         Container(
           padding: const EdgeInsets.all(16),
           color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -105,7 +102,7 @@ class _ExploreMapViewState extends State<ExploreMapView> {
               IconButton(
                 icon: const Icon(Icons.my_location),
                 onPressed: () {
-                  // TODO: Integrate with LocationService to get current location
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Feature coming soon!')),
                   );
@@ -114,8 +111,7 @@ class _ExploreMapViewState extends State<ExploreMapView> {
             ],
           ),
         ),
-        
-        // Map view
+
         Expanded(
           child: MapWidget(
             center: _center,
@@ -137,8 +133,7 @@ class _ExploreMapViewState extends State<ExploreMapView> {
                   ),
                 ];
               });
-              
-              // Show coordinates
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -150,8 +145,7 @@ class _ExploreMapViewState extends State<ExploreMapView> {
             },
           ),
         ),
-        
-        // Map controls
+
         Container(
           padding: const EdgeInsets.all(8),
           child: Row(
@@ -159,14 +153,14 @@ class _ExploreMapViewState extends State<ExploreMapView> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Add to travel plan
+
                 },
                 icon: const Icon(Icons.add_location_alt, size: 18),
                 label: const Text('Add to Plan'),
               ),
               OutlinedButton.icon(
                 onPressed: () {
-                  // TODO: Search nearby places
+
                 },
                 icon: const Icon(Icons.search, size: 18),
                 label: const Text('Search Nearby'),

@@ -158,7 +158,6 @@ class _BudgetInputState extends State<BudgetInput> {
 
         const SizedBox(height: 16),
 
-        // Budget Presets
         Text(
           'Quick Select',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -232,7 +231,6 @@ class _BudgetInputState extends State<BudgetInput> {
 
         const SizedBox(height: 12),
 
-        // Budget Breakdown Info
         if (widget.value > 0)
           Container(
             padding: const EdgeInsets.all(12),

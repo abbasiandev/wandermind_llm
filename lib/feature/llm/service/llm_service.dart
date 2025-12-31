@@ -13,7 +13,6 @@ class LLMService {
   bool _isInitialized = false;
   String _currentModel = 'tinyllama';
 
-  // Constructor with dependency injection
   LLMService({
     ModelDownloaderService? downloaderService,
     LlamaCppService? llamaService,
@@ -37,14 +36,12 @@ class LLMService {
       if (!isDownloaded) {
         _logger.i('Model not found, downloading...');
 
-        // Create a stream controller to emit progress updates
         final progressController = StreamController<double>();
-        
-        // Start the download in a separate async operation
+
         final downloadFuture = _downloaderService.downloadModel(
           selectedModel,
           onProgress: (progress) {
-            // Emit progress updates immediately: 0.2 to 0.7 range for download
+
             progressController.add(0.2 + (progress * 0.5));
             _logger.d(
                 'Download progress: ${(progress * 100).toStringAsFixed(1)}%');
@@ -60,12 +57,10 @@ class LLMService {
           },
         );
 
-        // Stream the progress updates as they come
         await for (final progress in progressController.stream) {
           yield progress;
         }
-        
-        // Wait for download to complete
+
         await downloadFuture;
         yield 0.7;
       } else {

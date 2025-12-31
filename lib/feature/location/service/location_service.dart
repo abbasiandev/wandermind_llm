@@ -24,17 +24,16 @@ class LocationService {
 
   Future<LocationData> getCurrentLocation() async {
     try {
-      // Check service first - this is quick
+
       final serviceEnabled = await isLocationServiceEnabled();
       if (!serviceEnabled) {
         _logger.w('Location services are disabled');
         throw Exception('Location services are disabled');
       }
 
-      // Check permissions
       LocationPermission permission = await checkPermission();
       _logger.d('Current permission: $permission');
-      
+
       if (permission == LocationPermission.denied) {
         _logger.i('Requesting location permission...');
         permission = await requestPermission();
@@ -63,8 +62,7 @@ class LocationService {
       );
 
       _logger.d('Position acquired: ${position.latitude}, ${position.longitude}');
-      
-      // Try to get address, but don't fail if geocoding fails
+
       String address = 'Location: ${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}';
       try {
         final geocodedAddress = await getAddressFromCoordinates(
@@ -76,7 +74,7 @@ class LocationService {
         }
       } catch (e) {
         _logger.w('Failed to geocode address, using coordinates: $e');
-        // Continue with coordinate-based address
+
       }
 
       final locationData = LocationData(
@@ -123,7 +121,7 @@ class LocationService {
           return [];
         },
       );
-      
+
       if (placemarks.isNotEmpty) {
         final placemark = placemarks.first;
         final addressComponents = [
