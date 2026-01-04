@@ -42,7 +42,20 @@ class LlamaCppService {
 
       final file = File(modelPath);
       if (!await file.exists()) {
-        throw Exception('Model file not found: $modelPath');
+        throw Exception('Model file not found at path: $modelPath\n'
+            'Please ensure the model is downloaded first.');
+      }
+
+      final fileSize = await file.length();
+      _logger.i('Model file size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+      
+      // Minimum valid model size should be at least 100MB
+      const minModelSize = 100 * 1024 * 1024; // 100MB
+      if (fileSize < minModelSize) {
+        throw Exception('Model file is too small (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB).\n'
+            'Expected at least 100MB but got ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB.\n'
+            'The model download appears to be incomplete or corrupted.\n'
+            'Please delete the model and download it again from Settings -> Model Settings.');
       }
 
       if (_isLoaded) {
@@ -53,6 +66,8 @@ class LlamaCppService {
       _contextSize = contextSize;
       _threads = threads;
 
+      _logger.i('Calling native loadModel with contextSize=$contextSize, threads=$threads');
+      
       final result = await _methodChannel.invokeMethod<bool>('loadModel', {
         'modelPath': modelPath,
         'contextSize': contextSize,
@@ -60,12 +75,25 @@ class LlamaCppService {
       });
 
       if (result != true) {
-        throw Exception('Failed to load model in native code');
+        throw Exception('Failed to load model in native code.\n'
+            'Possible causes:\n'
+            '- Model file is corrupted or incompatible\n'
+            '- Insufficient memory (need ~${contextSize * 2}MB RAM)\n'
+            '- Native library not properly built\n'
+            'Check Android logcat for detailed native errors.');
       }
 
       _isLoaded = true;
       _logger.i('Model loaded successfully with native llama.cpp: $_modelPath');
       _logger.i('Context size: $contextSize, Threads: $threads');
+    } on PlatformException catch (e, stackTrace) {
+      _logger.e('Platform error loading model: ${e.code} - ${e.message}', 
+          error: e, stackTrace: stackTrace);
+      _isLoaded = false;
+      _modelPath = null;
+      throw Exception('Native library error: ${e.message}\n'
+          'Error code: ${e.code}\n'
+          'This may indicate the native library is not properly built or loaded.');
     } catch (e, stackTrace) {
       _logger.e('Failed to load model: $e', error: e, stackTrace: stackTrace);
       _isLoaded = false;

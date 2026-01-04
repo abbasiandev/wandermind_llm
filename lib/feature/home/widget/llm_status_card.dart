@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
 
@@ -12,6 +13,7 @@ class LLMStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Show success state
     if (llmState.isInitialized) {
       return Card(
         color: AppColors.success.withOpacity(0.1),
@@ -46,6 +48,68 @@ class LLMStatusCard extends StatelessWidget {
       );
     }
 
+    // Show error state with helpful message
+    if (llmState.error != null) {
+      final isCorruptedModel = llmState.error?.contains('too small') ?? false;
+      
+      return Card(
+        color: Colors.red.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      isCorruptedModel 
+                          ? 'Model File Corrupted'
+                          : 'Initialization Failed',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isCorruptedModel
+                    ? 'The model file is incomplete or corrupted. Please delete and re-download.'
+                    : 'There was an error initializing the AI assistant',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                llmState.error ?? '',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.red[700],
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (isCorruptedModel) ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/settings'),
+                  icon: const Icon(Icons.settings),
+                  label: const Text('Go to Settings'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show loading state
     return Card(
       color: AppColors.warning.withOpacity(0.1),
       child: Padding(

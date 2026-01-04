@@ -26,8 +26,34 @@ Java_dev_abbasian_wandermind_1llm_LlamaCppService_nativeInit(
 ) {
     const char* path = env->GetStringUTFChars(modelPath, nullptr);
     LOGI("Initializing llama.cpp with model: %s", path);
+    LOGI("Context size: %d, Threads: %d", contextSize, threads);
+    
+    // Check if file exists and is readable
+    FILE* test_file = fopen(path, "rb");
+    if (!test_file) {
+        LOGE("Failed to open model file: %s (errno: %d)", path, errno);
+        env->ReleaseStringUTFChars(modelPath, path);
+        return 0;
+    }
+    
+    // Get file size
+    fseek(test_file, 0, SEEK_END);
+    long file_size = ftell(test_file);
+    fclose(test_file);
+    LOGI("Model file size: %ld bytes (%.2f MB)", file_size, file_size / (1024.0 * 1024.0));
+    
+    // Minimum valid model size should be at least 100MB
+    const long min_model_size = 100 * 1024 * 1024; // 100MB
+    if (file_size < min_model_size) {
+        LOGE("Model file is too small (%ld bytes = %.2f MB), expected at least 100MB", 
+             file_size, file_size / (1024.0 * 1024.0));
+        LOGE("This indicates an incomplete or corrupted download. Please re-download the model.");
+        env->ReleaseStringUTFChars(modelPath, path);
+        return 0;
+    }
     
     // Initialize llama backend
+    LOGI("Initializing llama backend...");
     llama_backend_init();
     
     // Model parameters
@@ -35,13 +61,17 @@ Java_dev_abbasian_wandermind_1llm_LlamaCppService_nativeInit(
     model_params.n_gpu_layers = 0; // CPU only for Android
     
     // Load model
+    LOGI("Loading model from file...");
     llama_model* model = llama_model_load_from_file(path, model_params);
     env->ReleaseStringUTFChars(modelPath, path);
     
     if (!model) {
-        LOGE("Failed to load model");
+        LOGE("Failed to load model - llama_model_load_from_file returned null");
+        llama_backend_free();
         return 0;
     }
+    
+    LOGI("Model loaded successfully, creating context...");
     
     // Context parameters
     llama_context_params ctx_params = llama_context_default_params();
@@ -52,10 +82,13 @@ Java_dev_abbasian_wandermind_1llm_LlamaCppService_nativeInit(
     // Create context
     llama_context* ctx = llama_init_from_model(model, ctx_params);
     if (!ctx) {
-        LOGE("Failed to create context");
+        LOGE("Failed to create context - llama_init_from_model returned null");
         llama_model_free(model);
+        llama_backend_free();
         return 0;
     }
+    
+    LOGI("Context created successfully, creating sampler...");
     
     // Create sampler
     llama_sampler* sampler = llama_sampler_chain_init(llama_sampler_chain_default_params());
@@ -70,7 +103,7 @@ Java_dev_abbasian_wandermind_1llm_LlamaCppService_nativeInit(
     llama_ctx->ctx = ctx;
     llama_ctx->sampler = sampler;
     
-    LOGI("Model initialized successfully");
+    LOGI("Model initialized successfully - returning context pointer");
     return reinterpret_cast<jlong>(llama_ctx);
 }
 

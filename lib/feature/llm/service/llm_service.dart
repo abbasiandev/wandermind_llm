@@ -34,20 +34,22 @@ class LLMService {
       yield 0.2;
 
       if (!isDownloaded) {
-        _logger.i('Model not found, downloading...');
+        _logger.i('Model not found, downloading automatically...');
+        _logger.w('NOTE: First-time model download may take several minutes depending on your connection.');
+        _logger.w('Please keep your device connected to WiFi and keep the screen on.');
 
         final progressController = StreamController<double>();
 
         final downloadFuture = _downloaderService.downloadModel(
           selectedModel,
           onProgress: (progress) {
-
+            // Map download progress to 20% - 70% of total
             progressController.add(0.2 + (progress * 0.5));
             _logger.d(
                 'Download progress: ${(progress * 100).toStringAsFixed(1)}%');
           },
           onComplete: () {
-            _logger.i('Download completed');
+            _logger.i('Download completed successfully');
             progressController.close();
           },
           onError: (error) {
@@ -69,7 +71,11 @@ class LLMService {
       }
 
       _logger.i('Loading model into memory...');
+      _logger.i('NOTE: Model loading may take 30-60 seconds on first load.');
+      yield 0.75;
+      
       final modelPath = await _downloaderService.getModelPath(selectedModel);
+      _logger.i('Model path: $modelPath');
 
       await _llamaService.loadModel(
         modelPath,
@@ -80,10 +86,10 @@ class LLMService {
 
       _currentModel = selectedModel;
       _isInitialized = true;
-      _logger.i('LLM initialization completed');
+      _logger.i('✓ LLM initialization completed successfully');
       yield 1.0;
     } catch (e) {
-      _logger.e('Failed to initialize LLM: $e');
+      _logger.e('✗ Failed to initialize LLM: $e');
       _isInitialized = false;
       rethrow;
     }

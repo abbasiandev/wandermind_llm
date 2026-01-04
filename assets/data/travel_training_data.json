@@ -1,0 +1,286 @@
+{
+  "training_data_version": "1.0",
+  "description": "Comprehensive training data for offline travel assistant",
+  "categories": {
+    "destinations": {
+      "description": "Information about popular travel destinations",
+      "sample_queries": [
+        "Tell me about Paris",
+        "What are the best tourist spots in Paris?",
+        "I'm planning a trip to Tokyo",
+        "What should I see in London?",
+        "Information about New York",
+        "Best places to visit in Dubai"
+      ],
+      "response_pattern": "Destination information includes: name, country, description, costs (accommodation, food, transport, activities), top activities, and travel tips"
+    },
+    "transportation": {
+      "description": "Airport transfers and public transportation information",
+      "sample_queries": [
+        "How to get from Paris airport to city center?",
+        "How do I get from CDG airport to downtown Paris?",
+        "Best way to get from Tokyo airport to the city?",
+        "Transportation options from JFK to Manhattan?",
+        "How to get around London?",
+        "What's the best public transport in Paris?",
+        "Metro system in Tokyo",
+        "Taxi from Heathrow to London city center"
+      ],
+      "response_pattern": "Transportation info includes: multiple options with icons, descriptions, costs, duration, and practical tips"
+    },
+    "general_travel_faq": {
+      "description": "Common travel questions and advice",
+      "topics": {
+        "visa_passport": {
+          "sample_queries": [
+            "Do I need a visa?",
+            "Visa requirements for traveling",
+            "What about passport validity?",
+            "How long should my passport be valid?"
+          ]
+        },
+        "insurance": {
+          "sample_queries": [
+            "Do I need travel insurance?",
+            "What does travel insurance cover?",
+            "Best travel insurance options"
+          ]
+        },
+        "money_currency": {
+          "sample_queries": [
+            "How much money should I bring?",
+            "Best way to exchange currency?",
+            "Should I use cash or card?",
+            "Where to exchange money?"
+          ]
+        },
+        "safety": {
+          "sample_queries": [
+            "Is it safe to travel alone?",
+            "Safety tips for travelers",
+            "How to stay safe while traveling?",
+            "What are common travel scams?"
+          ]
+        },
+        "packing": {
+          "sample_queries": [
+            "What should I pack?",
+            "Packing tips for travel",
+            "How to pack light?",
+            "Essential items to bring"
+          ]
+        },
+        "health": {
+          "sample_queries": [
+            "What vaccinations do I need?",
+            "Health precautions for travel",
+            "What if I get sick abroad?",
+            "Travel health tips"
+          ]
+        },
+        "language": {
+          "sample_queries": [
+            "How to deal with language barriers?",
+            "Do I need to speak the local language?",
+            "Translation apps for travel",
+            "Basic phrases to learn"
+          ]
+        },
+        "customs_culture": {
+          "sample_queries": [
+            "Local customs I should know",
+            "Cultural etiquette tips",
+            "What are the customs in Japan?",
+            "Dress code for temples"
+          ]
+        },
+        "accommodation": {
+          "sample_queries": [
+            "Where should I stay?",
+            "Best areas to book a hotel",
+            "Hostel vs hotel?",
+            "How to choose accommodation"
+          ]
+        },
+        "airport": {
+          "sample_queries": [
+            "Airport tips for international travel",
+            "How early should I arrive at the airport?",
+            "What to do at the airport?",
+            "Airport security tips"
+          ]
+        },
+        "solo_travel": {
+          "sample_queries": [
+            "Tips for solo travelers",
+            "Is solo travel safe?",
+            "How to meet people while traveling alone?",
+            "Solo travel advice"
+          ]
+        },
+        "budget_travel": {
+          "sample_queries": [
+            "How to travel on a budget?",
+            "Cheap travel tips",
+            "How to save money while traveling?",
+            "Budget travel advice"
+          ]
+        },
+        "jet_lag": {
+          "sample_queries": [
+            "How to avoid jet lag?",
+            "Dealing with time zone changes",
+            "Jet lag tips",
+            "How to adjust to new time zone"
+          ]
+        },
+        "scams": {
+          "sample_queries": [
+            "Common travel scams",
+            "How to avoid being scammed?",
+            "Tourist scams to watch out for",
+            "Taxi scams abroad"
+          ]
+        }
+      }
+    },
+    "routing_planning": {
+      "description": "Route planning and navigation",
+      "sample_queries": [
+        "Plan a route from A to B",
+        "Best way to get to the Eiffel Tower?",
+        "How long does it take to get to the Louvre?",
+        "Create a route with multiple stops"
+      ],
+      "features": [
+        "Offline map data",
+        "Multiple routing options",
+        "Scenic route preferences",
+        "Point of interest recommendations"
+      ]
+    }
+  },
+  "supported_cities": [
+    {
+      "name": "Paris",
+      "country": "France",
+      "features": ["destination_info", "transportation", "airport_transfer", "public_transport"]
+    },
+    {
+      "name": "Tokyo",
+      "country": "Japan",
+      "features": ["destination_info", "transportation", "airport_transfer", "public_transport"]
+    },
+    {
+      "name": "London",
+      "country": "United Kingdom",
+      "features": ["destination_info", "transportation", "airport_transfer", "public_transport"]
+    },
+    {
+      "name": "New York",
+      "country": "United States",
+      "features": ["destination_info", "transportation", "airport_transfer", "public_transport"]
+    },
+    {
+      "name": "Dubai",
+      "country": "United Arab Emirates",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Abu Dhabi",
+      "country": "United Arab Emirates",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Cairo",
+      "country": "Egypt",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Marrakech",
+      "country": "Morocco",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Doha",
+      "country": "Qatar",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Amman",
+      "country": "Jordan",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Rome",
+      "country": "Italy",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Barcelona",
+      "country": "Spain",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Istanbul",
+      "country": "Turkey",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Singapore",
+      "country": "Singapore",
+      "features": ["destination_info"]
+    },
+    {
+      "name": "Bangkok",
+      "country": "Thailand",
+      "features": ["destination_info"]
+    }
+  ],
+  "usage_instructions": {
+    "offline_mode": "All destination information, transportation data, and general travel FAQ are available completely offline once the app is installed",
+    "query_examples": [
+      "Ask about specific destinations: 'Tell me about Paris'",
+      "Ask about transportation: 'How to get from Paris airport to city center?'",
+      "Ask general travel questions: 'Do I need travel insurance?'",
+      "Get safety advice: 'Is it safe to travel alone?'",
+      "Get packing tips: 'What should I pack for my trip?'",
+      "Currency advice: 'Best way to exchange money?'"
+    ],
+    "features": [
+      "No internet required after installation",
+      "Comprehensive destination guides",
+      "Detailed transportation options with costs and times",
+      "General travel FAQ covering 14+ topics",
+      "Smart query detection and routing",
+      "Cost estimates and budgeting information",
+      "Practical tips and safety advice"
+    ]
+  },
+  "example_conversations": [
+    {
+      "user": "I'm planning a trip to Paris. What should I know?",
+      "assistant": "Returns comprehensive Paris destination info including description, daily costs, top activities, and travel tips"
+    },
+    {
+      "user": "How do I get from CDG airport to downtown Paris?",
+      "assistant": "Returns 4 transportation options: RER B Train (€10-11, 30-40 min), Roissybus (€13.70, 60 min), Taxi (€50-70, 30-50 min), Uber/Bolt (€40-60, 30-50 min) with detailed tips for each"
+    },
+    {
+      "user": "Do I need travel insurance?",
+      "assistant": "Returns detailed explanation of travel insurance importance, what it covers, and recommendations for coverage amounts"
+    },
+    {
+      "user": "How can I travel on a budget?",
+      "assistant": "Returns comprehensive budget travel tips including using public transport, eating at local markets, booking accommodations with kitchens, etc."
+    },
+    {
+      "user": "What are common travel scams?",
+      "assistant": "Returns list of common scams like overcharging taxis, fake closed attractions, fake police, friendship bracelet trap, etc. with prevention advice"
+    },
+    {
+      "user": "How to get around Tokyo?",
+      "assistant": "Returns Tokyo public transport options including JR Yamanote Line, Tokyo Metro, and taxis with costs and tips"
+    }
+  ]
+}

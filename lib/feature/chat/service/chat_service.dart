@@ -75,7 +75,8 @@ class ChatService {
 
       final destinations = [
         'dubai', 'abu dhabi', 'cairo', 'marrakech', 'doha', 'amman',
-        'paris', 'tokyo', 'new york', 'london', 'rome'
+        'paris', 'tokyo', 'new york', 'london', 'rome', 'barcelona',
+        'istanbul', 'singapore', 'bangkok'
       ];
 
       final queryLower = query.toLowerCase();
@@ -137,5 +138,134 @@ class ChatService {
     ];
 
     return destinationKeywords.any((keyword) => queryLower.contains(keyword));
+  }
+
+  /// Get transportation/routing information for a query
+  String? getTransportationInfo(String query) {
+    try {
+      final queryLower = query.toLowerCase();
+      
+      // Check if it's a routing/transportation question
+      final routingKeywords = [
+        'how to get',
+        'how do i get',
+        'get from',
+        'transport from',
+        'travel from',
+        'go from',
+        'airport to',
+        'from airport',
+        'transportation',
+        'best way to',
+        'metro',
+        'taxi',
+        'bus',
+        'train',
+        'subway',
+        'public transport',
+        'getting around',
+      ];
+
+      final isRoutingQuery = routingKeywords.any((keyword) => queryLower.contains(keyword));
+      if (!isRoutingQuery) return null;
+
+      // Try to identify the city
+      final cities = ['paris', 'tokyo', 'london', 'new york'];
+      
+      for (final city in cities) {
+        if (queryLower.contains(city)) {
+          final transportInfo = TravelKnowledgeBase.getTransportationInfo(city);
+          if (transportInfo != null) {
+            return _buildTransportationResponse(transportInfo, queryLower);
+          }
+        }
+      }
+
+      return null;
+    } catch (e) {
+      _logger.e('Failed to get transportation info: $e');
+      return null;
+    }
+  }
+
+  String _buildTransportationResponse(TransportationInfo info, String query) {
+    final buffer = StringBuffer();
+    
+    if (query.contains('airport')) {
+      buffer.writeln('🚖 Transportation from ${info.cityName} Airport to City Center:\n');
+      
+      for (final option in info.airportTransport) {
+        buffer.writeln('${option.icon} ${option.name}');
+        buffer.writeln('   ${option.description}');
+        buffer.writeln('   💰 Cost: ${option.cost}');
+        buffer.writeln('   ⏱️ Time: ${option.duration}');
+        if (option.tips.isNotEmpty) {
+          buffer.writeln('   💡 Tip: ${option.tips.first}');
+        }
+        buffer.writeln();
+      }
+    } else {
+      buffer.writeln('🚇 Getting Around ${info.cityName}:\n');
+      buffer.writeln(info.generalTransportInfo);
+      buffer.writeln();
+      
+      buffer.writeln('📍 Public Transport Options:\n');
+      for (final option in info.publicTransport) {
+        buffer.writeln('${option.icon} ${option.name}');
+        buffer.writeln('   ${option.description}');
+        buffer.writeln('   💰 Cost: ${option.cost}');
+        if (option.tips.isNotEmpty) {
+          buffer.writeln('   💡 ${option.tips.first}');
+        }
+        buffer.writeln();
+      }
+    }
+    
+    return buffer.toString();
+  }
+
+  /// Get general travel FAQ answer
+  String? getTravelFAQAnswer(String query) {
+    try {
+      return TravelKnowledgeBase.searchFAQ(query);
+    } catch (e) {
+      _logger.e('Failed to get FAQ answer: $e');
+      return null;
+    }
+  }
+
+  /// Determine the type of query and get appropriate response
+  String? getSmartResponse(String query) {
+    try {
+      // First, check for transportation/routing queries
+      final transportInfo = getTransportationInfo(query);
+      if (transportInfo != null) {
+        return transportInfo;
+      }
+
+      // Check for destination information queries
+      if (isDestinationQuery(query)) {
+        final destInfo = getQuickDestinationInfo(query);
+        if (destInfo != null) {
+          return destInfo;
+        }
+      }
+
+      // Check for general travel FAQ
+      final faqAnswer = getTravelFAQAnswer(query);
+      if (faqAnswer != null) {
+        return '💡 Travel Tip:\n\n$faqAnswer';
+      }
+
+      return null;
+    } catch (e) {
+      _logger.e('Failed to get smart response: $e');
+      return null;
+    }
+  }
+
+  /// Check if query can be answered with knowledge base
+  bool canAnswerWithKnowledgeBase(String query) {
+    return getSmartResponse(query) != null;
   }
 }
