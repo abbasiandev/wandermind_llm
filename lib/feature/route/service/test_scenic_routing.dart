@@ -306,7 +306,7 @@ class ScenicRoutingTester {
       }
 
       _logger.i('   Angle changes: $angleChanges / ${route.points.length - 2}');
-      
+
       if (angleChanges > route.points.length ~/ 4) {
         _logger.i('   ✅ Good angular variation (winding path detected)');
       } else {
@@ -318,7 +318,7 @@ class ScenicRoutingTester {
     _logger.i('🎯 SPIRAL QUALITY:');
     final spiralScore = _calculateSpiralScore(route, center);
     _logger.i('   Score: ${spiralScore.toStringAsFixed(1)}/100');
-    
+
     if (spiralScore > 70) {
       _logger.i('   ✅ EXCELLENT: Strong spiral pattern detected!');
     } else if (spiralScore > 50) {

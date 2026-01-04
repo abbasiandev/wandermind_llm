@@ -23,9 +23,9 @@ class OfflineMapDataService {
     _logger.i('Downloading road data for $regionName...');
 
     final overpassQuery = _buildOverpassQuery(minLat, maxLat, minLon, maxLon);
-    
+
     final url = Uri.parse('https://overpass-api.de/api/interpreter');
-    
+
     try {
       final response = await _client.post(
         url,
@@ -36,9 +36,9 @@ class OfflineMapDataService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final network = _parseOSMData(data, regionName, minLat, maxLat, minLon, maxLon);
-        
+
         await _saveNetworkToFile(network);
-        
+
         _logger.i('Downloaded ${network.nodes.length} nodes and ${network.edges.length} edges for $regionName');
         return network;
       } else {
@@ -72,7 +72,7 @@ out skel qt;
     double maxLon,
   ) {
     final elements = data['elements'] as List;
-    
+
     final osmNodes = <String, Map<String, dynamic>>{};
     final ways = <Map<String, dynamic>>[];
 
@@ -92,7 +92,7 @@ out skel qt;
       final wayId = way['id'].toString();
       final tags = way['tags'] as Map<String, dynamic>? ?? {};
       final nodeIds = (way['nodes'] as List).map((id) => id.toString()).toList();
-      
+
       if (nodeIds.length < 2) continue;
 
       final highway = tags['highway'] as String?;
@@ -233,12 +233,12 @@ out skel qt;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/offline_maps/${network.regionId}.json');
-      
+
       await file.parent.create(recursive: true);
-      
+
       final jsonData = json.encode(network.toJson());
       await file.writeAsString(jsonData);
-      
+
       _logger.i('Saved network to ${file.path}');
     } catch (e) {
       _logger.e('Error saving network: $e');
@@ -249,18 +249,18 @@ out skel qt;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/offline_maps/$regionId.json');
-      
+
       if (!await file.exists()) {
         _logger.w('Network file not found: $regionId');
         return null;
       }
-      
+
       final jsonData = await file.readAsString();
       final data = json.decode(jsonData);
-      
+
       final network = RoadNetwork.fromJson(data);
       _logger.i('Loaded network: ${network.regionName} with ${network.nodes.length} nodes');
-      
+
       return network;
     } catch (e) {
       _logger.e('Error loading network: $e');
@@ -272,11 +272,11 @@ out skel qt;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final offlineMapsDir = Directory('${dir.path}/offline_maps');
-      
+
       if (!await offlineMapsDir.exists()) {
         return [];
       }
-      
+
       final files = await offlineMapsDir.list().toList();
       return files
           .where((f) => f.path.endsWith('.json'))
@@ -292,7 +292,7 @@ out skel qt;
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/offline_maps/$regionId.json');
-      
+
       if (await file.exists()) {
         await file.delete();
         _logger.i('Deleted region: $regionId');
@@ -462,7 +462,7 @@ out skel qt;
     );
 
     await _saveNetworkToFile(network);
-    
+
     return network;
   }
 

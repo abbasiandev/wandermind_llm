@@ -57,7 +57,6 @@ class ModelDownloaderService {
       final modelInfo = availableModels[modelKey]!;
       final modelPath = await getModelPath(modelKey);
 
-      // Create models directory
       final modelDir = Directory(modelPath.substring(0, modelPath.lastIndexOf('/')));
       if (!await modelDir.exists()) {
         await modelDir.create(recursive: true);
@@ -72,7 +71,6 @@ class ModelDownloaderService {
         onReceiveProgress: (received, total) {
           if (total != -1) {
             final progress = received / total;
-            // Only report progress if it changed by at least 1% to prevent UI overwhelm
             if (progress - lastReportedProgress >= 0.01 || progress >= 1.0) {
               onProgress(progress);
               lastReportedProgress = progress;
@@ -118,7 +116,7 @@ class ModelDownloaderService {
 
       if (await file.exists()) {
         final size = await file.length();
-        return size / (1024 * 1024); // Convert to MB
+        return size / (1024 * 1024);
       }
       return 0;
     } catch (e) {

@@ -43,7 +43,6 @@ class LlamaCppService(private val context: Context) {
                 return false
             }
 
-            // Log detailed file information
             Log.i(TAG, "Model file exists: ${file.exists()}")
             Log.i(TAG, "Model file size: ${file.length()} bytes")
             Log.i(TAG, "Model file can read: ${file.canRead()}")

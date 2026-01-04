@@ -90,7 +90,7 @@ class ScenicRoutingEngine {
     double maxDistance,
   ) async {
     final allPaths = await _findMultiplePaths(start, end, 5);
-    
+
     if (allPaths.isEmpty) return null;
 
     var bestPath = allPaths.first;
@@ -212,7 +212,7 @@ class ScenicRoutingEngine {
 
       if (path != null && path.length > 1) {
         paths.add(path);
-        
+
         for (int j = 0; j < path.length - 1; j++) {
           final edgeId = '${path[j]}_${path[j + 1]}';
           usedEdges.add(edgeId);
@@ -319,7 +319,7 @@ class ScenicRoutingEngine {
 
     double score = edge.distanceMeters;
 
-    if (edge.roadType == RoadType.residential || 
+    if (edge.roadType == RoadType.residential ||
         edge.roadType == RoadType.service) {
       score *= 0.7;
     }

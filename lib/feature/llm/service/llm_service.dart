@@ -43,7 +43,6 @@ class LLMService {
         final downloadFuture = _downloaderService.downloadModel(
           selectedModel,
           onProgress: (progress) {
-            // Map download progress to 20% - 70% of total
             progressController.add(0.2 + (progress * 0.5));
             _logger.d(
                 'Download progress: ${(progress * 100).toStringAsFixed(1)}%');
@@ -73,7 +72,7 @@ class LLMService {
       _logger.i('Loading model into memory...');
       _logger.i('NOTE: Model loading may take 30-60 seconds on first load.');
       yield 0.75;
-      
+
       final modelPath = await _downloaderService.getModelPath(selectedModel);
       _logger.i('Model path: $modelPath');
 

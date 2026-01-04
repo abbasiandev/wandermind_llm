@@ -29,7 +29,7 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
   final MapController _mapController = MapController();
   final FlutterTts _flutterTts = FlutterTts();
   StreamSubscription? _locationSubscription;
-  
+
   LatLng? _currentLocation;
   double _currentZoom = 16.0;
   bool _followMode = true;
@@ -63,7 +63,7 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
     _locationSubscription = locationService.getLocationStream().listen(
       (locationData) {
         final newLocation = LatLng(locationData.latitude, locationData.longitude);
-        
+
         setState(() {
           _currentLocation = newLocation;
         });
@@ -71,7 +71,7 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
         final navState = ref.read(navigationStateNotifierProvider);
         if (navState.isNavigating) {
           ref.read(navigationStateNotifierProvider.notifier).updateLocation(newLocation);
-          
+
           _checkForVoiceAnnouncement();
         }
 
@@ -85,7 +85,7 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
   void _checkForVoiceAnnouncement() {
     final navState = ref.read(navigationStateNotifierProvider);
     final notifier = ref.read(navigationStateNotifierProvider.notifier);
-    
+
     if (navState.distanceToNextStep > 0) {
       if (notifier.shouldAnnounce(_previousDistanceToStep, navState.distanceToNextStep)) {
         final instruction = notifier.getVoiceInstruction();
@@ -110,7 +110,7 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
   void _startNavigation() {
     if (widget.route != null) {
       ref.read(navigationStateNotifierProvider.notifier).startNavigation(widget.route!);
-      
+
       setState(() {
         _followMode = true;
         _currentZoom = 17.0;
@@ -126,7 +126,7 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
 
   void _stopNavigation() {
     ref.read(navigationStateNotifierProvider.notifier).stopNavigation();
-    
+
     setState(() {
       _currentZoom = 16.0;
     });

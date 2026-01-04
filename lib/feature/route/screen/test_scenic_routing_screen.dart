@@ -72,7 +72,7 @@ class _TestScenicRoutingScreenState extends ConsumerState<TestScenicRoutingScree
 
   void _analyzeRoute(dynamic route) {
     final buffer = StringBuffer();
-    
+
     buffer.writeln('✅ Route Calculated Successfully!\n');
     buffer.writeln('📊 Statistics:');
     buffer.writeln('   Mode: ${route.name}');
@@ -103,7 +103,7 @@ class _TestScenicRoutingScreenState extends ConsumerState<TestScenicRoutingScree
 
       buffer.writeln('   Avg from center: ${avgDist.toStringAsFixed(0)} m');
       buffer.writeln('   Range: ${(maxDist - minDist).toStringAsFixed(0)} m');
-      
+
       if (maxDist - minDist > 500) {
         buffer.writeln('   ✅ Good spiral variation!');
       }

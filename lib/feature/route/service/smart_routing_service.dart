@@ -12,12 +12,12 @@ import 'scenic_routing_engine.dart';
 
 class SmartRoutingService {
   static final Logger _logger = Logger();
-  
+
   final http.Client _client;
   final OfflineRoutingEngine _offlineEngine;
   final OfflineMapDataService _offlineDataService;
   final ScenicRoutingEngine _scenicEngine;
-  
+
   SmartRoutingService({
     http.Client? client,
     OfflineRoutingEngine? offlineEngine,
@@ -147,7 +147,7 @@ class SmartRoutingService {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      
+
       if (data['code'] == 'Ok' && data['routes'] != null && (data['routes'] as List).isNotEmpty) {
         return _parseMapboxRoute(data['routes'][0], type);
       } else {
@@ -182,28 +182,28 @@ class SmartRoutingService {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      
+
       if (data['code'] == 'Ok' && data['routes'] != null) {
         final routes = <RouteResult>[];
         final mapboxRoutes = data['routes'] as List;
-        
+
         for (int i = 0; i < mapboxRoutes.length; i++) {
-          final routeType = i == 0 ? RouteType.fastest : 
+          final routeType = i == 0 ? RouteType.fastest :
                           i == 1 ? RouteType.balanced : RouteType.shortest;
           routes.add(_parseMapboxRoute(mapboxRoutes[i], routeType));
         }
-        
+
         return routes;
       }
     }
-    
+
     throw Exception('Failed to get Mapbox alternatives');
   }
 
   RouteResult _parseMapboxRoute(Map<String, dynamic> route, RouteType type) {
     final geometry = route['geometry'];
     final legs = route['legs'] as List;
-    
+
     final points = <LatLng>[];
     if (geometry['coordinates'] != null) {
       for (final coord in geometry['coordinates']) {
@@ -216,7 +216,7 @@ class SmartRoutingService {
 
     final steps = <NavigationStep>[];
     int stepIndex = 0;
-    
+
     for (final leg in legs) {
       if (leg['steps'] != null) {
         for (final step in leg['steps']) {
@@ -240,12 +240,12 @@ class SmartRoutingService {
   NavigationStep _parseMapboxStep(Map<String, dynamic> step, int index) {
     final maneuver = step['maneuver'];
     final location = maneuver['location'];
-    
+
     final distance = (step['distance'] as num).toDouble();
     final duration = (step['duration'] as num).toDouble();
     final instruction = maneuver['instruction'] ?? step['name'] ?? 'Continue';
     final maneuverType = _parseMapboxManeuver(maneuver['type'], maneuver['modifier']);
-    
+
     return NavigationStep(
       index: index,
       location: LatLng(location[1], location[0]),
@@ -280,12 +280,12 @@ class SmartRoutingService {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      
+
       if (data['code'] == 'Ok' && data['routes'] != null && (data['routes'] as List).isNotEmpty) {
         return _parseOSRMRoute(data['routes'][0], type);
       }
     }
-    
+
     throw Exception('OSRM routing failed');
   }
 
@@ -311,28 +311,28 @@ class SmartRoutingService {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      
+
       if (data['code'] == 'Ok' && data['routes'] != null) {
         final routes = <RouteResult>[];
         final osrmRoutes = data['routes'] as List;
-        
+
         for (int i = 0; i < osrmRoutes.length; i++) {
-          final routeType = i == 0 ? RouteType.fastest : 
+          final routeType = i == 0 ? RouteType.fastest :
                           i == 1 ? RouteType.balanced : RouteType.shortest;
           routes.add(_parseOSRMRoute(osrmRoutes[i], routeType));
         }
-        
+
         return routes;
       }
     }
-    
+
     throw Exception('OSRM alternatives failed');
   }
 
   RouteResult _parseOSRMRoute(Map<String, dynamic> route, RouteType type) {
     final geometry = route['geometry'];
     final legs = route['legs'] as List;
-    
+
     final points = <LatLng>[];
     if (geometry['coordinates'] != null) {
       for (final coord in geometry['coordinates']) {
@@ -345,7 +345,7 @@ class SmartRoutingService {
 
     final steps = <NavigationStep>[];
     int stepIndex = 0;
-    
+
     for (final leg in legs) {
       if (leg['steps'] != null) {
         for (final step in leg['steps']) {
@@ -369,12 +369,12 @@ class SmartRoutingService {
   NavigationStep _parseOSRMStep(Map<String, dynamic> step, int index) {
     final maneuver = step['maneuver'];
     final location = maneuver['location'];
-    
+
     final distance = (step['distance'] as num).toDouble();
     final duration = (step['duration'] as num).toDouble();
     final instruction = step['name'] ?? 'Continue';
     final maneuverType = _parseOSRMManeuver(maneuver['type'], maneuver['modifier']);
-    
+
     return NavigationStep(
       index: index,
       location: LatLng(location[1], location[0]),
@@ -435,7 +435,7 @@ class SmartRoutingService {
 
   ManeuverType _parseTurnModifier(String? modifier) {
     if (modifier == null) return ManeuverType.turn;
-    
+
     switch (modifier) {
       case 'left':
         return ManeuverType.turnLeft;
@@ -457,7 +457,7 @@ class SmartRoutingService {
   }
 
   String _generateInstruction(ManeuverType type, String streetName, double distance) {
-    final distanceStr = distance < 1000 
+    final distanceStr = distance < 1000
         ? '${distance.toStringAsFixed(0)} meters'
         : '${(distance / 1000).toStringAsFixed(1)} km';
 
@@ -512,7 +512,7 @@ class SmartRoutingService {
   Future<void> _loadOfflineNetwork() async {
     try {
       final regions = await _offlineDataService.listAvailableRegions();
-      
+
       if (regions.isEmpty) {
         _logger.i('No offline networks available, creating sample network...');
         final sampleNetwork = await _offlineDataService.createSampleNetwork();
@@ -522,7 +522,7 @@ class SmartRoutingService {
 
       final firstRegion = regions.first;
       final network = await _offlineDataService.loadNetworkFromFile(firstRegion);
-      
+
       if (network != null) {
         _offlineEngine.loadNetwork(network);
         _scenicEngine.loadNetwork(network);
@@ -547,7 +547,7 @@ class SmartRoutingService {
       minLon: minLon,
       maxLon: maxLon,
     );
-    
+
     _offlineEngine.loadNetwork(network);
     _scenicEngine.loadNetwork(network);
   }

@@ -26,14 +26,14 @@ class RouteCalculationService {
     RoutePreferences? preferences,
   }) async {
     await initialize();
-    
+
     _logger.i('Calculating routes from $start to $end');
 
     final prefs = preferences ?? const RoutePreferences();
 
     try {
       final waypointLocations = waypoints.map((w) => w.location).toList();
-      
+
       final routes = await _routingService.getAlternativeRoutes(
         start: start,
         end: end,
@@ -62,7 +62,7 @@ class RouteCalculationService {
     RoutePreferences prefs,
   ) async {
     _logger.i('Using fallback route calculation');
-    
+
     try {
       final route = await _routingService.getRoute(
         start: start,
@@ -83,13 +83,13 @@ class RouteCalculationService {
     List<Waypoint> waypoints,
   ) {
     _logger.w('Creating straight-line fallback route');
-    
+
     final points = <LatLng>[start];
-    
+
     for (final waypoint in waypoints) {
       points.add(waypoint.location);
     }
-    
+
     points.add(end);
 
     final distance = _calculateTotalDistance(points);

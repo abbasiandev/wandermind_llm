@@ -13,7 +13,6 @@ class LLMStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Show success state
     if (llmState.isInitialized) {
       return Card(
         color: AppColors.success.withOpacity(0.1),
@@ -48,10 +47,9 @@ class LLMStatusCard extends StatelessWidget {
       );
     }
 
-    // Show error state with helpful message
     if (llmState.error != null) {
       final isCorruptedModel = llmState.error?.contains('too small') ?? false;
-      
+
       return Card(
         color: Colors.red.withOpacity(0.1),
         child: Padding(
@@ -65,7 +63,7 @@ class LLMStatusCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      isCorruptedModel 
+                      isCorruptedModel
                           ? 'Model File Corrupted'
                           : 'Initialization Failed',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -109,7 +107,6 @@ class LLMStatusCard extends StatelessWidget {
       );
     }
 
-    // Show loading state
     return Card(
       color: AppColors.warning.withOpacity(0.1),
       child: Padding(

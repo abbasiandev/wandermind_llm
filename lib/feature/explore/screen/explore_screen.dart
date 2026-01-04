@@ -282,7 +282,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-                      // Navigate to create plan with destination pre-filled
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Creating plan for ${destination.name}'),

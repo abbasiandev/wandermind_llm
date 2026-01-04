@@ -15,7 +15,6 @@ final locationServiceProvider = Provider<LocationService>((ref) {
 class LocationController extends _$LocationController {
   @override
   Future<LocationData?> build() async {
-    // Don't auto-fetch on build, let screens request it explicitly
     return null;
   }
 

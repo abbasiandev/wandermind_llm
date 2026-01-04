@@ -55,8 +55,7 @@ final appInitializationProvider = FutureProvider<void>((ref) async {
   final prefs = await SharedPreferences.getInstance();
 
   await ref.read(storageServiceProvider).initialize();
-  
-  // Keep LLM service alive throughout app lifecycle
+
   ref.read(keepAliveLLMServiceProvider);
 });
 

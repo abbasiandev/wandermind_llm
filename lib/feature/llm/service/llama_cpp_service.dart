@@ -48,9 +48,8 @@ class LlamaCppService {
 
       final fileSize = await file.length();
       _logger.i('Model file size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
-      
-      // Minimum valid model size should be at least 100MB
-      const minModelSize = 100 * 1024 * 1024; // 100MB
+
+      const minModelSize = 100 * 1024 * 1024;
       if (fileSize < minModelSize) {
         throw Exception('Model file is too small (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB).\n'
             'Expected at least 100MB but got ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB.\n'
@@ -67,7 +66,7 @@ class LlamaCppService {
       _threads = threads;
 
       _logger.i('Calling native loadModel with contextSize=$contextSize, threads=$threads');
-      
+
       final result = await _methodChannel.invokeMethod<bool>('loadModel', {
         'modelPath': modelPath,
         'contextSize': contextSize,
@@ -87,7 +86,7 @@ class LlamaCppService {
       _logger.i('Model loaded successfully with native llama.cpp: $_modelPath');
       _logger.i('Context size: $contextSize, Threads: $threads');
     } on PlatformException catch (e, stackTrace) {
-      _logger.e('Platform error loading model: ${e.code} - ${e.message}', 
+      _logger.e('Platform error loading model: ${e.code} - ${e.message}',
           error: e, stackTrace: stackTrace);
       _isLoaded = false;
       _modelPath = null;

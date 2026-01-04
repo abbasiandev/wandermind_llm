@@ -30,7 +30,7 @@ class NavigationStateNotifier extends _$NavigationStateNotifier {
         this.state = state;
       });
     });
-    
+
     return const NavigationState(isNavigating: false);
   }
 

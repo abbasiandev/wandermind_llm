@@ -42,7 +42,6 @@ class _DestinationInputState extends State<DestinationInput> {
   void didUpdateWidget(DestinationInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != oldWidget.value && widget.value != _controller.text) {
-      // Update controller without triggering onChanged listener
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _controller.value = _controller.value.copyWith(
@@ -84,7 +83,6 @@ class _DestinationInputState extends State<DestinationInput> {
 
         const SizedBox(height: 16),
 
-        // Popular destinations
         Text(
           'Popular Destinations',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(

@@ -80,7 +80,6 @@ class DatePickerField extends StatelessWidget {
     } else if (firstDate != null && !firstDate!.isBefore(effectiveFirstDate)) {
       initialDate = firstDate!;
     } else {
-      // Use the later of today or firstDate
       initialDate = now.isAfter(effectiveFirstDate) ? now : effectiveFirstDate;
     }
 

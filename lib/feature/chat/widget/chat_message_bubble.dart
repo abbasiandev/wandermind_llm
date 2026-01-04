@@ -60,7 +60,6 @@ class ChatMessageBubble extends StatelessWidget {
                   else
                     _buildTextMessage(context, isUser),
 
-                  // Show route button for AI responses with routing info
                   if (!isUser && _isRoutingResponse(message.content))
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
@@ -202,7 +201,7 @@ class ChatMessageBubble extends StatelessWidget {
       'show route on map',
       'airport to',
     ];
-    
+
     final contentLower = content.toLowerCase();
     return routingKeywords.any((keyword) => contentLower.contains(keyword));
   }

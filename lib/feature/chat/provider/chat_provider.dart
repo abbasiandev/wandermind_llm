@@ -19,7 +19,7 @@ final chatServiceProvider = Provider<ChatService>((ref) {
 @riverpod
 class ChatController extends _$ChatController {
   static final Logger _logger = Logger();
-  
+
   @override
   Future<List<ChatMessage>> build() async {
     final service = ref.read(chatServiceProvider);
@@ -42,20 +42,16 @@ class ChatController extends _$ChatController {
       await service.saveMessage(userMessage);
 
       String aiResponse;
-      
-      // First try to get a complete smart response from knowledge base
+
       final smartResponse = service.getSmartResponse(content);
-      
+
       if (smartResponse != null) {
-        // We can answer completely from offline knowledge base
         _logger.i('Using smart offline response for: $content');
         aiResponse = smartResponse;
       } else {
-        // Try to enhance prompt with offline data if available
         final quickInfo = service.getQuickDestinationInfo(content);
-        
+
         if (quickInfo != null) {
-          // We have offline data - use it to enhance the LLM prompt
           _logger.i('Enhancing LLM with offline data for: $content');
           final llmController = ref.read(lLMControllerProvider.notifier);
           final enhancedPrompt = '''
@@ -68,7 +64,6 @@ Please provide a helpful, conversational response based on this information and 
 ''';
           aiResponse = await llmController.generateResponse(enhancedPrompt);
         } else {
-          // No offline data - use pure LLM
           _logger.i('Using LLM for query: $content');
           final llmController = ref.read(lLMControllerProvider.notifier);
           aiResponse = await llmController.generateResponse(content);

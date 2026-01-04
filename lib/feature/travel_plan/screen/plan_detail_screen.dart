@@ -532,7 +532,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
                     .read(currentTravelPlanControllerProvider.notifier)
                     .addNote(controller.text.trim());
                 Navigator.pop(context);
-                _loadPlan(); // Reload to show the new note
+                _loadPlan();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Note added successfully')),
                 );

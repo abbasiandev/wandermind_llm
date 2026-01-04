@@ -33,8 +33,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     try {
       await llmController.initializeLLM();
     } catch (e) {
-      // Silently fail - user can manually initialize from settings
-      // or the LLM status card will show the error
       debugPrint('Failed to auto-initialize LLM: $e');
     }
   }
