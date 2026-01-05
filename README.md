@@ -13,8 +13,6 @@
 
 </div>
 
----
-
 ## About
 
 **WanderMind LLM** is a revolutionary Flutter-based mobile travel companion that brings the power of Large Language Models (LLM) directly to your device. Unlike traditional travel apps that require constant internet connectivity, WanderMind runs **100% offline** using on-device AI powered by **Llama.cpp**, providing intelligent travel planning, personalized recommendations, and smart navigation even in remote locations.
