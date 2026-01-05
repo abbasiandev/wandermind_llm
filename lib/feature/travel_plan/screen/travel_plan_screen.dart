@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/widget/custom_app_bar.dart';
 import '../../../core/widget/loading_widget.dart';
 import '../provider/travel_plan_provider.dart';
 import '../widget/plan_list_item.dart';
-
 class TravelPlanScreen extends ConsumerWidget {
   const TravelPlanScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final plansAsync = ref.watch(travelPlansControllerProvider);
-
     return Scaffold(
       appBar: const CustomAppBar(title: 'My Travel Plans'),
       body: plansAsync.when(
@@ -21,7 +17,6 @@ class TravelPlanScreen extends ConsumerWidget {
           if (plans.isEmpty) {
             return _buildEmptyState(context);
           }
-
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: plans.length,
@@ -49,7 +44,6 @@ class TravelPlanScreen extends ConsumerWidget {
       ),
     );
   }
-
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(

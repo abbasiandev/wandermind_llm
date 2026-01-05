@@ -2,13 +2,10 @@ import 'package:logger/logger.dart';
 import '../../../core/data/travel_knowledge_base.dart';
 import '../../../core/model/app_model.dart';
 import 'llm_service.dart';
-
 class SmartTravelService {
   static final Logger _logger = Logger();
   final LLMService _llmService;
-
   SmartTravelService(this._llmService);
-
   Future<TravelPlan> generateSmartTravelPlan({
     required String destination,
     required DateTime startDate,
@@ -18,14 +15,10 @@ class SmartTravelService {
     String? additionalRequirements,
   }) async {
     _logger.i('Generating smart travel plan for $destination');
-
     final destinationInfo = TravelKnowledgeBase.getDestinationInfo(destination);
     final duration = endDate.difference(startDate).inDays + 1;
-
     if (destinationInfo != null) {
-
       _logger.i('Found offline data for $destination - building fast plan');
-
       return await _buildPlanWithOfflineData(
         destinationInfo: destinationInfo,
         destination: destination,
@@ -37,9 +30,7 @@ class SmartTravelService {
         additionalRequirements: additionalRequirements,
       );
     } else {
-
       _logger.w('No offline data for $destination - using LLM generation');
-
       return await _buildPlanWithLLM(
         destination: destination,
         startDate: startDate,
@@ -51,7 +42,6 @@ class SmartTravelService {
       );
     }
   }
-
   Future<TravelPlan> _buildPlanWithOfflineData({
     required DestinationInfo destinationInfo,
     required String destination,
@@ -62,33 +52,25 @@ class SmartTravelService {
     required List<String> interests,
     String? additionalRequirements,
   }) async {
-
     final budgetEstimate = TravelKnowledgeBase.getBudgetEstimate(destination, duration);
-
     final relevantActivities = TravelKnowledgeBase.getActivitiesForDestination(
       destination,
       interests,
     );
-
     final tips = TravelKnowledgeBase.getTravelTips(destination);
-
     final days = <DayPlan>[];
     final activitiesPerDay = (relevantActivities.length / duration).ceil();
-
     for (int dayIndex = 0; dayIndex < duration; dayIndex++) {
       final dayDate = startDate.add(Duration(days: dayIndex));
       final dayNumber = dayIndex + 1;
-
       final startActivityIndex = dayIndex * activitiesPerDay;
       final endActivityIndex = ((dayIndex + 1) * activitiesPerDay).clamp(0, relevantActivities.length);
       final dayActivities = relevantActivities.sublist(
         startActivityIndex.clamp(0, relevantActivities.length),
         endActivityIndex,
       );
-
       final activities = <Activity>[];
       int hourOffset = 9;
-
       for (var template in dayActivities) {
         activities.add(Activity(
           id: 'activity_${dayNumber}_${activities.length + 1}',
@@ -102,10 +84,8 @@ class SmartTravelService {
           type: _mapCategoryToType(template.categories.first),
           cost: template.cost,
         ));
-
         hourOffset += template.duration + 1;
       }
-
       days.add(DayPlan(
         dayNumber: dayNumber,
         date: dayDate,
@@ -114,7 +94,6 @@ class SmartTravelService {
         activities: activities,
       ));
     }
-
     String? personalizedDescription;
     if (_llmService.isInitialized && additionalRequirements != null && additionalRequirements.isNotEmpty) {
       try {
@@ -128,7 +107,6 @@ class SmartTravelService {
         _logger.w('LLM personalization failed, using offline data only: $e');
       }
     }
-
     return TravelPlan(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: '$destination ${duration}-Day Adventure',
@@ -145,7 +123,6 @@ class SmartTravelService {
       createdAt: DateTime.now(),
     );
   }
-
   Future<TravelPlan> _buildPlanWithLLM({
     required String destination,
     required DateTime startDate,
@@ -155,18 +132,14 @@ class SmartTravelService {
     required List<String> interests,
     String? additionalRequirements,
   }) async {
-
     final prompt = '''
 Create a travel plan for $destination for $duration days.
 Budget: \$${budget.toStringAsFixed(2)}
 Interests: ${interests.join(', ')}
 ${additionalRequirements != null ? 'Requirements: $additionalRequirements' : ''}
-
 Provide a brief itinerary with 2-3 activities per day.
 ''';
-
     final response = await _llmService.generateResponse(prompt);
-
     return _createBasicPlan(
       destination: destination,
       startDate: startDate,
@@ -177,7 +150,6 @@ Provide a brief itinerary with 2-3 activities per day.
       llmResponse: response,
     );
   }
-
   Future<String> _getLLMPersonalization(
     DestinationInfo info,
     List<String> interests,
@@ -187,20 +159,15 @@ Provide a brief itinerary with 2-3 activities per day.
 Given these interests: ${interests.join(', ')}
 And requirements: $requirements
 For a trip to ${info.name}
-
 Write one personalized tip (max 30 words):
 ''';
-
     return await _llmService.generateResponse(prompt);
   }
-
   String _generateDayOverview(List<ActivityTemplate> activities, DestinationInfo info) {
     if (activities.isEmpty) return 'Explore ${info.name}';
-
     final mainActivities = activities.take(2).map((a) => a.title).join(' & ');
     return mainActivities;
   }
-
   ActivityType _mapCategoryToType(String category) {
     switch (category.toLowerCase()) {
       case 'food':
@@ -225,7 +192,6 @@ Write one personalized tip (max 30 words):
         return ActivityType.sightseeing;
     }
   }
-
   TravelPlan _createBasicPlan({
     required String destination,
     required DateTime startDate,
@@ -235,9 +201,7 @@ Write one personalized tip (max 30 words):
     required List<String> interests,
     required String llmResponse,
   }) {
-
     final days = <DayPlan>[];
-
     for (int i = 0; i < duration; i++) {
       final dayDate = startDate.add(Duration(days: i));
       days.add(DayPlan(
@@ -261,7 +225,6 @@ Write one personalized tip (max 30 words):
         ],
       ));
     }
-
     return TravelPlan(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: '$destination Adventure',

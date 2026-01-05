@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
-
 class DayPlanCard extends StatelessWidget {
   final DayPlan dayPlan;
   final Function(Activity) onActivityTap;
-
   const DayPlanCard({
     super.key,
     required this.dayPlan,
     required this.onActivityTap,
   });
-
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('EEEE, MMM dd');
-
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,20 +72,16 @@ class DayPlanCard extends StatelessWidget {
     );
   }
 }
-
 class _ActivityTile extends StatelessWidget {
   final Activity activity;
   final VoidCallback onTap;
-
   const _ActivityTile({
     required this.activity,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     final timeFormat = DateFormat('h:mm a');
-
     return ListTile(
         onTap: onTap,
         leading: CircleAvatar(

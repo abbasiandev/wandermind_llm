@@ -5,28 +5,23 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
 import '../../../core/config/map_config.dart';
 import '../../../core/theme/app_color.dart';
 import '../../location/provider/location_provider.dart';
 import '../../location/service/location_service.dart';
-
 class RouteMapWidget extends ConsumerStatefulWidget {
   final LatLng? destination;
   final Function(LatLng)? onMapTap;
   final Function(bool)? onNavigationStateChanged;
-
   const RouteMapWidget({
     super.key,
     this.destination,
     this.onMapTap,
     this.onNavigationStateChanged,
   });
-
   @override
   ConsumerState<RouteMapWidget> createState() => _RouteMapWidgetState();
 }
-
 class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
   final MapController _mapController = MapController();
   final FlutterTts _flutterTts = FlutterTts();
@@ -41,21 +36,18 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
   String _nextTurn = '';
   double _distanceToTurn = 0.0;
   bool _isNavigating = false;
-
   @override
   void initState() {
     super.initState();
     _initTts();
     _startLocationTracking();
   }
-
   Future<void> _initTts() async {
     await _flutterTts.setLanguage("en-US");
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setPitch(1.0);
   }
-
   @override
   void dispose() {
     _locationSubscription?.cancel();
@@ -63,15 +55,12 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
     _flutterTts.stop();
     super.dispose();
   }
-
   void _startLocationTracking() {
     final locationService = ref.read(locationServiceProvider);
-
     _locationSubscription = locationService.getLocationStream().listen(
       (locationData) {
         final newLocation = LatLng(locationData.latitude, locationData.longitude);
         final now = DateTime.now();
-
         if (_previousLocation != null && _lastUpdateTime != null) {
           final distance = const Distance().distance(_previousLocation!, newLocation);
           final timeDiff = now.difference(_lastUpdateTime!).inSeconds;
@@ -79,22 +68,17 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
             _currentSpeed = distance / timeDiff;
           }
         }
-
         setState(() {
           _previousLocation = _currentLocation;
           _currentLocation = newLocation;
           _lastUpdateTime = now;
         });
-
         if (widget.destination != null && _isNavigating) {
           _updateNavigationInstructions(newLocation);
         }
-
         if (_followMode && mounted) {
-
           _mapController.move(newLocation, _currentZoom);
         }
-
         if (_isNavigating && !_followMode) {
           setState(() {
             _followMode = true;
@@ -106,12 +90,9 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       },
     );
   }
-
   void _updateNavigationInstructions(LatLng currentPos) {
     if (widget.destination == null) return;
-
     final distanceToDestination = const Distance().distance(currentPos, widget.destination!);
-
     if (distanceToDestination < 100) {
       _nextTurn = 'Arriving at destination';
       _distanceToTurn = distanceToDestination;
@@ -132,10 +113,8 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       _nextTurn = 'Head towards destination';
       _distanceToTurn = distanceToDestination;
     }
-
     setState(() {});
   }
-
   Future<void> _speak(String text) async {
     try {
       await _flutterTts.speak(text);
@@ -143,7 +122,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       debugPrint('TTS error: $e');
     }
   }
-
   void _startNavigation() {
     if (widget.destination != null) {
       setState(() {
@@ -151,17 +129,13 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
         _followMode = true;
         _currentZoom = 17.0;
       });
-
       if (_currentLocation != null) {
         _mapController.move(_currentLocation!, _currentZoom);
       }
-
       _speak('Navigation started');
-
       widget.onNavigationStateChanged?.call(true);
     }
   }
-
   void _stopNavigation() {
     setState(() {
       _isNavigating = false;
@@ -169,18 +143,13 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       _distanceToTurn = 0.0;
       _currentZoom = 16.0;
     });
-
     if (_currentLocation != null) {
       _mapController.move(_currentLocation!, _currentZoom);
     }
-
     _speak('Navigation stopped');
-
     widget.onNavigationStateChanged?.call(false);
   }
-
   void _toggleFollowMode() {
-
     if (_isNavigating) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -190,16 +159,13 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       );
       return;
     }
-
     setState(() {
       _followMode = !_followMode;
     });
-
     if (_followMode && _currentLocation != null) {
       _mapController.move(_currentLocation!, _currentZoom);
     }
   }
-
   void _zoomIn() {
     setState(() {
       _currentZoom = (_currentZoom + 1).clamp(3.0, 18.0);
@@ -208,7 +174,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       _mapController.move(_currentLocation!, _currentZoom);
     }
   }
-
   void _zoomOut() {
     setState(() {
       _currentZoom = (_currentZoom - 1).clamp(3.0, 18.0);
@@ -217,17 +182,13 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       _mapController.move(_currentLocation!, _currentZoom);
     }
   }
-
   void _tiltMap() {
-
     setState(() {
       _currentRotation = _currentRotation == 0.0 ? 45.0 : 0.0;
     });
   }
-
   List<Marker> _buildMarkers() {
     final markers = <Marker>[];
-
     if (_currentLocation != null) {
       markers.add(
         Marker(
@@ -237,7 +198,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-
               Container(
                 width: 50,
                 height: 50,
@@ -246,7 +206,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                   color: AppColors.primary.withOpacity(0.3),
                 ),
               ),
-
               Container(
                 width: 20,
                 height: 20,
@@ -262,7 +221,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                   ],
                 ),
               ),
-
               const Icon(
                 Icons.navigation,
                 color: Colors.white,
@@ -273,7 +231,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
         ),
       );
     }
-
     if (widget.destination != null) {
       markers.add(
         Marker(
@@ -288,15 +245,12 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
         ),
       );
     }
-
     return markers;
   }
-
   List<Polyline> _buildRoute() {
     if (_currentLocation == null || widget.destination == null) {
       return [];
     }
-
     return [
       Polyline(
         points: [_currentLocation!, widget.destination!],
@@ -307,21 +261,17 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       ),
     ];
   }
-
   @override
   Widget build(BuildContext context) {
     final locationAsync = ref.watch(locationControllerProvider);
-
     return locationAsync.when(
       data: (location) {
-
         if (_currentLocation == null && location != null) {
           _currentLocation = LatLng(location.latitude, location.longitude);
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _mapController.move(_currentLocation!, _currentZoom);
           });
         }
-
         return Stack(
           children: [
             FlutterMap(
@@ -332,7 +282,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                 minZoom: 3.0,
                 maxZoom: 18.0,
                 onTap: (_, point) {
-
                   if (!_isNavigating) {
                     widget.onMapTap?.call(point);
                     setState(() {
@@ -343,7 +292,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
               ),
               children: [
                 TileLayer(
-
                   urlTemplate: MapConfig.getTileUrlTemplate(),
                   userAgentPackageName: 'dev.abbasian.wandermind_llm',
                   maxNativeZoom: 19,
@@ -357,13 +305,11 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                 ),
               ],
             ),
-
             Positioned(
               right: 16,
               bottom: 100,
               child: Column(
                 children: [
-
                   FloatingActionButton.small(
                     heroTag: 'follow',
                     onPressed: _toggleFollowMode,
@@ -374,7 +320,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
                   FloatingActionButton.small(
                     heroTag: '3d',
                     onPressed: _tiltMap,
@@ -385,7 +330,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
                   FloatingActionButton.small(
                     heroTag: 'zoom_in',
                     onPressed: _zoomIn,
@@ -393,7 +337,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                     child: const Icon(Icons.add, color: AppColors.primary),
                   ),
                   const SizedBox(height: 8),
-
                   FloatingActionButton.small(
                     heroTag: 'zoom_out',
                     onPressed: _zoomOut,
@@ -403,7 +346,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                 ],
               ),
             ),
-
             if (_followMode || _isNavigating)
               Positioned(
                 top: 16,
@@ -444,7 +386,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                   ),
                 ),
               ),
-
             Positioned(
               top: 80,
               left: 16,
@@ -483,7 +424,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                 ),
               ),
             ),
-
             if (_currentLocation != null && widget.destination != null)
               Positioned(
                 bottom: 16,
@@ -508,7 +448,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-
                           Expanded(
                             child: Column(
                               children: [
@@ -531,7 +470,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                               ],
                             ),
                           ),
-
                           Expanded(
                             child: Column(
                               children: [
@@ -556,7 +494,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                           ),
                         ],
                       ),
-
                       if (!_isNavigating)
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
@@ -593,7 +530,6 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
                   ),
                 ),
               ),
-
             if (_isNavigating && _nextTurn.isNotEmpty)
               Positioned(
                 top: 80,
@@ -664,13 +600,11 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       ),
     );
   }
-
   String _calculateDistance(LatLng from, LatLng to) {
     const distance = Distance();
     final meters = distance(from, to);
     return _formatDistance(meters);
   }
-
   String _formatDistance(double meters) {
     if (meters < 1000) {
       return '${meters.toStringAsFixed(0)} m';
@@ -678,15 +612,11 @@ class _RouteMapWidgetState extends ConsumerState<RouteMapWidget> {
       return '${(meters / 1000).toStringAsFixed(1)} km';
     }
   }
-
   String _calculateETA(LatLng from, LatLng to) {
     const distance = Distance();
     final meters = distance(from, to);
-
     double speedMps = _currentSpeed > 0 ? _currentSpeed : 8.33;
-
     final seconds = (meters / speedMps).round();
-
     if (seconds < 60) {
       return '< 1 min';
     } else if (seconds < 3600) {

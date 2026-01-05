@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_color.dart';
 import '../model/scenic_route_preferences.dart';
-
 class ScenicRouteSelector extends StatelessWidget {
   final ScenicMode selectedMode;
   final Function(ScenicMode) onModeChanged;
-
   const ScenicRouteSelector({
     super.key,
     required this.selectedMode,
     required this.onModeChanged,
   });
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -59,7 +56,6 @@ class ScenicRouteSelector extends StatelessWidget {
       ],
     );
   }
-
   IconData _getModeIcon(ScenicMode mode) {
     switch (mode) {
       case ScenicMode.direct:
@@ -75,30 +71,24 @@ class ScenicRouteSelector extends StatelessWidget {
     }
   }
 }
-
 class ScenicRouteSelectorSheet extends StatefulWidget {
   final ScenicMode initialMode;
   final Function(ScenicMode) onModeSelected;
-
   const ScenicRouteSelectorSheet({
     super.key,
     required this.initialMode,
     required this.onModeSelected,
   });
-
   @override
   State<ScenicRouteSelectorSheet> createState() => _ScenicRouteSelectorSheetState();
 }
-
 class _ScenicRouteSelectorSheetState extends State<ScenicRouteSelectorSheet> {
   late ScenicMode _selectedMode;
-
   @override
   void initState() {
     super.initState();
     _selectedMode = widget.initialMode;
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(

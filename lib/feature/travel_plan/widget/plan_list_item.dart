@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/model/app_model.dart';
-
 class PlanListItem extends StatelessWidget {
   final TravelPlan plan;
   final VoidCallback onTap;
-
   const PlanListItem({
     super.key,
     required this.plan,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     final duration = plan.endDate.difference(plan.startDate).inDays + 1;
-
     return Card(
       child: InkWell(
         onTap: onTap,

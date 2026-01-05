@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/widget/custom_app_bar.dart';
 import '../../../core/theme/app_color.dart';
 import '../provider/travel_plan_provider.dart';
@@ -12,23 +11,18 @@ import '../widget/date_picker_field.dart';
 import '../widget/budget_input.dart';
 import '../widget/interest_selector.dart';
 import '../widget/additional_requirements_input.dart';
-
 class CreatePlanScreen extends ConsumerStatefulWidget {
   final String? planId;
-
   const CreatePlanScreen({
     super.key,
     this.planId,
   });
-
   @override
   ConsumerState<CreatePlanScreen> createState() => _CreatePlanScreenState();
 }
-
 class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isCreating = false;
-
   @override
   void initState() {
     super.initState();
@@ -36,20 +30,15 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
       _loadExistingPlan();
     }
   }
-
   void _loadExistingPlan() {
-
   }
-
   @override
   Widget build(BuildContext context) {
     final creationState = ref.watch(travelPlanCreationControllerProvider);
     final llmState = ref.watch(lLMControllerProvider);
     final locationAsync = ref.watch(locationControllerProvider);
-
     final isEditing = widget.planId != null;
     final title = isEditing ? 'Edit Travel Plan' : 'Create Travel Plan';
-
     return Scaffold(
       appBar: CustomAppBar(
         title: title,
@@ -170,7 +159,6 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
                         if (date != null) {
                           final endDate = creationState.endDate;
                           if (endDate != null && date.isAfter(endDate)) {
-
                             ref
                                 .read(travelPlanCreationControllerProvider
                                     .notifier)
@@ -377,7 +365,6 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
       ),
     );
   }
-
   Widget _buildSummaryRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -403,11 +390,9 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
       ),
     );
   }
-
   bool _isFormValid() {
     return ref.read(travelPlanCreationControllerProvider.notifier).isValid;
   }
-
   bool _canCreatePlan() {
     final llmState = ref.read(lLMControllerProvider);
     return _isFormValid() &&
@@ -415,20 +400,15 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
         !_isCreating &&
         !llmState.isGenerating;
   }
-
   Future<void> _createTravelPlan() async {
     if (!_canCreatePlan()) return;
-
     setState(() {
       _isCreating = true;
     });
-
     await Future.delayed(Duration(milliseconds: 100));
-
     try {
       final creationState = ref.read(travelPlanCreationControllerProvider);
       final llmController = ref.read(lLMControllerProvider.notifier);
-
       final plan = await llmController.generateTravelPlan(
         destination: creationState.destination,
         startDate: creationState.startDate!,
@@ -439,17 +419,13 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
             ? creationState.additionalRequirements
             : null,
       );
-
       await ref
           .read(travelPlansControllerProvider.notifier)
           .addTravelPlan(plan);
-
       ref.read(travelPlanCreationControllerProvider.notifier).reset();
-
       if (mounted) {
         final planId = plan.id;
         final destination = plan.destination;
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -459,13 +435,11 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
               label: 'View',
               textColor: Colors.white,
               onPressed: () {
-
                 Navigator.of(context).pushReplacementNamed('/plan/$planId');
               },
             ),
           ),
         );
-
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             context.go('/plan/$planId');
@@ -489,7 +463,6 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
       }
     }
   }
-
   void _showResetDialog() {
     showDialog(
       context: context,

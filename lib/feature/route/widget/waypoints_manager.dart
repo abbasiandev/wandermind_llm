@@ -1,35 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-
 import '../../../core/theme/app_color.dart';
 import '../model/route_models.dart';
-
 class WaypointsManager extends ConsumerStatefulWidget {
   final List<Waypoint> waypoints;
   final Function(List<Waypoint>) onWaypointsChanged;
   final Function(LatLng)? onWaypointTap;
-
   const WaypointsManager({
     super.key,
     required this.waypoints,
     required this.onWaypointsChanged,
     this.onWaypointTap,
   });
-
   @override
   ConsumerState<WaypointsManager> createState() => _WaypointsManagerState();
 }
-
 class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
   late List<Waypoint> _waypoints;
-
   @override
   void initState() {
     super.initState();
     _waypoints = List.from(widget.waypoints);
   }
-
   @override
   void didUpdateWidget(WaypointsManager oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -37,7 +30,6 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       _waypoints = List.from(widget.waypoints);
     }
   }
-
   void _addWaypoint(LatLng location) {
     final newWaypoint = Waypoint(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -45,17 +37,14 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       name: 'Stop ${_waypoints.length + 1}',
       order: _waypoints.length,
     );
-
     setState(() {
       _waypoints.add(newWaypoint);
     });
     widget.onWaypointsChanged(_waypoints);
   }
-
   void _removeWaypoint(String id) {
     setState(() {
       _waypoints.removeWhere((w) => w.id == id);
-
       for (int i = 0; i < _waypoints.length; i++) {
         _waypoints[i] = _waypoints[i].copyWith(
           order: i,
@@ -65,7 +54,6 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
     });
     widget.onWaypointsChanged(_waypoints);
   }
-
   void _reorderWaypoints(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) {
@@ -73,7 +61,6 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       }
       final item = _waypoints.removeAt(oldIndex);
       _waypoints.insert(newIndex, item);
-
       for (int i = 0; i < _waypoints.length; i++) {
         _waypoints[i] = _waypoints[i].copyWith(
           order: i,
@@ -83,18 +70,13 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
     });
     widget.onWaypointsChanged(_waypoints);
   }
-
   void _optimizeRoute() {
-
     if (_waypoints.length <= 1) return;
-
     setState(() {
       final optimized = <Waypoint>[_waypoints.first];
       final remaining = List<Waypoint>.from(_waypoints.skip(1));
-
       while (remaining.isNotEmpty) {
         final current = optimized.last;
-
         remaining.sort((a, b) {
           final distA = const Distance()(current.location, a.location);
           final distB = const Distance()(current.location, b.location);
@@ -102,15 +84,12 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
         });
         optimized.add(remaining.removeAt(0));
       }
-
       _waypoints = optimized;
-
       for (int i = 0; i < _waypoints.length; i++) {
         _waypoints[i] = _waypoints[i].copyWith(order: i);
       }
     });
     widget.onWaypointsChanged(_waypoints);
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Route optimized!'),
@@ -119,18 +98,15 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     if (_waypoints.isEmpty) {
       return _buildEmptyState();
     }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
@@ -158,7 +134,6 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
             ],
           ),
         ),
-
         SizedBox(
           height: 200,
           child: ReorderableListView.builder(
@@ -173,7 +148,6 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       ],
     );
   }
-
   Widget _buildEmptyState() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -207,7 +181,6 @@ class _WaypointsManagerState extends ConsumerState<WaypointsManager> {
       ),
     );
   }
-
   Widget _buildWaypointItem(Waypoint waypoint, int index, {required Key key}) {
     return Dismissible(
       key: key,

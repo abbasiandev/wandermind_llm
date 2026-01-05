@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'app_color.dart';
-
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
@@ -45,7 +44,6 @@ class AppTheme {
       fontFamily: 'Poppins',
     );
   }
-
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

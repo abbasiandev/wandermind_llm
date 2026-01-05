@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../theme/app_color.dart';
-
 class BottomNavigationShell extends StatefulWidget {
   final Widget child;
-
   const BottomNavigationShell({
     super.key,
     required this.child,
   });
-
   @override
   State<BottomNavigationShell> createState() => _BottomNavigationShellState();
 }
-
 class _BottomNavigationShellState extends State<BottomNavigationShell> {
   int _currentIndex = 0;
-
   final List<NavigationItem> _items = [
     NavigationItem(
       path: '/',
@@ -50,13 +44,11 @@ class _BottomNavigationShellState extends State<BottomNavigationShell> {
       selectedIcon: Icons.settings,
     ),
   ];
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _updateCurrentIndex();
   }
-
   void _updateCurrentIndex() {
     final location = GoRouterState.of(context).uri.path;
     for (int i = 0; i < _items.length; i++) {
@@ -69,7 +61,6 @@ class _BottomNavigationShellState extends State<BottomNavigationShell> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,13 +83,11 @@ class _BottomNavigationShellState extends State<BottomNavigationShell> {
     );
   }
 }
-
 class NavigationItem {
   final String path;
   final String label;
   final IconData icon;
   final IconData selectedIcon;
-
   NavigationItem({
     required this.path,
     required this.label,

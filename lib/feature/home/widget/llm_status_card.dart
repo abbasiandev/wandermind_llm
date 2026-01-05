@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
-
 class LLMStatusCard extends StatelessWidget {
   final LLMState llmState;
-
   const LLMStatusCard({
     super.key,
     required this.llmState,
   });
-
   @override
   Widget build(BuildContext context) {
     if (llmState.isInitialized) {
@@ -46,10 +43,8 @@ class LLMStatusCard extends StatelessWidget {
         ),
       );
     }
-
     if (llmState.error != null) {
       final isCorruptedModel = llmState.error?.contains('too small') ?? false;
-
       return Card(
         color: Colors.red.withOpacity(0.1),
         child: Padding(
@@ -106,7 +101,6 @@ class LLMStatusCard extends StatelessWidget {
         ),
       );
     }
-
     return Card(
       color: AppColors.warning.withOpacity(0.1),
       child: Padding(

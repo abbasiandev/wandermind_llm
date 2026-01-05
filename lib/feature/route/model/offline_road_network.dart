@@ -1,9 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:latlong2/latlong.dart';
-
 part 'offline_road_network.freezed.dart';
 part 'offline_road_network.g.dart';
-
 @freezed
 class RoadNode with _$RoadNode {
   const factory RoadNode({
@@ -12,11 +10,9 @@ class RoadNode with _$RoadNode {
     required double longitude,
     @Default([]) List<String> connectedNodeIds,
   }) = _RoadNode;
-
   factory RoadNode.fromJson(Map<String, dynamic> json) =>
       _$RoadNodeFromJson(json);
 }
-
 @freezed
 class RoadEdge with _$RoadEdge {
   const factory RoadEdge({
@@ -30,11 +26,9 @@ class RoadEdge with _$RoadEdge {
     @Default(false) bool isOneWay,
     @Default([]) List<LatLng> geometry,
   }) = _RoadEdge;
-
   factory RoadEdge.fromJson(Map<String, dynamic> json) =>
       _$RoadEdgeFromJson(json);
 }
-
 enum RoadType {
   motorway,
   trunk,
@@ -45,7 +39,6 @@ enum RoadType {
   service,
   unclassified,
 }
-
 @freezed
 class RoadNetwork with _$RoadNetwork {
   const factory RoadNetwork({
@@ -59,18 +52,15 @@ class RoadNetwork with _$RoadNetwork {
     required Map<String, RoadEdge> edges,
     required DateTime lastUpdated,
   }) = _RoadNetwork;
-
   factory RoadNetwork.fromJson(Map<String, dynamic> json) =>
       _$RoadNetworkFromJson(json);
 }
-
 class OfflineRouteResult {
   final List<LatLng> points;
   final List<RoadEdge> edges;
   final double totalDistance;
   final double estimatedDuration;
   final List<String> nodeIds;
-
   OfflineRouteResult({
     required this.points,
     required this.edges,

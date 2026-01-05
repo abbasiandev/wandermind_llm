@@ -2,29 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wandermind_llm/feature/llm/provider/llm_provider.dart';
-
 import '../../../core/widget/custom_app_bar.dart';
 import '../../../core/widget/loading_widget.dart';
 import '../provider/chat_provider.dart';
 import '../widget/chat_input.dart';
 import '../widget/chat_message_bubble.dart';
-
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
-
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
-
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
-
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
-
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -34,13 +28,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final chatAsync = ref.watch(chatControllerProvider);
     final llmState = ref.watch(lLMControllerProvider);
     final chatInputState = ref.watch(chatInputControllerProvider);
-
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Travel Assistant',
@@ -83,7 +75,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       body: Column(
         children: [
-
           if (!llmState.isInitialized)
             Container(
               width: double.infinity,
@@ -122,18 +113,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ],
               ),
             ),
-
           Expanded(
             child: chatAsync.when(
               data: (messages) {
                 if (messages.isEmpty) {
                   return _buildEmptyChat();
                 }
-
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _scrollToBottom();
                 });
-
                 return ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.all(16),
@@ -186,7 +174,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             ),
           ),
-
           ChatInput(
             message: chatInputState.message,
             isLoading: chatInputState.isLoading || llmState.isGenerating,
@@ -203,7 +190,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
     );
   }
-
   Widget _buildEmptyChat() {
     return Center(
       child: Column(
@@ -262,7 +248,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
     );
   }
-
   Widget _buildSuggestionChip(String suggestion) {
     return ActionChip(
       label: Text(
@@ -271,13 +256,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       onPressed: () async {
         ref.read(chatInputControllerProvider.notifier).updateMessage(suggestion);
-
         await ref.read(chatControllerProvider.notifier).sendMessage(suggestion);
         ref.read(chatInputControllerProvider.notifier).clearMessage();
       },
     );
   }
-
   void _showClearChatDialog() {
     showDialog(
       context: context,
@@ -300,9 +283,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
     );
   }
-
   void _exportChat() {
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Export feature coming soon!')),
     );

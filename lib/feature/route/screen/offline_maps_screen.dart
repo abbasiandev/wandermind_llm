@@ -2,25 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_color.dart';
 import '../service/smart_routing_service.dart';
-
 class OfflineMapsScreen extends ConsumerStatefulWidget {
   const OfflineMapsScreen({super.key});
-
   @override
   ConsumerState<OfflineMapsScreen> createState() => _OfflineMapsScreenState();
 }
-
 class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
   final _routingService = SmartRoutingService();
   List<String> _availableRegions = [];
   bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
     _loadRegions();
   }
-
   Future<void> _loadRegions() async {
     setState(() => _isLoading = true);
     try {
@@ -39,7 +34,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
       }
     }
   }
-
   Future<void> _downloadRegion(String regionName, double minLat, double maxLat, double minLon, double maxLon) async {
     showDialog(
       context: context,
@@ -56,7 +50,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
         ),
       ),
     );
-
     try {
       await _routingService.downloadRegion(
         regionName: regionName,
@@ -65,7 +58,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
         minLon: minLon,
         maxLon: maxLon,
       );
-
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -82,7 +74,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
       }
     }
   }
-
   Future<void> _deleteRegion(String regionId) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -101,7 +92,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
         ],
       ),
     );
-
     if (confirm == true) {
       await _routingService.deleteOfflineRegion(regionId);
       await _loadRegions();
@@ -112,7 +102,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
       }
     }
   }
-
   void _showDownloadDialog() {
     final regions = [
       {'name': 'Dubai Marina', 'minLat': 25.07, 'maxLat': 25.09, 'minLon': 55.12, 'maxLon': 55.15},
@@ -120,7 +109,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
       {'name': 'Dubai Mall Area', 'minLat': 25.19, 'maxLat': 25.22, 'minLon': 55.26, 'maxLon': 55.29},
       {'name': 'Business Bay', 'minLat': 25.18, 'maxLat': 25.20, 'minLon': 55.25, 'maxLon': 55.27},
     ];
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -160,7 +148,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -254,7 +241,6 @@ class _OfflineMapsScreenState extends ConsumerState<OfflineMapsScreen> {
       ),
     );
   }
-
   @override
   void dispose() {
     _routingService.dispose();

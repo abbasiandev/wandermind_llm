@@ -1,49 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wandermind_llm/core/provider/llm_di_provider.dart';
-
 import '../../../core/widget/custom_app_bar.dart';
 import '../../../core/theme/app_color.dart';
 import '../../llm/service/model_downloader_service.dart';
 import '../../llm/provider/llm_provider.dart';
-
 class ModelSettingsScreen extends ConsumerStatefulWidget {
   const ModelSettingsScreen({super.key});
-
   @override
   ConsumerState<ModelSettingsScreen> createState() =>
       _ModelSettingsScreenState();
 }
-
 class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
   Map<String, bool> _downloadedModels = {};
   Map<String, double> _downloadProgress = {};
   bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
     _checkDownloadedModels();
   }
-
   Future<void> _checkDownloadedModels() async {
     setState(() => _isLoading = true);
-
     final llmService = ref.read(llmServiceProvider);
     final models = await llmService.getAvailableModels();
-
     for (final model in models) {
       final isDownloaded = await llmService.isModelDownloaded(model);
       _downloadedModels[model] = isDownloaded;
     }
-
     setState(() => _isLoading = false);
   }
-
   @override
   Widget build(BuildContext context) {
     final llmState = ref.watch(lLMControllerProvider);
-
     return Scaffold(
       appBar: const CustomAppBar(title: 'AI Model Settings'),
       body: _isLoading
@@ -87,7 +76,6 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
             ),
     );
   }
-
   Widget _buildModelCard(
     BuildContext context,
     String modelKey,
@@ -97,7 +85,6 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
   ) {
     final isDownloading = _downloadProgress[modelKey] != null;
     final progress = _downloadProgress[modelKey] ?? 0.0;
-
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -182,16 +169,13 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
       ),
     );
   }
-
   Future<void> _downloadModel(String modelKey) async {
     setState(() {
       _downloadProgress[modelKey] = 0.0;
     });
-
     try {
       final llmService = ref.read(llmServiceProvider);
       final downloader = ModelDownloaderService();
-
       await downloader.downloadModel(
         modelKey,
         onProgress: (progress) {
@@ -204,7 +188,6 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
             _downloadProgress.remove(modelKey);
             _downloadedModels[modelKey] = true;
           });
-
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Model downloaded successfully!')),
           );
@@ -213,7 +196,6 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
           setState(() {
             _downloadProgress.remove(modelKey);
           });
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Download failed: $error')),
           );
@@ -223,20 +205,16 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
       setState(() {
         _downloadProgress.remove(modelKey);
       });
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     }
   }
-
   Future<void> _useModel(String modelKey) async {
     try {
       final llmService = ref.read(llmServiceProvider);
       await llmService.changeModel(modelKey);
-
       await ref.read(lLMControllerProvider.notifier).initializeLLM();
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -251,7 +229,6 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
       );
     }
   }
-
   Future<void> _deleteModel(String modelKey) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -272,16 +249,13 @@ class _ModelSettingsScreenState extends ConsumerState<ModelSettingsScreen> {
         ],
       ),
     );
-
     if (confirm == true) {
       try {
         final llmService = ref.read(llmServiceProvider);
         await llmService.deleteModel(modelKey);
-
         setState(() {
           _downloadedModels[modelKey] = false;
         });
-
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Model deleted successfully')),

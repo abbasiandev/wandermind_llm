@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../core/widget/custom_app_bar.dart';
 import '../../../core/theme/app_color.dart';
-
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
-
   @override
   ConsumerState<ExploreScreen> createState() => _ExploreScreenState();
 }
-
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'All';
-
   final List<String> _categories = [
     'All',
     'Popular',
@@ -25,7 +20,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     'Culture',
     'Relaxation',
   ];
-
   final List<Destination> _destinations = [
     Destination(
       name: 'Tokyo, Japan',
@@ -70,17 +64,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       category: 'Adventure',
     ),
   ];
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final filteredDestinations = _getFilteredDestinations();
-
     return Scaffold(
       appBar: const CustomAppBar(
         title: 'Explore Destinations',
@@ -112,7 +103,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               onChanged: (value) => setState(() {}),
             ),
           ),
-
           SizedBox(
             height: 50,
             child: ListView.builder(
@@ -139,9 +129,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               },
             ),
           ),
-
           const SizedBox(height: 16),
-
           Expanded(
             child: filteredDestinations.isEmpty
                 ? _buildEmptyState()
@@ -168,16 +156,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       ),
     );
   }
-
   List<Destination> _getFilteredDestinations() {
     var filtered = _destinations;
-
     if (_selectedCategory != 'All') {
       filtered = filtered
           .where((d) => d.category == _selectedCategory)
           .toList();
     }
-
     if (_searchController.text.isNotEmpty) {
       final query = _searchController.text.toLowerCase();
       filtered = filtered
@@ -186,10 +171,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           d.description.toLowerCase().contains(query))
           .toList();
     }
-
     return filtered;
   }
-
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -214,7 +197,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       ),
     );
   }
-
   void _showDestinationDetails(Destination destination) {
     showModalBottomSheet(
       context: context,
@@ -303,16 +285,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     );
   }
 }
-
 class _DestinationCard extends StatelessWidget {
   final Destination destination;
   final VoidCallback onTap;
-
   const _DestinationCard({
     required this.destination,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -405,14 +384,12 @@ class _DestinationCard extends StatelessWidget {
     );
   }
 }
-
 class Destination {
   final String name;
   final String description;
   final String imageUrl;
   final double rating;
   final String category;
-
   Destination({
     required this.name,
     required this.description,

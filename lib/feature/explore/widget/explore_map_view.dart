@@ -2,36 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../core/widget/map_widget.dart';
-
 class ExploreMapView extends StatefulWidget {
   final double? latitude;
   final double? longitude;
   final String? locationName;
-
   const ExploreMapView({
     super.key,
     this.latitude,
     this.longitude,
     this.locationName,
   });
-
   @override
   State<ExploreMapView> createState() => _ExploreMapViewState();
 }
-
 class _ExploreMapViewState extends State<ExploreMapView> {
   late LatLng _center;
   List<Marker> _markers = [];
-
   @override
   void initState() {
     super.initState();
-
     _center = LatLng(
       widget.latitude ?? 37.7749,
       widget.longitude ?? -122.4194,
     );
-
     if (widget.latitude != null && widget.longitude != null) {
       _markers = [
         Marker(
@@ -69,12 +62,10 @@ class _ExploreMapViewState extends State<ExploreMapView> {
       ];
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-
         Container(
           padding: const EdgeInsets.all(16),
           color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -102,7 +93,6 @@ class _ExploreMapViewState extends State<ExploreMapView> {
               IconButton(
                 icon: const Icon(Icons.my_location),
                 onPressed: () {
-
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Feature coming soon!')),
                   );
@@ -111,7 +101,6 @@ class _ExploreMapViewState extends State<ExploreMapView> {
             ],
           ),
         ),
-
         Expanded(
           child: MapWidget(
             center: _center,
@@ -133,7 +122,6 @@ class _ExploreMapViewState extends State<ExploreMapView> {
                   ),
                 ];
               });
-
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -145,7 +133,6 @@ class _ExploreMapViewState extends State<ExploreMapView> {
             },
           ),
         ),
-
         Container(
           padding: const EdgeInsets.all(8),
           child: Row(
@@ -153,14 +140,12 @@ class _ExploreMapViewState extends State<ExploreMapView> {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-
                 },
                 icon: const Icon(Icons.add_location_alt, size: 18),
                 label: const Text('Add to Plan'),
               ),
               OutlinedButton.icon(
                 onPressed: () {
-
                 },
                 icon: const Icon(Icons.search, size: 18),
                 label: const Text('Search Nearby'),

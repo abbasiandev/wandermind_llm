@@ -1,9 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
-
 part 'app_model.freezed.dart';
 part 'app_model.g.dart';
-
 @freezed
 class TravelPlan with _$TravelPlan {
   const factory TravelPlan({
@@ -19,11 +17,9 @@ class TravelPlan with _$TravelPlan {
     required DateTime createdAt,
     DateTime? updatedAt,
   }) = _TravelPlan;
-
   factory TravelPlan.fromJson(Map<String, dynamic> json) =>
       _$TravelPlanFromJson(json);
 }
-
 @freezed
 class DayPlan with _$DayPlan {
   const factory DayPlan({
@@ -33,11 +29,9 @@ class DayPlan with _$DayPlan {
     required String overview,
     @Default(0.0) double estimatedCost,
   }) = _DayPlan;
-
   factory DayPlan.fromJson(Map<String, dynamic> json) =>
       _$DayPlanFromJson(json);
 }
-
 @freezed
 class Activity with _$Activity {
   const factory Activity({
@@ -52,22 +46,18 @@ class Activity with _$Activity {
     @Default(0.0) double longitude,
     @Default([]) List<String> tips,
   }) = _Activity;
-
   factory Activity.fromJson(Map<String, dynamic> json) =>
       _$ActivityFromJson(json);
 }
-
 @freezed
 class TimeSlot with _$TimeSlot {
   const factory TimeSlot({
     required DateTime startTime,
     required DateTime endTime,
   }) = _TimeSlot;
-
   factory TimeSlot.fromJson(Map<String, dynamic> json) =>
       _$TimeSlotFromJson(json);
 }
-
 enum ActivityType {
   sightseeing,
   food,
@@ -80,7 +70,6 @@ enum ActivityType {
   culture,
   nightlife,
 }
-
 @freezed
 class ChatMessage with _$ChatMessage {
   const factory ChatMessage({
@@ -91,18 +80,15 @@ class ChatMessage with _$ChatMessage {
     @Default(MessageType.text) MessageType type,
     Map<String, dynamic>? metadata,
   }) = _ChatMessage;
-
   factory ChatMessage.fromJson(Map<String, dynamic> json) =>
       _$ChatMessageFromJson(json);
 }
-
 enum MessageType {
   text,
   travelPlan,
   suggestion,
   error,
 }
-
 @freezed
 class LocationData with _$LocationData {
   const factory LocationData({
@@ -113,11 +99,9 @@ class LocationData with _$LocationData {
     String? country,
     DateTime? timestamp,
   }) = _LocationData;
-
   factory LocationData.fromJson(Map<String, dynamic> json) =>
       _$LocationDataFromJson(json);
 }
-
 @freezed
 class LLMState with _$LLMState {
   const factory LLMState({
@@ -129,7 +113,6 @@ class LLMState with _$LLMState {
     @Default(0.0) double initializationProgress,
   }) = _LLMState;
 }
-
 @freezed
 class AppError with _$AppError {
   const factory AppError({

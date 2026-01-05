@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/widget/custom_app_bar.dart';
 import '../../../core/theme/app_color.dart';
-
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
-
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
-
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _darkModeEnabled = false;
   bool _autoSyncEnabled = true;
   String _selectedCurrency = 'USD';
   String _selectedLanguage = 'English';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,7 +162,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   Widget _buildSection(String title, List<Widget> children) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +185,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ],
     );
   }
-
   Widget _buildListTile({
     required IconData icon,
     required String title,
@@ -206,7 +199,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       onTap: onTap,
     );
   }
-
   Widget _buildSwitchTile({
     required IconData icon,
     required String title,
@@ -222,10 +214,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       onChanged: onChanged,
     );
   }
-
   void _showCurrencySelector() {
     final currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'INR'];
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -252,10 +242,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showLanguageSelector() {
     final languages = ['English', 'Spanish', 'French', 'German', 'Japanese', 'Chinese'];
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -282,7 +270,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showModelSettings() {
     showDialog(
       context: context,
@@ -300,7 +287,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showClearCacheDialog() {
     showDialog(
       context: context,
@@ -327,7 +313,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showBackupOptions() {
     showDialog(
       context: context,
@@ -361,7 +346,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showStorageInfo() {
     showDialog(
       context: context,
@@ -388,7 +372,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   Widget _buildStorageItem(String label, String size, {bool isBold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -411,7 +394,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showClearDataDialog() {
     showDialog(
       context: context,
@@ -441,7 +423,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showAboutDialog() {
     showAboutDialog(
       context: context,
@@ -455,7 +436,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ],
     );
   }
-
   void _showPrivacyPolicy() {
     showDialog(
       context: context,
@@ -477,7 +457,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showTermsOfService() {
     showDialog(
       context: context,
@@ -499,7 +478,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showHelpSupport() {
     showDialog(
       context: context,
@@ -536,7 +514,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
-
   void _showLogoutDialog() {
     showDialog(
       context: context,

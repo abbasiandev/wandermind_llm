@@ -2,11 +2,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:logger/logger.dart';
-
 class ModelDownloaderService {
   static final Logger _logger = Logger();
   final Dio _dio = Dio();
-
   static const Map<String, ModelInfo> availableModels = {
     'tinyllama': ModelInfo(
       name: 'TinyLlama 1.1B',
@@ -30,13 +28,11 @@ class ModelDownloaderService {
       description: 'Google Gemma 2B, balanced performance',
     ),
   };
-
   Future<String> getModelPath(String modelKey) async {
     final appDir = await getApplicationDocumentsDirectory();
     final modelInfo = availableModels[modelKey]!;
     return '${appDir.path}/models/${modelInfo.fileName}';
   }
-
   Future<bool> isModelDownloaded(String modelKey) async {
     try {
       final modelPath = await getModelPath(modelKey);
@@ -46,7 +42,6 @@ class ModelDownloaderService {
       return false;
     }
   }
-
   Future<void> downloadModel(
       String modelKey, {
         required Function(double) onProgress,
@@ -56,14 +51,11 @@ class ModelDownloaderService {
     try {
       final modelInfo = availableModels[modelKey]!;
       final modelPath = await getModelPath(modelKey);
-
       final modelDir = Directory(modelPath.substring(0, modelPath.lastIndexOf('/')));
       if (!await modelDir.exists()) {
         await modelDir.create(recursive: true);
       }
-
       _logger.i('Downloading model: ${modelInfo.name}');
-
       double lastReportedProgress = -1.0;
       await _dio.download(
         modelInfo.url,
@@ -83,22 +75,18 @@ class ModelDownloaderService {
           sendTimeout: const Duration(minutes: 5),
         ),
       );
-
       _logger.i('Model downloaded successfully');
       onComplete();
-
     } catch (e) {
       _logger.e('Failed to download model: $e');
       onError(e.toString());
       rethrow;
     }
   }
-
   Future<void> deleteModel(String modelKey) async {
     try {
       final modelPath = await getModelPath(modelKey);
       final file = File(modelPath);
-
       if (await file.exists()) {
         await file.delete();
         _logger.i('Model deleted: $modelKey');
@@ -108,12 +96,10 @@ class ModelDownloaderService {
       rethrow;
     }
   }
-
   Future<double> getModelSize(String modelKey) async {
     try {
       final modelPath = await getModelPath(modelKey);
       final file = File(modelPath);
-
       if (await file.exists()) {
         final size = await file.length();
         return size / (1024 * 1024);
@@ -125,14 +111,12 @@ class ModelDownloaderService {
     }
   }
 }
-
 class ModelInfo {
   final String name;
   final String fileName;
   final String url;
   final int sizeInMB;
   final String description;
-
   const ModelInfo({
     required this.name,
     required this.fileName,

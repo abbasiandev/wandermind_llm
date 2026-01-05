@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/widget/custom_app_bar.dart';
 import '../../../core/widget/loading_widget.dart';
 import '../../../core/theme/app_color.dart';
@@ -11,38 +10,30 @@ import '../provider/travel_plan_provider.dart';
 import '../widget/day_plan_card.dart';
 import '../widget/plan_overview_card.dart';
 import '../widget/budget_breakdown_card.dart';
-
 class PlanDetailScreen extends ConsumerStatefulWidget {
   final String planId;
-
   const PlanDetailScreen({
     super.key,
     required this.planId,
   });
-
   @override
   ConsumerState<PlanDetailScreen> createState() => _PlanDetailScreenState();
 }
-
 class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   TravelPlan? _plan;
   bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadPlan();
   }
-
   Future<void> _loadPlan() async {
     setState(() => _isLoading = true);
-
     final service = ref.read(travelPlanServiceProvider);
     final plan = await service.getTravelPlan(widget.planId);
-
     if (plan != null) {
       ref.read(currentTravelPlanControllerProvider.notifier).setCurrentPlan(plan);
       setState(() {
@@ -53,13 +44,11 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       setState(() => _isLoading = false);
     }
   }
-
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -67,7 +56,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
         body: LoadingWidget(message: 'Loading travel plan...'),
       );
     }
-
     if (_plan == null) {
       return Scaffold(
         appBar: const CustomAppBar(title: 'Plan Not Found'),
@@ -100,7 +88,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
         ),
       );
     }
-
     return Scaffold(
       appBar: CustomAppBar(
         title: _plan!.title,
@@ -182,7 +169,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -202,7 +188,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   Widget _buildItineraryTab() {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -219,7 +204,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       },
     );
   }
-
   Widget _buildBudgetTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -232,7 +216,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   Widget _buildInfoSection(String title, IconData icon, String content) {
     return Card(
       child: Padding(
@@ -262,7 +245,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   Widget _buildNotesSection() {
     return Card(
       child: Padding(
@@ -332,7 +314,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   Widget _buildDailyBudgetList() {
     return Card(
       child: Column(
@@ -382,7 +363,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   void _showActivityDetails(Activity activity) {
     showModalBottomSheet(
       context: context,
@@ -469,7 +449,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   Widget _buildDetailRow(IconData icon, String text) {
     return Row(
       children: [
@@ -479,7 +458,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ],
     );
   }
-
   IconData _getActivityIcon(ActivityType type) {
     switch (type) {
       case ActivityType.sightseeing:
@@ -504,10 +482,8 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
         return Icons.nightlife;
     }
   }
-
   void _showAddNoteDialog() {
     final controller = TextEditingController();
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -544,7 +520,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
       ),
     );
   }
-
   void _handleMenuAction(String action) {
     switch (action) {
       case 'share':
@@ -561,25 +536,21 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen>
         break;
     }
   }
-
   void _sharePlan() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Share feature coming soon!')),
     );
   }
-
   void _exportPlan() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Export feature coming soon!')),
     );
   }
-
   void _duplicatePlan() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Duplicate feature coming soon!')),
     );
   }
-
   void _showDeleteConfirmation() {
     showDialog(
       context: context,

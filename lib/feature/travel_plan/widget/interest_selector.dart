@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_color.dart';
-
 class InterestsSelector extends StatelessWidget {
   final List<String> selectedInterests;
   final Function(List<String>) onChanged;
-
   const InterestsSelector({
     super.key,
     required this.selectedInterests,
     required this.onChanged,
   });
-
   static const List<InterestOption> _interestOptions = [
     InterestOption(
       id: 'culture',
@@ -85,7 +82,6 @@ class InterestsSelector extends StatelessWidget {
       color: AppColors.transport,
     ),
   ];
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -98,7 +94,6 @@ class InterestsSelector extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -112,7 +107,6 @@ class InterestsSelector extends StatelessWidget {
           itemBuilder: (context, index) {
             final option = _interestOptions[index];
             final isSelected = selectedInterests.contains(option.id);
-
             return InkWell(
               onTap: () => _toggleInterest(option.id),
               borderRadius: BorderRadius.circular(12),
@@ -163,9 +157,7 @@ class InterestsSelector extends StatelessWidget {
             );
           },
         ),
-
         const SizedBox(height: 12),
-
         Row(
           children: [
             Icon(
@@ -190,26 +182,21 @@ class InterestsSelector extends StatelessWidget {
       ],
     );
   }
-
   void _toggleInterest(String interestId) {
     final newInterests = List<String>.from(selectedInterests);
-
     if (newInterests.contains(interestId)) {
       newInterests.remove(interestId);
     } else {
       newInterests.add(interestId);
     }
-
     onChanged(newInterests);
   }
 }
-
 class InterestOption {
   final String id;
   final String label;
   final IconData icon;
   final Color color;
-
   const InterestOption({
     required this.id,
     required this.label,

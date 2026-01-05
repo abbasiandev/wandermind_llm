@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 class DatePickerField extends StatelessWidget {
   final String label;
   final DateTime? value;
@@ -9,7 +8,6 @@ class DatePickerField extends StatelessWidget {
   final DateTime? lastDate;
   final String? hintText;
   final String? errorText;
-
   const DatePickerField({
     super.key,
     required this.label,
@@ -20,11 +18,9 @@ class DatePickerField extends StatelessWidget {
     this.hintText,
     this.errorText,
   });
-
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMM dd, yyyy');
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,12 +62,10 @@ class DatePickerField extends StatelessWidget {
       ],
     );
   }
-
   Future<void> _selectDate(BuildContext context) async {
     final now = DateTime.now();
     final effectiveFirstDate = firstDate ?? now;
     final effectiveLastDate = lastDate ?? now.add(const Duration(days: 365 * 2));
-
     DateTime initialDate;
     if (value != null &&
         !value!.isBefore(effectiveFirstDate) &&
@@ -82,7 +76,6 @@ class DatePickerField extends StatelessWidget {
     } else {
       initialDate = now.isAfter(effectiveFirstDate) ? now : effectiveFirstDate;
     }
-
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -99,19 +92,16 @@ class DatePickerField extends StatelessWidget {
         );
       },
     );
-
     if (picked != null && picked != value) {
       onChanged(picked);
     }
   }
 }
-
 class DateRangePicker extends StatelessWidget {
   final DateTime? startDate;
   final DateTime? endDate;
   final Function(DateTime?) onStartDateChanged;
   final Function(DateTime?) onEndDateChanged;
-
   const DateRangePicker({
     super.key,
     required this.startDate,
@@ -119,7 +109,6 @@ class DateRangePicker extends StatelessWidget {
     required this.onStartDateChanged,
     required this.onEndDateChanged,
   });
-
   @override
   Widget build(BuildContext context) {
     return Column(

@@ -1,21 +1,16 @@
 import 'package:logger/logger.dart';
-
 import '../../../core/model/app_model.dart';
 import '../../../core/service/storage_service.dart';
 import '../../../core/data/travel_knowledge_base.dart';
-
 class ChatService {
   static final Logger _logger = Logger();
   final StorageService _storageService;
   static const String _boxName = 'chat_history';
-
   ChatService(this._storageService);
-
   Future<List<ChatMessage>> getChatHistory() async {
     try {
       final box = await _storageService.openBox(_boxName);
       final messages = <ChatMessage>[];
-
       for (final key in box.keys) {
         final messageData = box.get(key);
         if (messageData != null) {
@@ -23,9 +18,7 @@ class ChatService {
           messages.add(message);
         }
       }
-
       messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
       _logger.d('Retrieved ${messages.length} chat messages');
       return messages;
     } catch (e) {
@@ -33,7 +26,6 @@ class ChatService {
       return [];
     }
   }
-
   Future<void> saveMessage(ChatMessage message) async {
     try {
       final box = await _storageService.openBox(_boxName);
@@ -44,7 +36,6 @@ class ChatService {
       rethrow;
     }
   }
-
   Future<void> clearChatHistory() async {
     try {
       final box = await _storageService.openBox(_boxName);
@@ -55,12 +46,10 @@ class ChatService {
       rethrow;
     }
   }
-
   Future<List<ChatMessage>> searchMessages(String query) async {
     try {
       final allMessages = await getChatHistory();
       final searchQuery = query.toLowerCase();
-
       return allMessages.where((message) {
         return message.content.toLowerCase().contains(searchQuery);
       }).toList();
@@ -69,23 +58,18 @@ class ChatService {
       return [];
     }
   }
-
   String? getQuickDestinationInfo(String query) {
     try {
-
       final destinations = [
         'dubai', 'abu dhabi', 'cairo', 'marrakech', 'doha', 'amman',
         'paris', 'tokyo', 'new york', 'london', 'rome', 'barcelona',
         'istanbul', 'singapore', 'bangkok'
       ];
-
       final queryLower = query.toLowerCase();
-
       for (final destination in destinations) {
         if (queryLower.contains(destination)) {
           final info = TravelKnowledgeBase.getDestinationInfo(destination);
           if (info != null) {
-
             final buffer = StringBuffer();
             buffer.writeln('${info.name}, ${info.country}');
             buffer.writeln();
@@ -104,19 +88,16 @@ class ChatService {
             }
             buffer.writeln();
             buffer.writeln(' Pro tip: ${info.tips.first}');
-
             return buffer.toString();
           }
         }
       }
-
       return null;
     } catch (e) {
       _logger.e('Failed to get quick destination info: $e');
       return null;
     }
   }
-
   bool isDestinationQuery(String query) {
     final queryLower = query.toLowerCase();
     final destinationKeywords = [
@@ -136,14 +117,11 @@ class ChatService {
       'trip to',
       'about',
     ];
-
     return destinationKeywords.any((keyword) => queryLower.contains(keyword));
   }
-
   String? getTransportationInfo(String query) {
     try {
       final queryLower = query.toLowerCase();
-
       final routingKeywords = [
         'how to get',
         'how do i get',
@@ -163,12 +141,9 @@ class ChatService {
         'public transport',
         'getting around',
       ];
-
       final isRoutingQuery = routingKeywords.any((keyword) => queryLower.contains(keyword));
       if (!isRoutingQuery) return null;
-
       final cities = ['paris', 'tokyo', 'london', 'new york'];
-
       for (final city in cities) {
         if (queryLower.contains(city)) {
           final transportInfo = TravelKnowledgeBase.getTransportationInfo(city);
@@ -177,50 +152,43 @@ class ChatService {
           }
         }
       }
-
       return null;
     } catch (e) {
       _logger.e('Failed to get transportation info: $e');
       return null;
     }
   }
-
   String _buildTransportationResponse(TransportationInfo info, String query) {
     final buffer = StringBuffer();
-
     if (query.contains('airport')) {
-      buffer.writeln('🚖 Transportation from ${info.cityName} Airport to City Center:\n');
-
+      buffer.writeln(' Transportation from ${info.cityName} Airport to City Center:\n');
       for (final option in info.airportTransport) {
         buffer.writeln('${option.icon} ${option.name}');
         buffer.writeln('   ${option.description}');
-        buffer.writeln('   💰 Cost: ${option.cost}');
-        buffer.writeln('   ⏱️ Time: ${option.duration}');
+        buffer.writeln('    Cost: ${option.cost}');
+        buffer.writeln('   ⏱ Time: ${option.duration}');
         if (option.tips.isNotEmpty) {
-          buffer.writeln('   💡 Tip: ${option.tips.first}');
+          buffer.writeln('    Tip: ${option.tips.first}');
         }
         buffer.writeln();
       }
     } else {
-      buffer.writeln('🚇 Getting Around ${info.cityName}:\n');
+      buffer.writeln(' Getting Around ${info.cityName}:\n');
       buffer.writeln(info.generalTransportInfo);
       buffer.writeln();
-
-      buffer.writeln('📍 Public Transport Options:\n');
+      buffer.writeln(' Public Transport Options:\n');
       for (final option in info.publicTransport) {
         buffer.writeln('${option.icon} ${option.name}');
         buffer.writeln('   ${option.description}');
-        buffer.writeln('   💰 Cost: ${option.cost}');
+        buffer.writeln('    Cost: ${option.cost}');
         if (option.tips.isNotEmpty) {
-          buffer.writeln('   💡 ${option.tips.first}');
+          buffer.writeln('    ${option.tips.first}');
         }
         buffer.writeln();
       }
     }
-
     return buffer.toString();
   }
-
   String? getTravelFAQAnswer(String query) {
     try {
       return TravelKnowledgeBase.searchFAQ(query);
@@ -229,33 +197,28 @@ class ChatService {
       return null;
     }
   }
-
   String? getSmartResponse(String query) {
     try {
       final transportInfo = getTransportationInfo(query);
       if (transportInfo != null) {
         return transportInfo;
       }
-
       if (isDestinationQuery(query)) {
         final destInfo = getQuickDestinationInfo(query);
         if (destInfo != null) {
           return destInfo;
         }
       }
-
       final faqAnswer = getTravelFAQAnswer(query);
       if (faqAnswer != null) {
-        return '💡 Travel Tip:\n\n$faqAnswer';
+        return ' Travel Tip:\n\n$faqAnswer';
       }
-
       return null;
     } catch (e) {
       _logger.e('Failed to get smart response: $e');
       return null;
     }
   }
-
   bool canAnswerWithKnowledgeBase(String query) {
     return getSmartResponse(query) != null;
   }

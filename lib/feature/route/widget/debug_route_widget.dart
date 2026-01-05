@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/route_models.dart';
-
 class DebugRouteWidget extends ConsumerWidget {
   final RouteResult? route;
-
   const DebugRouteWidget({super.key, this.route});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (route == null) {
@@ -18,9 +15,7 @@ class DebugRouteWidget extends ConsumerWidget {
         ),
       );
     }
-
     final routeData = route!;
-
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-
 class AdditionalRequirementsInput extends StatefulWidget {
   final String value;
   final Function(String) onChanged;
   final int? maxLength;
   final int? minLines;
   final int? maxLines;
-
   const AdditionalRequirementsInput({
     super.key,
     required this.value,
@@ -15,17 +13,14 @@ class AdditionalRequirementsInput extends StatefulWidget {
     this.minLines = 3,
     this.maxLines = 6,
   });
-
   @override
   State<AdditionalRequirementsInput> createState() =>
       _AdditionalRequirementsInputState();
 }
-
 class _AdditionalRequirementsInputState
     extends State<AdditionalRequirementsInput> {
   final TextEditingController _controller = TextEditingController();
   bool _showSuggestions = true;
-
   final List<String> _quickSuggestions = [
     'Family-friendly activities',
     'Pet-friendly accommodations',
@@ -40,13 +35,11 @@ class _AdditionalRequirementsInputState
     'Cultural immersion',
     'Relaxation and spa',
   ];
-
   @override
   void initState() {
     super.initState();
     _controller.text = widget.value;
   }
-
   @override
   void didUpdateWidget(AdditionalRequirementsInput oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -54,7 +47,6 @@ class _AdditionalRequirementsInputState
       _controller.text = widget.value;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -85,9 +77,7 @@ class _AdditionalRequirementsInputState
           ),
           onChanged: widget.onChanged,
         ),
-
         const SizedBox(height: 12),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -109,7 +99,6 @@ class _AdditionalRequirementsInputState
             ),
           ],
         ),
-
         if (_showSuggestions) ...[
           const SizedBox(height: 8),
           Wrap(
@@ -123,7 +112,6 @@ class _AdditionalRequirementsInputState
                 onSelected: (selected) {
                   String currentText = _controller.text;
                   if (selected) {
-
                     if (currentText.isNotEmpty) {
                       currentText += currentText.endsWith('.') ? ' ' : '. ';
                     }
@@ -134,7 +122,6 @@ class _AdditionalRequirementsInputState
                     currentText = currentText.replaceAll(RegExp(r'\.+'), '.');
                     currentText = currentText.replaceAll('. .', '.');
                   }
-
                   _controller.text = currentText;
                   widget.onChanged(currentText);
                 },
@@ -142,9 +129,7 @@ class _AdditionalRequirementsInputState
             }).toList(),
           ),
         ],
-
         const SizedBox(height: 12),
-
         ExpansionTile(
           title: Text(
             'Need inspiration? See examples',
@@ -193,7 +178,6 @@ class _AdditionalRequirementsInputState
       ],
     );
   }
-
   Widget _buildExampleItem(String title, String example) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +199,6 @@ class _AdditionalRequirementsInputState
       ],
     );
   }
-
   @override
   void dispose() {
     _controller.dispose();

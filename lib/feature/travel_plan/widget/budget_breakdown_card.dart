@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
-
 class BudgetBreakdownCard extends StatelessWidget {
   final TravelPlan plan;
-
   const BudgetBreakdownCard({
     super.key,
     required this.plan,
   });
-
   @override
   Widget build(BuildContext context) {
     final totalSpent = plan.days.fold(
@@ -18,7 +15,6 @@ class BudgetBreakdownCard extends StatelessWidget {
     );
     final remaining = plan.budget - totalSpent;
     final percentageUsed = (totalSpent / plan.budget * 100).clamp(0, 100);
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -69,7 +65,6 @@ class BudgetBreakdownCard extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildBudgetItem(
       BuildContext context,
       String label,

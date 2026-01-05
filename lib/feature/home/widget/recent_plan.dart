@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/model/app_model.dart';
-
 class RecentPlans extends StatelessWidget {
   final List<TravelPlan> plans;
   final VoidCallback onViewAll;
   final Function(TravelPlan) onPlanTap;
-
   const RecentPlans({
     super.key,
     required this.plans,
     required this.onViewAll,
     required this.onPlanTap,
   });
-
   @override
   Widget build(BuildContext context) {
     if (plans.isEmpty) {
       return _buildEmptyState(context);
     }
-
     return Column(
       children: [
         ...plans.map((plan) => Padding(
@@ -37,7 +33,6 @@ class RecentPlans extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildEmptyState(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(32),
@@ -72,21 +67,17 @@ class RecentPlans extends StatelessWidget {
     );
   }
 }
-
 class _PlanCard extends StatelessWidget {
   final TravelPlan plan;
   final VoidCallback onTap;
-
   const _PlanCard({
     required this.plan,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     final duration = plan.endDate.difference(plan.startDate).inDays + 1;
-
     return Card(
       child: InkWell(
         onTap: onTap,

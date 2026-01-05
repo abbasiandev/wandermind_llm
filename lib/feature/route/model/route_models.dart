@@ -1,9 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:latlong2/latlong.dart';
-
 part 'route_models.freezed.dart';
 part 'route_models.g.dart';
-
 @freezed
 class RouteResult with _$RouteResult {
   const factory RouteResult({
@@ -14,17 +12,14 @@ class RouteResult with _$RouteResult {
     String? name,
     @Default([]) List<NavigationStep> steps,
   }) = _RouteResult;
-
   factory RouteResult.fromJson(Map<String, dynamic> json) =>
       _$RouteResultFromJson(json);
 }
-
 enum RouteType {
   fastest,
   shortest,
   balanced,
 }
-
 @freezed
 class NavigationStep with _$NavigationStep {
   const factory NavigationStep({
@@ -39,11 +34,9 @@ class NavigationStep with _$NavigationStep {
     int? exitNumber,
     @Default(0.0) double bearing,
   }) = _NavigationStep;
-
   factory NavigationStep.fromJson(Map<String, dynamic> json) =>
       _$NavigationStepFromJson(json);
 }
-
 enum ManeuverType {
   depart,
   turn,
@@ -71,7 +64,6 @@ enum ManeuverType {
   roundabout,
   rotary,
 }
-
 @freezed
 class NavigationState with _$NavigationState {
   const factory NavigationState({
@@ -86,11 +78,9 @@ class NavigationState with _$NavigationState {
     @Default(false) bool isRerouting,
     DateTime? lastUpdateTime,
   }) = _NavigationState;
-
   factory NavigationState.fromJson(Map<String, dynamic> json) =>
       _$NavigationStateFromJson(json);
 }
-
 @freezed
 class RoutePreferences with _$RoutePreferences {
   const factory RoutePreferences({
@@ -100,11 +90,9 @@ class RoutePreferences with _$RoutePreferences {
     @Default(false) bool avoidFerries,
     @Default(false) bool avoidUnpaved,
   }) = _RoutePreferences;
-
   factory RoutePreferences.fromJson(Map<String, dynamic> json) =>
       _$RoutePreferencesFromJson(json);
 }
-
 @freezed
 class Waypoint with _$Waypoint {
   const factory Waypoint({
@@ -115,11 +103,9 @@ class Waypoint with _$Waypoint {
     @Default(false) bool isCompleted,
     int? order,
   }) = _Waypoint;
-
   factory Waypoint.fromJson(Map<String, dynamic> json) =>
       _$WaypointFromJson(json);
 }
-
 @freezed
 class RouteWithWaypoints with _$RouteWithWaypoints {
   const factory RouteWithWaypoints({
@@ -130,7 +116,6 @@ class RouteWithWaypoints with _$RouteWithWaypoints {
     @Default([]) List<RouteResult> alternativeRoutes,
     @Default(RoutePreferences()) RoutePreferences preferences,
   }) = _RouteWithWaypoints;
-
   factory RouteWithWaypoints.fromJson(Map<String, dynamic> json) =>
       _$RouteWithWaypointsFromJson(json);
 }

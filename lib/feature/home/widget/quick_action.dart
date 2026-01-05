@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_color.dart';
-
 class QuickActions extends StatelessWidget {
   final VoidCallback onCreatePlan;
   final VoidCallback onChat;
   final VoidCallback onExplore;
   final VoidCallback onSettings;
-
   const QuickActions({
     super.key,
     required this.onCreatePlan,
@@ -14,7 +12,6 @@ class QuickActions extends StatelessWidget {
     required this.onExplore,
     required this.onSettings,
   });
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -49,7 +46,6 @@ class QuickActions extends StatelessWidget {
     );
   }
 }
-
 class _QuickActionCard extends StatelessWidget {
   final IconData icon;
   final String label;

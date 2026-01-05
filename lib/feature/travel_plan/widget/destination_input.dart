@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../core/model/app_model.dart';
-
 class DestinationInput extends StatefulWidget {
   final String value;
   final Function(String) onChanged;
   final LocationData? currentLocation;
-
   const DestinationInput({
     super.key,
     required this.value,
     required this.onChanged,
     this.currentLocation,
   });
-
   @override
   State<DestinationInput> createState() => _DestinationInputState();
 }
-
 class _DestinationInputState extends State<DestinationInput> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _popularDestinations = [
@@ -31,13 +27,11 @@ class _DestinationInputState extends State<DestinationInput> {
     'Sydney, Australia',
     'Amsterdam, Netherlands',
   ];
-
   @override
   void initState() {
     super.initState();
     _controller.text = widget.value;
   }
-
   @override
   void didUpdateWidget(DestinationInput oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -52,7 +46,6 @@ class _DestinationInputState extends State<DestinationInput> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -80,9 +73,7 @@ class _DestinationInputState extends State<DestinationInput> {
             return null;
           },
         ),
-
         const SizedBox(height: 16),
-
         Text(
           'Popular Destinations',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -90,7 +81,6 @@ class _DestinationInputState extends State<DestinationInput> {
           ),
         ),
         const SizedBox(height: 8),
-
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -107,7 +97,6 @@ class _DestinationInputState extends State<DestinationInput> {
       ],
     );
   }
-
   void _useCurrentLocation() {
     if (widget.currentLocation != null) {
       final location = widget.currentLocation!;
@@ -116,7 +105,6 @@ class _DestinationInputState extends State<DestinationInput> {
       widget.onChanged(locationText);
     }
   }
-
   @override
   void dispose() {
     _controller.dispose();

@@ -2,18 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
-
 import '../model/route_models.dart';
-
 class OSRMRoutingService {
   static final Logger _logger = Logger();
-
   static const String _baseUrl = 'https://router.project-osrm.org';
-
   final http.Client _client;
-
   OSRMRoutingService({http.Client? client}) : _client = client ?? http.Client();
-
   Future<RouteResult> getRoute({
     required LatLng start,
     required LatLng end,
@@ -25,20 +19,15 @@ class OSRMRoutingService {
       final coordString = coordinates
           .map((c) => '${c.longitude},${c.latitude}')
           .join(';');
-
       final url = Uri.parse(
         '$_baseUrl/route/v1/driving/$coordString?steps=true&geometries=geojson&overview=full&annotations=true',
       );
-
       _logger.i('Requesting OSRM route: $url');
-
       final response = await _client.get(url).timeout(
         const Duration(seconds: 15),
       );
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
         if (data['code'] == 'Ok' && data['routes'] != null && (data['routes'] as List).isNotEmpty) {
           return _parseOSRMRoute(data['routes'][0], type);
         } else {
@@ -52,7 +41,6 @@ class OSRMRoutingService {
       rethrow;
     }
   }
-
   Future<List<RouteResult>> getAlternativeRoutes({
     required LatLng start,
     required LatLng end,
@@ -64,56 +52,44 @@ class OSRMRoutingService {
       final coordString = coordinates
           .map((c) => '${c.longitude},${c.latitude}')
           .join(';');
-
       final url = Uri.parse(
         '$_baseUrl/route/v1/driving/$coordString?steps=true&geometries=geojson&overview=full&annotations=true&alternatives=$alternatives',
       );
-
       final response = await _client.get(url).timeout(
         const Duration(seconds: 15),
       );
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
         if (data['code'] == 'Ok' && data['routes'] != null) {
           final routes = <RouteResult>[];
           final osrmRoutes = data['routes'] as List;
-
           for (int i = 0; i < osrmRoutes.length; i++) {
             final routeType = i == 0 ? RouteType.fastest :
                             i == 1 ? RouteType.balanced : RouteType.shortest;
             routes.add(_parseOSRMRoute(osrmRoutes[i], routeType));
           }
-
           return routes;
         }
       }
-
       throw Exception('Failed to get alternative routes');
     } catch (e) {
       _logger.e('Error getting alternative routes: $e');
       rethrow;
     }
   }
-
   RouteResult _parseOSRMRoute(Map<String, dynamic> route, RouteType type) {
     final geometry = route['geometry'];
     final legs = route['legs'] as List;
-
     final points = <LatLng>[];
     if (geometry['coordinates'] != null) {
       for (final coord in geometry['coordinates']) {
         points.add(LatLng(coord[1], coord[0]));
       }
     }
-
     final distance = (route['distance'] as num).toDouble();
     final duration = (route['duration'] as num).toDouble();
-
     final steps = <NavigationStep>[];
     int stepIndex = 0;
-
     for (final leg in legs) {
       if (leg['steps'] != null) {
         for (final step in leg['steps']) {
@@ -121,7 +97,6 @@ class OSRMRoutingService {
         }
       }
     }
-
     return RouteResult(
       points: points,
       distanceMeters: distance,
@@ -131,16 +106,13 @@ class OSRMRoutingService {
       steps: steps,
     );
   }
-
   NavigationStep _parseNavigationStep(Map<String, dynamic> step, int index) {
     final maneuver = step['maneuver'];
     final location = maneuver['location'];
-
     final distance = (step['distance'] as num).toDouble();
     final duration = (step['duration'] as num).toDouble();
     final instruction = step['name'] ?? 'Continue';
     final maneuverType = _parseManeuverType(maneuver['type'], maneuver['modifier']);
-
     return NavigationStep(
       index: index,
       location: LatLng(location[1], location[0]),
@@ -152,7 +124,6 @@ class OSRMRoutingService {
       bearing: (maneuver['bearing_after'] ?? 0.0).toDouble(),
     );
   }
-
   ManeuverType _parseManeuverType(String type, String? modifier) {
     switch (type) {
       case 'depart':
@@ -183,10 +154,8 @@ class OSRMRoutingService {
         return ManeuverType.continueRoute;
     }
   }
-
   ManeuverType _parseTurnModifier(String? modifier) {
     if (modifier == null) return ManeuverType.turn;
-
     switch (modifier) {
       case 'left':
         return ManeuverType.turnLeft;
@@ -206,12 +175,10 @@ class OSRMRoutingService {
         return ManeuverType.turn;
     }
   }
-
   String _generateInstruction(ManeuverType type, String streetName, double distance) {
     final distanceStr = distance < 1000
         ? '${distance.toStringAsFixed(0)} meters'
         : '${(distance / 1000).toStringAsFixed(1)} km';
-
     switch (type) {
       case ManeuverType.depart:
         return 'Head ${streetName.isNotEmpty ? "on $streetName" : "straight"}';
@@ -248,7 +215,6 @@ class OSRMRoutingService {
         return 'Continue${streetName.isNotEmpty ? " on $streetName" : ""}';
     }
   }
-
   String _getRouteName(RouteType type) {
     switch (type) {
       case RouteType.fastest:
@@ -259,7 +225,6 @@ class OSRMRoutingService {
         return 'Balanced Route';
     }
   }
-
   void dispose() {
     _client.close();
   }

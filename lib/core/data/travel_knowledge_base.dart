@@ -1,22 +1,16 @@
-
 class TravelKnowledgeBase {
-
   static DestinationInfo? getDestinationInfo(String destination) {
     final normalized = destination.toLowerCase().trim();
-
     if (_destinations.containsKey(normalized)) {
       return _destinations[normalized];
     }
-
     for (final entry in _destinations.entries) {
       final cityName = entry.key;
-
       if (normalized.startsWith(cityName) ||
           normalized.contains(cityName)) {
         return entry.value;
       }
     }
-
     for (final entry in _destinations.entries) {
       final info = entry.value;
       final fullName = '${info.name.toLowerCase()}, ${info.country.toLowerCase()}';
@@ -25,20 +19,15 @@ class TravelKnowledgeBase {
         return entry.value;
       }
     }
-
     return null;
   }
-
   static TransportationInfo? getTransportationInfo(String destination) {
     final normalized = destination.toLowerCase().trim();
     return _transportation[normalized];
   }
-
   static String? getRoutingAdvice(String query) {
     final queryLower = query.toLowerCase();
-
     if (!_isRoutingQuery(queryLower)) return null;
-
     for (final destination in _transportation.keys) {
       if (queryLower.contains(destination)) {
         final info = _transportation[destination];
@@ -47,10 +36,8 @@ class TravelKnowledgeBase {
         }
       }
     }
-
     return null;
   }
-
   static bool _isRoutingQuery(String query) {
     final routingKeywords = [
       'how to get',
@@ -69,57 +56,47 @@ class TravelKnowledgeBase {
       'train',
       'subway',
     ];
-
     return routingKeywords.any((keyword) => query.contains(keyword));
   }
-
   static String _buildRoutingResponse(TransportationInfo info, String query) {
     final buffer = StringBuffer();
-
     if (query.contains('airport')) {
-      buffer.writeln('🚖 Transportation from ${info.cityName} Airport:\n');
-
+      buffer.writeln(' Transportation from ${info.cityName} Airport:\n');
       for (final option in info.airportTransport) {
         buffer.writeln('${option.icon} ${option.name}');
         buffer.writeln('   Cost: ${option.cost}');
         buffer.writeln('   Time: ${option.duration}');
         buffer.writeln('   Details: ${option.description}');
         if (option.tips.isNotEmpty) {
-          buffer.writeln('   💡 Tip: ${option.tips.first}');
+          buffer.writeln('    Tip: ${option.tips.first}');
         }
         buffer.writeln();
       }
     } else {
-      buffer.writeln('🚇 Getting Around ${info.cityName}:\n');
+      buffer.writeln(' Getting Around ${info.cityName}:\n');
       buffer.writeln(info.generalTransportInfo);
       buffer.writeln();
-
       buffer.writeln('Public Transport Options:');
       for (final option in info.publicTransport) {
         buffer.writeln('• ${option.name}: ${option.description}');
         buffer.writeln('  Cost: ${option.cost}');
       }
     }
-
-    buffer.writeln('\n📍 Tip: Tap "Show Route on Map" to see the route visually');
-
+    buffer.writeln('\n Tip: Tap "Show Route on Map" to see the route visually');
     return buffer.toString();
   }
-
   static List<ActivityTemplate> getActivitiesForDestination(
     String destination,
     List<String> interests,
   ) {
     final info = getDestinationInfo(destination);
     if (info == null) return [];
-
     return info.activities.where((activity) {
       return interests.any((interest) =>
         activity.categories.contains(interest.toLowerCase())
       );
     }).toList();
   }
-
   static BudgetEstimate getBudgetEstimate(String destination, int days) {
     final info = getDestinationInfo(destination);
     if (info == null) {
@@ -131,7 +108,6 @@ class TravelKnowledgeBase {
         total: 140.0 * days,
       );
     }
-
     return BudgetEstimate(
       accommodation: info.avgAccommodationPerDay * days,
       food: info.avgFoodPerDay * days,
@@ -143,12 +119,10 @@ class TravelKnowledgeBase {
               info.avgActivitiesPerDay) * days,
     );
   }
-
   static List<String> getTravelTips(String destination) {
     final info = getDestinationInfo(destination);
     return info?.tips ?? _generalTips;
   }
-
   static final Map<String, DestinationInfo> _destinations = {
     'paris': DestinationInfo(
       name: 'Paris',
@@ -208,7 +182,6 @@ class TravelKnowledgeBase {
         'Try local bakeries for affordable authentic meals',
       ],
     ),
-
     'tokyo': DestinationInfo(
       name: 'Tokyo',
       country: 'Japan',
@@ -267,7 +240,6 @@ class TravelKnowledgeBase {
         'Try convenience store food - surprisingly good and cheap',
       ],
     ),
-
     'new york': DestinationInfo(
       name: 'New York',
       country: 'USA',
@@ -326,7 +298,6 @@ class TravelKnowledgeBase {
         'Pizza slices and food carts offer affordable eats',
       ],
     ),
-
     'london': DestinationInfo(
       name: 'London',
       country: 'UK',
@@ -385,7 +356,6 @@ class TravelKnowledgeBase {
         'Pubs offer affordable lunch deals',
       ],
     ),
-
     'rome': DestinationInfo(
       name: 'Rome',
       country: 'Italy',
@@ -444,7 +414,6 @@ class TravelKnowledgeBase {
         'Gelato should cost €2-3 per scoop - avoid tourist traps',
       ],
     ),
-
     'dubai': DestinationInfo(
       name: 'Dubai',
       country: 'United Arab Emirates',
@@ -529,7 +498,6 @@ class TravelKnowledgeBase {
         'Stay hydrated - summers are extremely hot',
       ],
     ),
-
     'abu dhabi': DestinationInfo(
       name: 'Abu Dhabi',
       country: 'United Arab Emirates',
@@ -597,7 +565,6 @@ class TravelKnowledgeBase {
         'Many attractions close during prayer times',
       ],
     ),
-
     'cairo': DestinationInfo(
       name: 'Cairo',
       country: 'Egypt',
@@ -666,7 +633,6 @@ class TravelKnowledgeBase {
         'Carry small bills - change can be hard to get',
       ],
     ),
-
     'marrakech': DestinationInfo(
       name: 'Marrakech',
       country: 'Morocco',
@@ -734,7 +700,6 @@ class TravelKnowledgeBase {
         'Learn basic French or Arabic phrases - helpful for shopping',
       ],
     ),
-
     'doha': DestinationInfo(
       name: 'Doha',
       country: 'Qatar',
@@ -802,7 +767,6 @@ class TravelKnowledgeBase {
         'Friday is weekend - some places have reduced hours',
       ],
     ),
-
     'amman': DestinationInfo(
       name: 'Amman',
       country: 'Jordan',
@@ -870,7 +834,6 @@ class TravelKnowledgeBase {
         'Best weather: March-May and September-November',
       ],
     ),
-
     'barcelona': DestinationInfo(
       name: 'Barcelona',
       country: 'Spain',
@@ -938,7 +901,6 @@ class TravelKnowledgeBase {
         'Try pintxos and vermut at local bars',
       ],
     ),
-
     'istanbul': DestinationInfo(
       name: 'Istanbul',
       country: 'Turkey',
@@ -1006,7 +968,6 @@ class TravelKnowledgeBase {
         'Ramadan affects restaurant and attraction hours',
       ],
     ),
-
     'singapore': DestinationInfo(
       name: 'Singapore',
       country: 'Singapore',
@@ -1074,7 +1035,6 @@ class TravelKnowledgeBase {
         'Book attractions online for better deals',
       ],
     ),
-
     'bangkok': DestinationInfo(
       name: 'Bangkok',
       country: 'Thailand',
@@ -1144,14 +1104,13 @@ class TravelKnowledgeBase {
       ],
     ),
   };
-
   static final Map<String, TransportationInfo> _transportation = {
     'paris': TransportationInfo(
       cityName: 'Paris',
       airportTransport: [
         TransportOption(
           name: 'RER B Train',
-          icon: '🚆',
+          icon: '',
           description: 'Direct train from CDG Airport to city center',
           cost: '€10-11',
           duration: '30-40 minutes',
@@ -1163,7 +1122,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Roissybus',
-          icon: '🚌',
+          icon: '',
           description: 'Express bus to Opéra',
           cost: '€13.70',
           duration: '60 minutes',
@@ -1175,7 +1134,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Taxi',
-          icon: '🚖',
+          icon: '',
           description: 'Direct door-to-door service',
           cost: '€50-70 (flat rate to city center)',
           duration: '30-50 minutes depending on traffic',
@@ -1187,7 +1146,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Uber/Bolt',
-          icon: '🚗',
+          icon: '',
           description: 'Private ride-sharing service',
           cost: '€40-60',
           duration: '30-50 minutes',
@@ -1201,7 +1160,7 @@ class TravelKnowledgeBase {
       publicTransport: [
         TransportOption(
           name: 'Metro',
-          icon: '🚇',
+          icon: '',
           description: 'Extensive subway network covering all Paris',
           cost: '€1.90 per journey, €14.90 for 10 tickets',
           duration: 'Varies by route',
@@ -1213,7 +1172,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Bus',
-          icon: '🚌',
+          icon: '',
           description: 'Comprehensive bus network',
           cost: '€1.90 per journey',
           duration: 'Varies by route',
@@ -1225,7 +1184,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Vélib\' (Bike Share)',
-          icon: '🚲',
+          icon: '',
           description: 'Public bike sharing system',
           cost: '€1 for 30 minutes',
           duration: 'Self-paced',
@@ -1243,7 +1202,7 @@ class TravelKnowledgeBase {
       airportTransport: [
         TransportOption(
           name: 'Narita Express (N\'EX)',
-          icon: '🚄',
+          icon: '',
           description: 'Fast train from Narita Airport',
           cost: '¥3,070 (~\$28)',
           duration: '60 minutes to Tokyo Station',
@@ -1256,7 +1215,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Keisei Skyliner',
-          icon: '🚆',
+          icon: '',
           description: 'Express train to Ueno',
           cost: '¥2,520 (~\$23)',
           duration: '45 minutes to Ueno',
@@ -1268,7 +1227,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Airport Limousine Bus',
-          icon: '🚌',
+          icon: '',
           description: 'Direct bus to major hotels',
           cost: '¥3,200 (~\$29)',
           duration: '75-120 minutes',
@@ -1280,7 +1239,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Taxi',
-          icon: '🚖',
+          icon: '',
           description: 'Private taxi service',
           cost: '¥20,000-30,000 (~\$180-270)',
           duration: '60-90 minutes',
@@ -1294,7 +1253,7 @@ class TravelKnowledgeBase {
       publicTransport: [
         TransportOption(
           name: 'JR Yamanote Line',
-          icon: '🚃',
+          icon: '',
           description: 'Circular line connecting major stations',
           cost: '¥140-200 per journey',
           duration: 'Loop takes 60 minutes',
@@ -1306,7 +1265,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Tokyo Metro',
-          icon: '🚇',
+          icon: '',
           description: '9 subway lines across Tokyo',
           cost: '¥170-320 per journey',
           duration: 'Varies by route',
@@ -1318,7 +1277,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Taxi',
-          icon: '🚖',
+          icon: '',
           description: 'Metered taxi service',
           cost: '¥500 base + distance',
           duration: 'Varies',
@@ -1336,7 +1295,7 @@ class TravelKnowledgeBase {
       airportTransport: [
         TransportOption(
           name: 'Heathrow Express',
-          icon: '🚄',
+          icon: '',
           description: 'Fast train to Paddington Station',
           cost: '£25-37 (~\$32-47)',
           duration: '15 minutes',
@@ -1349,7 +1308,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Piccadilly Line (Tube)',
-          icon: '🚇',
+          icon: '',
           description: 'Underground to central London',
           cost: '£5.50 with Oyster card',
           duration: '45-60 minutes',
@@ -1362,7 +1321,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'National Express Coach',
-          icon: '🚌',
+          icon: '',
           description: 'Budget coach service',
           cost: '£6-10',
           duration: '60-90 minutes',
@@ -1375,7 +1334,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Black Cab/Taxi',
-          icon: '🚖',
+          icon: '',
           description: 'Licensed London taxi',
           cost: '£50-90',
           duration: '45-75 minutes',
@@ -1390,7 +1349,7 @@ class TravelKnowledgeBase {
       publicTransport: [
         TransportOption(
           name: 'London Underground (Tube)',
-          icon: '🚇',
+          icon: '',
           description: 'Extensive subway network',
           cost: '£2.50-7 per journey with Oyster/Contactless',
           duration: 'Varies by route',
@@ -1403,7 +1362,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Double-Decker Bus',
-          icon: '🚌',
+          icon: '',
           description: 'Iconic red London buses',
           cost: '£1.65 per journey',
           duration: 'Varies by route',
@@ -1416,7 +1375,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Santander Cycles',
-          icon: '🚲',
+          icon: '',
           description: 'Public bike hire scheme',
           cost: '£2 for 24 hours',
           duration: 'Self-paced',
@@ -1435,7 +1394,7 @@ class TravelKnowledgeBase {
       airportTransport: [
         TransportOption(
           name: 'JFK AirTrain + Subway',
-          icon: '🚆',
+          icon: '',
           description: 'AirTrain to Jamaica Station, then subway',
           cost: '\$10.75 total',
           duration: '60-90 minutes',
@@ -1448,7 +1407,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Express Bus',
-          icon: '🚌',
+          icon: '',
           description: 'NYC Airporter bus to Manhattan',
           cost: '\$19-40',
           duration: '60-90 minutes',
@@ -1461,7 +1420,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Taxi (Yellow Cab)',
-          icon: '🚖',
+          icon: '',
           description: 'Metered yellow taxi',
           cost: '\$52 flat rate + tolls and tip',
           duration: '45-75 minutes',
@@ -1474,7 +1433,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Uber/Lyft',
-          icon: '🚗',
+          icon: '',
           description: 'Ride-sharing service',
           cost: '\$50-80',
           duration: '45-75 minutes',
@@ -1489,7 +1448,7 @@ class TravelKnowledgeBase {
       publicTransport: [
         TransportOption(
           name: 'NYC Subway',
-          icon: '🚇',
+          icon: '',
           description: 'Extensive 24/7 subway system',
           cost: '\$2.75 per ride',
           duration: 'Varies by route',
@@ -1502,7 +1461,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Bus',
-          icon: '🚌',
+          icon: '',
           description: 'City bus network',
           cost: '\$2.75 per ride',
           duration: 'Varies by route',
@@ -1515,7 +1474,7 @@ class TravelKnowledgeBase {
         ),
         TransportOption(
           name: 'Citi Bike',
-          icon: '🚲',
+          icon: '',
           description: 'Bike share system',
           cost: '\$3.50 for 30 minutes',
           duration: 'Self-paced',
@@ -1530,7 +1489,6 @@ class TravelKnowledgeBase {
       generalTransportInfo: 'NYC subway runs 24/7 and is the fastest way to get around. Get a MetroCard or use OMNY contactless payment. Walking is also great for exploring neighborhoods. Taxis are plentiful but can be expensive.',
     ),
   };
-
   static final List<String> _generalTips = [
     'Research local customs and etiquette',
     'Download offline maps before traveling',
@@ -1542,46 +1500,29 @@ class TravelKnowledgeBase {
     'Pack a basic first-aid kit',
     'Keep valuables in hotel safe when not needed',
   ];
-
   static final Map<String, String> _travelFAQ = {
     'visa': 'Visa requirements vary by country and your nationality. Check with the embassy or consulate of your destination country at least 2-3 months before travel. Many countries offer visa-free entry or visa-on-arrival for tourists. Always ensure your passport is valid for at least 6 months beyond your planned departure date.',
-
     'insurance': 'Travel insurance is highly recommended and covers medical emergencies, trip cancellations, lost luggage, and other unexpected events. Choose a policy that includes medical coverage (minimum \$50,000), emergency evacuation, trip cancellation/interruption, baggage loss/delay, and 24/7 assistance hotline.',
-
     'money': 'Always carry multiple payment options: credit cards (Visa/Mastercard widely accepted), debit card for ATM withdrawals, some local currency (exchange at banks), and a backup card kept separately. Notify your bank before traveling, use ATMs inside banks when possible, and avoid airport currency exchanges (poor rates).',
-
     'safety': 'Essential safety guidelines: Research safe/unsafe areas, keep copies of documents separately, share itinerary with family/friends, use hotel safes for valuables, be aware of common scams, trust your instincts, and have emergency contacts readily available.',
-
     'packing': 'Smart packing essentials: Roll clothes to save space, pack versatile layerable clothing, bring one extra day\'s medication, keep valuables in carry-on, use packing cubes, bring universal power adapter, download offline maps, pack reusable water bottle, and include photocopies of important documents.',
-
     'health': 'Stay healthy while traveling: Check required vaccinations 6-8 weeks before departure, bring prescription medications in original containers, pack basic medications, drink bottled water in developing countries, wash hands frequently, use insect repellent in tropical areas, and get travel insurance with medical coverage.',
-
     'language': 'Communicate effectively: Learn 10-15 basic phrases (hello, thank you, help), download offline translation app (Google Translate), carry hotel business card with address in local language, use translation apps with camera feature for signs/menus, speak slowly and clearly, and use gestures when needed.',
-
     'customs': 'Respect local cultures: Research dress codes (especially religious sites), learn appropriate greetings, understand tipping customs (varies widely), know photography restrictions, respect personal space norms, learn dining etiquette, and be mindful of religious practices and holidays.',
-
     'accommodation': 'Choose and book wisely: Read recent reviews on multiple platforms, check location accessibility to attractions, verify cancellation policies, book directly for better rates sometimes, consider neighborhoods carefully, check for hidden fees, and verify included amenities (WiFi, breakfast).',
-
     'airport': 'Navigate airports smoothly: Arrive 3 hours early for international flights, check in online 24 hours before, have passport and boarding pass easily accessible, pack liquids in clear bag (100ml containers), wear easy-to-remove shoes, download airline app for updates, and have backup plans for delays.',
-
     'solo travel': 'Solo travel safely: Stay in social accommodations (hostels), join group tours or activities, share location with trusted contacts, trust your instincts, avoid walking alone at night in unfamiliar areas, keep valuable items hidden, make copies of important documents, and stay in well-reviewed accommodations.',
-
     'budget': 'Travel on a budget: Use public transportation, eat at local markets and street food, book accommodations with kitchen facilities, take advantage of free walking tours, visit free attractions and museums on free days, travel during off-peak seasons, use budget airlines, and cook some meals yourself.',
-
     'jet lag': 'Minimize jet lag effects: Adjust sleep schedule before departure, stay hydrated during flight, avoid alcohol and caffeine on plane, get sunlight upon arrival, try to stay awake until local bedtime, exercise lightly after arrival, and consider melatonin supplements.',
-
     'scams': 'Common travel scams to avoid: Overcharging by taxis (use meter or agree price first), fake "closed" attraction scam, fake police asking to see wallet, friendship bracelet trap, street games and betting, "free" tours demanding high tips, restaurant bill padding, and credit card skimming. Always be cautious and verify official services.',
   };
-
   static String? searchFAQ(String query) {
     final queryLower = query.toLowerCase();
-
     for (final entry in _travelFAQ.entries) {
       if (queryLower.contains(entry.key)) {
         return entry.value;
       }
     }
-
     if (queryLower.contains('visa') || queryLower.contains('passport')) {
       return _travelFAQ['visa'];
     }
@@ -1624,11 +1565,9 @@ class TravelKnowledgeBase {
     if (queryLower.contains('scam') || queryLower.contains('cheat') || queryLower.contains('fraud')) {
       return _travelFAQ['scams'];
     }
-
     return null;
   }
 }
-
 class DestinationInfo {
   final String name;
   final String country;
@@ -1639,7 +1578,6 @@ class DestinationInfo {
   final double avgActivitiesPerDay;
   final List<ActivityTemplate> activities;
   final List<String> tips;
-
   DestinationInfo({
     required this.name,
     required this.country,
@@ -1652,7 +1590,6 @@ class DestinationInfo {
     required this.tips,
   });
 }
-
 class ActivityTemplate {
   final String title;
   final String description;
@@ -1660,7 +1597,6 @@ class ActivityTemplate {
   final double cost;
   final List<String> categories;
   final String bestTimeOfDay;
-
   ActivityTemplate({
     required this.title,
     required this.description,
@@ -1670,14 +1606,12 @@ class ActivityTemplate {
     required this.bestTimeOfDay,
   });
 }
-
 class BudgetEstimate {
   final double accommodation;
   final double food;
   final double transport;
   final double activities;
   final double total;
-
   BudgetEstimate({
     required this.accommodation,
     required this.food,
@@ -1686,7 +1620,6 @@ class BudgetEstimate {
     required this.total,
   });
 }
-
 class TransportOption {
   final String name;
   final String icon;
@@ -1694,7 +1627,6 @@ class TransportOption {
   final String cost;
   final String duration;
   final List<String> tips;
-
   TransportOption({
     required this.name,
     required this.icon,
@@ -1704,13 +1636,11 @@ class TransportOption {
     this.tips = const [],
   });
 }
-
 class TransportationInfo {
   final String cityName;
   final List<TransportOption> airportTransport;
   final List<TransportOption> publicTransport;
   final String generalTransportInfo;
-
   TransportationInfo({
     required this.cityName,
     required this.airportTransport,

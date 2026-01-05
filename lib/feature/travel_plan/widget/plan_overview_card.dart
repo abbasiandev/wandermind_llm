@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
-
 class PlanOverviewCard extends StatelessWidget {
   final TravelPlan plan;
-
   const PlanOverviewCard({
     super.key,
     required this.plan,
   });
-
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     final duration = plan.endDate.difference(plan.startDate).inDays + 1;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -69,7 +64,6 @@ class PlanOverviewCard extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildInfoRow(
       BuildContext context,
       IconData icon,

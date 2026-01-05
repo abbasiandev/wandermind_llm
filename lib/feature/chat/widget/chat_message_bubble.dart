@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
-
 class ChatMessageBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback? onTravelPlanTap;
-
   const ChatMessageBubble({
     super.key,
     required this.message,
     this.onTravelPlanTap,
   });
-
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
     final theme = Theme.of(context);
-
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -59,13 +54,11 @@ class ChatMessageBubble extends StatelessWidget {
                     _buildTravelPlanPreview(context)
                   else
                     _buildTextMessage(context, isUser),
-
                   if (!isUser && _isRoutingResponse(message.content))
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
                       child: _buildRouteButton(context),
                     ),
-
                   if (!isUser)
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -98,7 +91,6 @@ class ChatMessageBubble extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildTextMessage(BuildContext context, bool isUser) {
     final theme = Theme.of(context);
     return SelectableText(
@@ -110,7 +102,6 @@ class ChatMessageBubble extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildTravelPlanPreview(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -161,7 +152,6 @@ class ChatMessageBubble extends StatelessWidget {
       ),
     );
   }
-
   void _copyMessage(BuildContext context) {
     Clipboard.setData(ClipboardData(text: message.content));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -171,11 +161,9 @@ class ChatMessageBubble extends StatelessWidget {
       ),
     );
   }
-
   String _formatTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-
     if (difference.inMinutes < 1) {
       return 'Just now';
     } else if (difference.inHours < 1) {
@@ -186,7 +174,6 @@ class ChatMessageBubble extends StatelessWidget {
       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
     }
   }
-
   bool _isRoutingResponse(String content) {
     final routingKeywords = [
       'route',
@@ -201,11 +188,9 @@ class ChatMessageBubble extends StatelessWidget {
       'show route on map',
       'airport to',
     ];
-
     final contentLower = content.toLowerCase();
     return routingKeywords.any((keyword) => contentLower.contains(keyword));
   }
-
   Widget _buildRouteButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,

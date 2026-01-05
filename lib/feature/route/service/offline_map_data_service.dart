@@ -4,15 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
-
 import '../model/offline_road_network.dart';
-
 class OfflineMapDataService {
   static final Logger _logger = Logger();
   final http.Client _client;
-
   OfflineMapDataService({http.Client? client}) : _client = client ?? http.Client();
-
   Future<RoadNetwork> downloadRegionData({
     required String regionName,
     required double minLat,
@@ -21,24 +17,18 @@ class OfflineMapDataService {
     required double maxLon,
   }) async {
     _logger.i('Downloading road data for $regionName...');
-
     final overpassQuery = _buildOverpassQuery(minLat, maxLat, minLon, maxLon);
-
     final url = Uri.parse('https://overpass-api.de/api/interpreter');
-
     try {
       final response = await _client.post(
         url,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: {'data': overpassQuery},
       ).timeout(const Duration(minutes: 2));
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final network = _parseOSMData(data, regionName, minLat, maxLat, minLon, maxLon);
-
         await _saveNetworkToFile(network);
-
         _logger.i('Downloaded ${network.nodes.length} nodes and ${network.edges.length} edges for $regionName');
         return network;
       } else {
@@ -49,7 +39,6 @@ class OfflineMapDataService {
       rethrow;
     }
   }
-
   String _buildOverpassQuery(double minLat, double maxLat, double minLon, double maxLon) {
     return '''
 [out:json][timeout:120];
@@ -62,7 +51,6 @@ out body;
 out skel qt;
 ''';
   }
-
   RoadNetwork _parseOSMData(
     Map<String, dynamic> data,
     String regionName,
@@ -72,10 +60,8 @@ out skel qt;
     double maxLon,
   ) {
     final elements = data['elements'] as List;
-
     final osmNodes = <String, Map<String, dynamic>>{};
     final ways = <Map<String, dynamic>>[];
-
     for (final element in elements) {
       if (element['type'] == 'node') {
         osmNodes[element['id'].toString()] = element;
@@ -83,35 +69,26 @@ out skel qt;
         ways.add(element);
       }
     }
-
     final roadNodes = <String, RoadNode>{};
     final roadEdges = <String, RoadEdge>{};
     final nodeConnections = <String, Set<String>>{};
-
     for (final way in ways) {
       final wayId = way['id'].toString();
       final tags = way['tags'] as Map<String, dynamic>? ?? {};
       final nodeIds = (way['nodes'] as List).map((id) => id.toString()).toList();
-
       if (nodeIds.length < 2) continue;
-
       final highway = tags['highway'] as String?;
       if (highway == null) continue;
-
       final roadType = _parseRoadType(highway);
       final speedLimit = _getSpeedLimit(roadType);
       final streetName = tags['name'] as String?;
       final isOneWay = tags['oneway'] == 'yes';
-
       for (int i = 0; i < nodeIds.length - 1; i++) {
         final fromNodeId = nodeIds[i];
         final toNodeId = nodeIds[i + 1];
-
         final fromOSM = osmNodes[fromNodeId];
         final toOSM = osmNodes[toNodeId];
-
         if (fromOSM == null || toOSM == null) continue;
-
         if (!roadNodes.containsKey(fromNodeId)) {
           roadNodes[fromNodeId] = RoadNode(
             id: fromNodeId,
@@ -120,7 +97,6 @@ out skel qt;
           );
           nodeConnections[fromNodeId] = {};
         }
-
         if (!roadNodes.containsKey(toNodeId)) {
           roadNodes[toNodeId] = RoadNode(
             id: toNodeId,
@@ -129,11 +105,9 @@ out skel qt;
           );
           nodeConnections[toNodeId] = {};
         }
-
         final fromLatLng = LatLng(fromOSM['lat'].toDouble(), fromOSM['lon'].toDouble());
         final toLatLng = LatLng(toOSM['lat'].toDouble(), toOSM['lon'].toDouble());
         final distance = const Distance()(fromLatLng, toLatLng);
-
         final geometry = <LatLng>[];
         for (int j = i; j <= i + 1 && j < nodeIds.length; j++) {
           final nodeId = nodeIds[j];
@@ -142,7 +116,6 @@ out skel qt;
             geometry.add(LatLng(osmNode['lat'].toDouble(), osmNode['lon'].toDouble()));
           }
         }
-
         final edgeId = '${wayId}_${i}';
         roadEdges[edgeId] = RoadEdge(
           id: edgeId,
@@ -155,21 +128,18 @@ out skel qt;
           isOneWay: isOneWay,
           geometry: geometry,
         );
-
         nodeConnections[fromNodeId]!.add(toNodeId);
         if (!isOneWay) {
           nodeConnections[toNodeId]!.add(fromNodeId);
         }
       }
     }
-
     final finalNodes = <String, RoadNode>{};
     for (final entry in roadNodes.entries) {
       finalNodes[entry.key] = entry.value.copyWith(
         connectedNodeIds: nodeConnections[entry.key]?.toList() ?? [],
       );
     }
-
     return RoadNetwork(
       regionId: _generateRegionId(minLat, maxLat, minLon, maxLon),
       regionName: regionName,
@@ -182,7 +152,6 @@ out skel qt;
       lastUpdated: DateTime.now(),
     );
   }
-
   RoadType _parseRoadType(String highway) {
     switch (highway) {
       case 'motorway':
@@ -203,7 +172,6 @@ out skel qt;
         return RoadType.unclassified;
     }
   }
-
   double _getSpeedLimit(RoadType roadType) {
     switch (roadType) {
       case RoadType.motorway:
@@ -224,59 +192,46 @@ out skel qt;
         return 50.0;
     }
   }
-
   String _generateRegionId(double minLat, double maxLat, double minLon, double maxLon) {
     return 'region_${minLat.toStringAsFixed(2)}_${maxLat.toStringAsFixed(2)}_${minLon.toStringAsFixed(2)}_${maxLon.toStringAsFixed(2)}';
   }
-
   Future<void> _saveNetworkToFile(RoadNetwork network) async {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/offline_maps/${network.regionId}.json');
-
       await file.parent.create(recursive: true);
-
       final jsonData = json.encode(network.toJson());
       await file.writeAsString(jsonData);
-
       _logger.i('Saved network to ${file.path}');
     } catch (e) {
       _logger.e('Error saving network: $e');
     }
   }
-
   Future<RoadNetwork?> loadNetworkFromFile(String regionId) async {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/offline_maps/$regionId.json');
-
       if (!await file.exists()) {
         _logger.w('Network file not found: $regionId');
         return null;
       }
-
       final jsonData = await file.readAsString();
       final data = json.decode(jsonData);
-
       final network = RoadNetwork.fromJson(data);
       _logger.i('Loaded network: ${network.regionName} with ${network.nodes.length} nodes');
-
       return network;
     } catch (e) {
       _logger.e('Error loading network: $e');
       return null;
     }
   }
-
   Future<List<String>> listAvailableRegions() async {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final offlineMapsDir = Directory('${dir.path}/offline_maps');
-
       if (!await offlineMapsDir.exists()) {
         return [];
       }
-
       final files = await offlineMapsDir.list().toList();
       return files
           .where((f) => f.path.endsWith('.json'))
@@ -287,12 +242,10 @@ out skel qt;
       return [];
     }
   }
-
   Future<void> deleteRegion(String regionId) async {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/offline_maps/$regionId.json');
-
       if (await file.exists()) {
         await file.delete();
         _logger.i('Deleted region: $regionId');
@@ -301,10 +254,8 @@ out skel qt;
       _logger.e('Error deleting region: $e');
     }
   }
-
   Future<RoadNetwork> createSampleNetwork() async {
     _logger.i('Creating sample road network for Dubai...');
-
     final nodes = <String, RoadNode>{
       '1': const RoadNode(
         id: '1',
@@ -349,7 +300,6 @@ out skel qt;
         connectedNodeIds: ['6'],
       ),
     };
-
     final edges = <String, RoadEdge>{
       'e1': RoadEdge(
         id: 'e1',
@@ -448,7 +398,6 @@ out skel qt;
         ],
       ),
     };
-
     final network = RoadNetwork(
       regionId: 'dubai_sample',
       regionName: 'Dubai Sample Network',
@@ -460,12 +409,9 @@ out skel qt;
       edges: edges,
       lastUpdated: DateTime.now(),
     );
-
     await _saveNetworkToFile(network);
-
     return network;
   }
-
   void dispose() {
     _client.close();
   }

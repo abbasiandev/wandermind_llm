@@ -1,34 +1,25 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-
 class LlamaCppService {
   static final Logger _logger = Logger();
-
   static const MethodChannel _methodChannel =
       MethodChannel('dev.abbasian.wandermind/llama_cpp');
   static const EventChannel _eventChannel =
       EventChannel('dev.abbasian.wandermind/llama_cpp_stream');
-
   static LlamaCppService? _instance;
-
   String? _modelPath;
   bool _isLoaded = false;
-
   int _contextSize = 2048;
   int _threads = 4;
-
   bool get isLoaded => _isLoaded;
   String? get modelPath => _modelPath;
   bool get isMockMode => false;
-
   LlamaCppService._internal();
-
   factory LlamaCppService() {
     _instance ??= LlamaCppService._internal();
     return _instance!;
   }
-
   Future<void> loadModel(
     String modelPath, {
     int contextSize = 2048,
@@ -39,16 +30,13 @@ class LlamaCppService {
   }) async {
     try {
       _logger.i('Loading model from: $modelPath');
-
       final file = File(modelPath);
       if (!await file.exists()) {
         throw Exception('Model file not found at path: $modelPath\n'
             'Please ensure the model is downloaded first.');
       }
-
       final fileSize = await file.length();
       _logger.i('Model file size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
-
       const minModelSize = 100 * 1024 * 1024;
       if (fileSize < minModelSize) {
         throw Exception('Model file is too small (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB).\n'
@@ -56,23 +44,18 @@ class LlamaCppService {
             'The model download appears to be incomplete or corrupted.\n'
             'Please delete the model and download it again from Settings -> Model Settings.');
       }
-
       if (_isLoaded) {
         await unloadModel();
       }
-
       _modelPath = modelPath;
       _contextSize = contextSize;
       _threads = threads;
-
       _logger.i('Calling native loadModel with contextSize=$contextSize, threads=$threads');
-
       final result = await _methodChannel.invokeMethod<bool>('loadModel', {
         'modelPath': modelPath,
         'contextSize': contextSize,
         'threads': threads,
       });
-
       if (result != true) {
         throw Exception('Failed to load model in native code.\n'
             'Possible causes:\n'
@@ -81,7 +64,6 @@ class LlamaCppService {
             '- Native library not properly built\n'
             'Check Android logcat for detailed native errors.');
       }
-
       _isLoaded = true;
       _logger.i('Model loaded successfully with native llama.cpp: $_modelPath');
       _logger.i('Context size: $contextSize, Threads: $threads');
@@ -100,7 +82,6 @@ class LlamaCppService {
       rethrow;
     }
   }
-
   Future<String> generateText(
     String prompt, {
     int maxTokens = 512,
@@ -113,27 +94,22 @@ class LlamaCppService {
     if (!_isLoaded) {
       throw Exception('Model not loaded. Call loadModel() first.');
     }
-
     try {
       _logger.d('Generating text for prompt length: ${prompt.length}');
-
       final response = await _methodChannel.invokeMethod<String>('generateText', {
         'prompt': prompt,
         'maxTokens': maxTokens,
         'temperature': temperature,
       });
-
       if (response == null) {
         throw Exception('Failed to generate text in native code');
       }
-
       final cleanedResponse = response
           .replaceAll(stopSequence, '')
           .replaceAll('<|assistant|>', '')
           .replaceAll('<|system|>', '')
           .replaceAll('<|user|>', '')
           .trim();
-
       _logger.d('Generated response length: ${cleanedResponse.length}');
       return cleanedResponse;
     } catch (e, stackTrace) {
@@ -141,7 +117,6 @@ class LlamaCppService {
       rethrow;
     }
   }
-
   Stream<String> generateTextStream(
     String prompt, {
     int maxTokens = 512,
@@ -154,47 +129,38 @@ class LlamaCppService {
     if (!_isLoaded) {
       throw Exception('Model not loaded. Call loadModel() first.');
     }
-
     try {
       _logger.d('Generating streaming text for prompt length: ${prompt.length}');
-
       final stream = _eventChannel.receiveBroadcastStream({
         'prompt': prompt,
         'maxTokens': maxTokens,
         'temperature': temperature,
       });
-
       await for (final token in stream) {
         if (token is String) {
-
           final cleanedChunk = token
               .replaceAll(stopSequence, '')
               .replaceAll('<|assistant|>', '')
               .replaceAll('<|system|>', '')
               .replaceAll('<|user|>', '');
-
           if (cleanedChunk.isNotEmpty) {
             yield cleanedChunk;
           }
-
           if (token.contains(stopSequence)) {
             break;
           }
         }
       }
-
       _logger.d('Streaming generation completed');
     } catch (e, stackTrace) {
       _logger.e('Failed to generate streaming text: $e', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
-
   Future<Map<String, dynamic>> getModelInfo() async {
     if (!_isLoaded) {
       throw Exception('Model not loaded');
     }
-
     try {
       final isLoaded = await _methodChannel.invokeMethod<bool>('isModelLoaded');
       return {
@@ -208,32 +174,26 @@ class LlamaCppService {
       rethrow;
     }
   }
-
   Future<void> unloadModel() async {
     if (_isLoaded) {
       _logger.i('Unloading model...');
-
       try {
         await _methodChannel.invokeMethod('unloadModel');
         _isLoaded = false;
         _modelPath = null;
-
         _logger.i('Model unloaded successfully');
       } catch (e, stackTrace) {
         _logger.e('Error unloading model: $e', error: e, stackTrace: stackTrace);
-
         _isLoaded = false;
         _modelPath = null;
       }
     }
   }
-
   Future<void> dispose() async {
     await unloadModel();
     _instance = null;
     _logger.i('LlamaCppService disposed');
   }
-
   static void resetInstance() {
     _instance = null;
   }

@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../core/model/app_model.dart';
 import '../../../core/theme/app_color.dart';
-
 class HomeHeader extends StatelessWidget {
   final LocationData? locationData;
-
   const HomeHeader({
     super.key,
     this.locationData,
   });
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,7 +59,6 @@ class HomeHeader extends StatelessWidget {
       ),
     );
   }
-
   String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) {

@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../core/theme/app_color.dart';
 import '../model/route_models.dart';
-
 class RoutePreferencesSheet extends ConsumerStatefulWidget {
   final RoutePreferences initialPreferences;
   final Function(RoutePreferences) onApply;
-
   const RoutePreferencesSheet({
     super.key,
     required this.initialPreferences,
     required this.onApply,
   });
-
   @override
   ConsumerState<RoutePreferencesSheet> createState() =>
       _RoutePreferencesSheetState();
 }
-
 class _RoutePreferencesSheetState
     extends ConsumerState<RoutePreferencesSheet> {
   late RoutePreferences _preferences;
-
   @override
   void initState() {
     super.initState();
     _preferences = widget.initialPreferences;
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final surfaceColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
-
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -45,7 +37,6 @@ class _RoutePreferencesSheetState
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             children: [
               const Icon(Icons.tune, color: AppColors.primary),
@@ -64,7 +55,6 @@ class _RoutePreferencesSheetState
             ],
           ),
           const SizedBox(height: 24),
-
           Text(
             'Route Type',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -73,11 +63,9 @@ class _RoutePreferencesSheetState
           ),
           const SizedBox(height: 12),
           _buildRouteTypeSelector(),
-
           const SizedBox(height: 24),
           const Divider(),
           const SizedBox(height: 24),
-
           Text(
             'Avoid',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -85,7 +73,6 @@ class _RoutePreferencesSheetState
                 ),
           ),
           const SizedBox(height: 12),
-
           _buildAvoidOption(
             icon: Icons.traffic,
             title: 'Highways',
@@ -97,7 +84,6 @@ class _RoutePreferencesSheetState
               });
             },
           ),
-
           _buildAvoidOption(
             icon: Icons.toll,
             title: 'Tolls',
@@ -109,7 +95,6 @@ class _RoutePreferencesSheetState
               });
             },
           ),
-
           _buildAvoidOption(
             icon: Icons.directions_boat,
             title: 'Ferries',
@@ -121,7 +106,6 @@ class _RoutePreferencesSheetState
               });
             },
           ),
-
           _buildAvoidOption(
             icon: Icons.terrain,
             title: 'Unpaved Roads',
@@ -133,9 +117,7 @@ class _RoutePreferencesSheetState
               });
             },
           ),
-
           const SizedBox(height: 24),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -150,13 +132,11 @@ class _RoutePreferencesSheetState
               child: const Text('Apply Preferences'),
             ),
           ),
-
           const SizedBox(height: 8),
         ],
       ),
     );
   }
-
   Widget _buildRouteTypeSelector() {
     return Row(
       children: [
@@ -189,7 +169,6 @@ class _RoutePreferencesSheetState
       ],
     );
   }
-
   Widget _buildRouteTypeChip({
     required RouteType type,
     required IconData icon,
@@ -200,7 +179,6 @@ class _RoutePreferencesSheetState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final unselectedBg = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
     final unselectedBorder = isDark ? Colors.grey[700]! : Colors.grey[300]!;
-
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -246,7 +224,6 @@ class _RoutePreferencesSheetState
       ),
     );
   }
-
   Widget _buildAvoidOption({
     required IconData icon,
     required String title,
@@ -255,7 +232,6 @@ class _RoutePreferencesSheetState
     required Function(bool) onChanged,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(

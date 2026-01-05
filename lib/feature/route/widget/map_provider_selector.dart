@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../core/config/map_config.dart';
 import '../../../core/theme/app_color.dart';
-
 class MapProviderSelector extends ConsumerStatefulWidget {
   final Function()? onProviderChanged;
-
   const MapProviderSelector({
     super.key,
     this.onProviderChanged,
   });
-
   @override
   ConsumerState<MapProviderSelector> createState() =>
       _MapProviderSelectorState();
 }
-
 class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
   MapProvider _selectedProvider = MapConfig.preferredProvider;
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -35,7 +28,6 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             children: [
               const Icon(Icons.map, color: AppColors.primary),
@@ -62,13 +54,10 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
             ),
           ),
           const SizedBox(height: 24),
-
           ...MapConfig.availableProviders.map((provider) {
             return _buildProviderOption(provider);
           }).toList(),
-
           const SizedBox(height: 16),
-
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -95,9 +84,7 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -113,15 +100,12 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
       ),
     );
   }
-
   Widget _buildProviderOption(MapProvider provider) {
     final isSelected = _selectedProvider == provider;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isDisabled = provider == MapProvider.mapbox && !MapConfig.isMapboxAvailable;
-
     IconData icon;
     String subtitle;
-
     switch (provider) {
       case MapProvider.mapbox:
         icon = Icons.layers;
@@ -138,7 +122,6 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
         subtitle = 'Uses Mapbox if available, else OSM';
         break;
     }
-
     return Opacity(
       opacity: isDisabled ? 0.5 : 1.0,
       child: Padding(
@@ -215,14 +198,11 @@ class _MapProviderSelectorState extends ConsumerState<MapProviderSelector> {
       ),
     );
   }
-
   Future<void> _applySelection() async {
     await MapConfig.setPreferredProvider(_selectedProvider);
-
     if (mounted) {
       Navigator.pop(context);
       widget.onProviderChanged?.call();
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

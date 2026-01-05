@@ -1,31 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 import '../../../core/model/app_model.dart';
 import '../../../core/provider/llm_di_provider.dart';
 import '../service/smart_travel_service.dart';
-
 part 'llm_provider.g.dart';
-
 @riverpod
 class LLMController extends _$LLMController {
   @override
   LLMState build() {
     return const LLMState();
   }
-
   Future<void> initializeLLM() async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
-
       final service = ref.read(keepAliveLLMServiceProvider);
-
       await for (final progress in service.initializeModel()) {
-
         state = state.copyWith(initializationProgress: progress);
       }
-
       state = state.copyWith(
         isInitialized: true,
         isLoading: false,
@@ -38,19 +29,14 @@ class LLMController extends _$LLMController {
       );
     }
   }
-
   Future<String> generateResponse(String prompt) async {
     if (!state.isInitialized) {
       throw Exception('LLM not initialized');
     }
-
     state = state.copyWith(isGenerating: true, error: null);
-
     try {
-
       final service = ref.read(keepAliveLLMServiceProvider);
       final response = await service.generateResponse(prompt);
-
       state = state.copyWith(isGenerating: false);
       return response;
     } catch (e) {
@@ -61,7 +47,6 @@ class LLMController extends _$LLMController {
       rethrow;
     }
   }
-
   Future<TravelPlan> generateTravelPlan({
     required String destination,
     required DateTime startDate,
@@ -73,14 +58,10 @@ class LLMController extends _$LLMController {
     if (!state.isInitialized) {
       throw Exception('LLM not initialized');
     }
-
     state = state.copyWith(isGenerating: true, error: null);
-
     try {
-
       final llmService = ref.read(keepAliveLLMServiceProvider);
       final smartService = SmartTravelService(llmService);
-
       final plan = await smartService.generateSmartTravelPlan(
         destination: destination,
         startDate: startDate,
@@ -89,7 +70,6 @@ class LLMController extends _$LLMController {
         interests: interests,
         additionalRequirements: additionalRequirements,
       );
-
       state = state.copyWith(isGenerating: false);
       return plan;
     } catch (e) {
@@ -100,7 +80,6 @@ class LLMController extends _$LLMController {
       rethrow;
     }
   }
-
   String _buildTravelPlanPrompt({
     required String destination,
     required DateTime startDate,
@@ -111,7 +90,6 @@ class LLMController extends _$LLMController {
   }) {
     final duration = endDate.difference(startDate).inDays + 1;
     final interestsText = interests.join(', ');
-
     return '''
 Create a detailed travel plan for $destination for $duration days.
 Budget: \$${budget.toStringAsFixed(2)}
@@ -119,11 +97,9 @@ Interests: $interestsText
 Start Date: ${startDate.toIso8601String().split('T')[0]}
 End Date: ${endDate.toIso8601String().split('T')[0]}
 ${additionalRequirements != null ? 'Additional Requirements: $additionalRequirements' : ''}
-
 Please provide a detailed itinerary with daily activities, estimated costs, and travel tips.
 ''';
   }
-
   TravelPlan _parseTravelPlanResponse(
       String response,
       String destination,
@@ -140,7 +116,6 @@ Please provide a detailed itinerary with daily activities, estimated costs, and 
       interests,
     );
   }
-
   TravelPlan _createFallbackTravelPlan(
       String destination,
       DateTime startDate,
@@ -150,7 +125,6 @@ Please provide a detailed itinerary with daily activities, estimated costs, and 
       ) {
     final duration = endDate.difference(startDate).inDays + 1;
     final days = <DayPlan>[];
-
     for (int i = 0; i < duration; i++) {
       final dayDate = startDate.add(Duration(days: i));
       days.add(DayPlan(
@@ -198,7 +172,6 @@ Please provide a detailed itinerary with daily activities, estimated costs, and 
         ],
       ));
     }
-
     return TravelPlan(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: '$destination Adventure',

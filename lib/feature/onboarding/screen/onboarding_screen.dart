@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/theme/app_color.dart';
-
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
-
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
-
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-
   final List<OnboardingPage> _pages = [
     OnboardingPage(
       title: 'Welcome to WanderMind',
@@ -45,13 +40,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       color: AppColors.primary,
     ),
   ];
-
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +61,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
               ),
             ),
-
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -81,7 +73,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 },
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(24),
               child: Row(
@@ -92,7 +83,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
               child: Row(
@@ -143,7 +133,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
     );
   }
-
   Widget _buildPage(OnboardingPage page) {
     return Padding(
       padding: const EdgeInsets.all(40),
@@ -182,7 +171,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
     );
   }
-
   Widget _buildDot(int index) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -197,19 +185,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
     );
   }
-
   void _finishOnboarding() {
-
     context.go('/');
   }
 }
-
 class OnboardingPage {
   final String title;
   final String description;
   final IconData icon;
   final Color color;
-
   OnboardingPage({
     required this.title,
     required this.description,

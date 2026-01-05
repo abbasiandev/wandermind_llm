@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/theme/app_color.dart';
-
 class BudgetInput extends StatefulWidget {
   final double value;
   final Function(double) onChanged;
   final String? currency;
   final double? minBudget;
   final double? maxBudget;
-
   const BudgetInput({
     super.key,
     required this.value,
@@ -17,19 +15,15 @@ class BudgetInput extends StatefulWidget {
     this.minBudget,
     this.maxBudget,
   });
-
   @override
   State<BudgetInput> createState() => _BudgetInputState();
 }
-
 class _BudgetInputState extends State<BudgetInput> {
   final TextEditingController _controller = TextEditingController();
   String _selectedCurrency = 'USD';
-
   final List<String> _currencies = [
     'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'INR', 'MXN'
   ];
-
   final Map<String, String> _currencySymbols = {
     'USD': '\$',
     'EUR': '€',
@@ -42,14 +36,12 @@ class _BudgetInputState extends State<BudgetInput> {
     'INR': '₹',
     'MXN': '\$',
   };
-
   final List<BudgetPreset> _budgetPresets = [
     BudgetPreset(label: 'Budget', amount: 1000, icon: Icons.savings),
     BudgetPreset(label: 'Moderate', amount: 3000, icon: Icons.account_balance_wallet),
     BudgetPreset(label: 'Comfortable', amount: 5000, icon: Icons.card_travel),
     BudgetPreset(label: 'Luxury', amount: 10000, icon: Icons.diamond),
   ];
-
   @override
   void initState() {
     super.initState();
@@ -58,7 +50,6 @@ class _BudgetInputState extends State<BudgetInput> {
       _controller.text = widget.value.toStringAsFixed(0);
     }
   }
-
   @override
   void didUpdateWidget(BudgetInput oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -66,7 +57,6 @@ class _BudgetInputState extends State<BudgetInput> {
       _controller.text = widget.value.toStringAsFixed(0);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -155,9 +145,7 @@ class _BudgetInputState extends State<BudgetInput> {
             ),
           ],
         ),
-
         const SizedBox(height: 16),
-
         Text(
           'Quick Select',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -165,7 +153,6 @@ class _BudgetInputState extends State<BudgetInput> {
           ),
         ),
         const SizedBox(height: 8),
-
         Row(
           children: _budgetPresets.map((preset) {
             final isSelected = widget.value == preset.amount;
@@ -228,9 +215,7 @@ class _BudgetInputState extends State<BudgetInput> {
             );
           }).toList(),
         ),
-
         const SizedBox(height: 12),
-
         if (widget.value > 0)
           Container(
             padding: const EdgeInsets.all(12),
@@ -268,7 +253,6 @@ class _BudgetInputState extends State<BudgetInput> {
       ],
     );
   }
-
   Widget _buildBreakdownRow(String category, double percentage) {
     final amount = widget.value * percentage;
     return Padding(
@@ -290,19 +274,16 @@ class _BudgetInputState extends State<BudgetInput> {
       ),
     );
   }
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 }
-
 class BudgetPreset {
   final String label;
   final double amount;
   final IconData icon;
-
   const BudgetPreset({
     required this.label,
     required this.amount,

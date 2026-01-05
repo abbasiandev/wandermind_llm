@@ -1,8 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-
 part 'scenic_route_preferences.freezed.dart';
 part 'scenic_route_preferences.g.dart';
-
 @freezed
 class ScenicRoutePreferences with _$ScenicRoutePreferences {
   const factory ScenicRoutePreferences({
@@ -14,11 +12,9 @@ class ScenicRoutePreferences with _$ScenicRoutePreferences {
     @Default([]) List<String> preferredRoadTypes,
     @Default([]) List<PointOfInterestType> poiPreferences,
   }) = _ScenicRoutePreferences;
-
   factory ScenicRoutePreferences.fromJson(Map<String, dynamic> json) =>
       _$ScenicRoutePreferencesFromJson(json);
 }
-
 enum ScenicMode {
   direct,
   balanced,
@@ -26,7 +22,6 @@ enum ScenicMode {
   exploration,
   spiral,
 }
-
 enum PointOfInterestType {
   parks,
   landmarks,
@@ -37,7 +32,6 @@ enum PointOfInterestType {
   waterfront,
   gardens,
 }
-
 extension ScenicModeExtension on ScenicMode {
   String get displayName {
     switch (this) {
@@ -53,7 +47,6 @@ extension ScenicModeExtension on ScenicMode {
         return 'Spiral Route';
     }
   }
-
   String get description {
     switch (this) {
       case ScenicMode.direct:
@@ -68,7 +61,6 @@ extension ScenicModeExtension on ScenicMode {
         return 'Winding path through streets and alleys';
     }
   }
-
   double get detourMultiplier {
     switch (this) {
       case ScenicMode.direct:

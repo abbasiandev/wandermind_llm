@@ -4,51 +4,42 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
 import '../../../core/config/map_config.dart';
 import '../../../core/theme/app_color.dart';
 import '../../location/provider/location_provider.dart';
 import '../provider/route_provider.dart';
 import '../model/route_models.dart';
-
 class EnhancedRouteMapWidget extends ConsumerStatefulWidget {
   final RouteResult? route;
   final Function(LatLng)? onMapTap;
-
   const EnhancedRouteMapWidget({
     super.key,
     this.route,
     this.onMapTap,
   });
-
   @override
   ConsumerState<EnhancedRouteMapWidget> createState() => _EnhancedRouteMapWidgetState();
 }
-
 class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget> {
   final MapController _mapController = MapController();
   final FlutterTts _flutterTts = FlutterTts();
   StreamSubscription? _locationSubscription;
-
   LatLng? _currentLocation;
   double _currentZoom = 16.0;
   bool _followMode = true;
   double _previousDistanceToStep = 0.0;
-
   @override
   void initState() {
     super.initState();
     _initTts();
     _startLocationTracking();
   }
-
   Future<void> _initTts() async {
     await _flutterTts.setLanguage("en-US");
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setPitch(1.0);
   }
-
   @override
   void dispose() {
     _locationSubscription?.cancel();
@@ -56,36 +47,28 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
     _flutterTts.stop();
     super.dispose();
   }
-
   void _startLocationTracking() {
     final locationService = ref.read(locationServiceProvider);
-
     _locationSubscription = locationService.getLocationStream().listen(
       (locationData) {
         final newLocation = LatLng(locationData.latitude, locationData.longitude);
-
         setState(() {
           _currentLocation = newLocation;
         });
-
         final navState = ref.read(navigationStateNotifierProvider);
         if (navState.isNavigating) {
           ref.read(navigationStateNotifierProvider.notifier).updateLocation(newLocation);
-
           _checkForVoiceAnnouncement();
         }
-
         if (_followMode && mounted) {
           _mapController.move(newLocation, _currentZoom);
         }
       },
     );
   }
-
   void _checkForVoiceAnnouncement() {
     final navState = ref.read(navigationStateNotifierProvider);
     final notifier = ref.read(navigationStateNotifierProvider.notifier);
-
     if (navState.distanceToNextStep > 0) {
       if (notifier.shouldAnnounce(_previousDistanceToStep, navState.distanceToNextStep)) {
         final instruction = notifier.getVoiceInstruction();
@@ -93,12 +76,10 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
       }
       _previousDistanceToStep = navState.distanceToNextStep;
     }
-
     if (navState.isOffRoute && !navState.isRerouting) {
       _speak('Rerouting...');
     }
   }
-
   Future<void> _speak(String text) async {
     try {
       await _flutterTts.speak(text);
@@ -106,37 +87,28 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
       debugPrint('TTS error: $e');
     }
   }
-
   void _startNavigation() {
     if (widget.route != null) {
       ref.read(navigationStateNotifierProvider.notifier).startNavigation(widget.route!);
-
       setState(() {
         _followMode = true;
         _currentZoom = 17.0;
       });
-
       if (_currentLocation != null) {
         _mapController.move(_currentLocation!, _currentZoom);
       }
-
       _speak('Navigation started');
     }
   }
-
   void _stopNavigation() {
     ref.read(navigationStateNotifierProvider.notifier).stopNavigation();
-
     setState(() {
       _currentZoom = 16.0;
     });
-
     _speak('Navigation stopped');
   }
-
   List<Marker> _buildMarkers() {
     final markers = <Marker>[];
-
     if (_currentLocation != null) {
       markers.add(
         Marker(
@@ -179,7 +151,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
         ),
       );
     }
-
     if (widget.route != null && widget.route!.points.isNotEmpty) {
       markers.add(
         Marker(
@@ -194,21 +165,17 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
         ),
       );
     }
-
     return markers;
   }
-
   List<Polyline> _buildRoute() {
     if (widget.route == null || widget.route!.points.isEmpty) {
-      debugPrint('⚠️ No route to display');
+      debugPrint(' No route to display');
       return [];
     }
-
-    debugPrint('📍 Drawing route with ${widget.route!.points.length} points');
+    debugPrint(' Drawing route with ${widget.route!.points.length} points');
     debugPrint('   Route name: ${widget.route!.name}');
     debugPrint('   Distance: ${(widget.route!.distanceMeters / 1000).toStringAsFixed(2)} km');
     debugPrint('   Steps: ${widget.route!.steps.length}');
-
     return [
       Polyline(
         points: widget.route!.points,
@@ -219,7 +186,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
       ),
     ];
   }
-
   IconData _getManeuverIcon(ManeuverType type) {
     switch (type) {
       case ManeuverType.turnLeft:
@@ -242,12 +208,10 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
         return Icons.arrow_upward;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final navState = ref.watch(navigationStateNotifierProvider);
     final locationAsync = ref.watch(locationControllerProvider);
-
     return locationAsync.when(
       data: (location) {
         if (_currentLocation == null && location != null) {
@@ -256,7 +220,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
             _mapController.move(_currentLocation!, _currentZoom);
           });
         }
-
         return Stack(
           children: [
             FlutterMap(
@@ -285,7 +248,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
                 MarkerLayer(markers: _buildMarkers()),
               ],
             ),
-
             if (navState.isNavigating && navState.currentStep != null)
               Positioned(
                 top: 16,
@@ -368,7 +330,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
                   ),
                 ),
               ),
-
             Positioned(
               right: 16,
               bottom: navState.isNavigating ? 180 : 100,
@@ -389,7 +350,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
                 ),
               ),
             ),
-
             if (widget.route != null)
               Positioned(
                 top: navState.isNavigating ? 100 : 16,
@@ -430,7 +390,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
                   ),
                 ),
               ),
-
             if (_currentLocation != null && widget.route != null)
               Positioned(
                 bottom: 16,
@@ -507,7 +466,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
       error: (error, stack) => Center(child: Text('Error: $error')),
     );
   }
-
   Widget _buildInfoColumn(String label, String value) {
     return Column(
       children: [
@@ -530,7 +488,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
       ],
     );
   }
-
   String _formatDistance(double meters) {
     if (meters < 1000) {
       return '${meters.toStringAsFixed(0)} m';
@@ -538,7 +495,6 @@ class _EnhancedRouteMapWidgetState extends ConsumerState<EnhancedRouteMapWidget>
       return '${(meters / 1000).toStringAsFixed(1)} km';
     }
   }
-
   String _formatDuration(double seconds) {
     if (seconds < 60) {
       return '< 1 min';

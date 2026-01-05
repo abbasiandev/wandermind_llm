@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-
 import '../../../core/theme/app_color.dart';
 import '../widget/route_map_widget.dart';
 import '../widget/route_preferences_sheet.dart';
@@ -13,21 +12,17 @@ import '../provider/route_provider.dart';
 import '../model/route_models.dart';
 import '../../../core/config/map_config.dart';
 import '../../location/provider/location_provider.dart';
-
 class RouteScreen extends ConsumerStatefulWidget {
   final String? startLocation;
   final String? endLocation;
-
   const RouteScreen({
     super.key,
     this.startLocation,
     this.endLocation,
   });
-
   @override
   ConsumerState<RouteScreen> createState() => _RouteScreenState();
 }
-
 class _RouteScreenState extends ConsumerState<RouteScreen> {
   final TextEditingController _startController = TextEditingController();
   final TextEditingController _endController = TextEditingController();
@@ -35,29 +30,24 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
   bool _showWaypoints = false;
   bool _isCalculatingRoutes = false;
   bool _isNavigating = false;
-
   @override
   void initState() {
     super.initState();
     _startController.text = widget.startLocation ?? 'Current Location';
     _endController.text = widget.endLocation ?? '';
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(locationControllerProvider.notifier).getCurrentLocation();
     });
   }
-
   @override
   void dispose() {
     _startController.dispose();
     _endController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final locationAsync = ref.watch(locationControllerProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Route Navigation'),
@@ -81,7 +71,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       ),
       body: Column(
         children: [
-
           if (!_isNavigating)
             Container(
             padding: const EdgeInsets.all(16),
@@ -97,7 +86,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
             ),
             child: Column(
               children: [
-
                 TextField(
                   controller: _startController,
                   decoration: InputDecoration(
@@ -117,7 +105,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 TextField(
                   controller: _endController,
                   decoration: InputDecoration(
@@ -132,7 +119,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 Row(
                   children: [
                     Expanded(
@@ -179,7 +165,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
               ],
             ),
           ),
-
           if (_showWaypoints)
             Container(
               decoration: BoxDecoration(
@@ -198,11 +183,9 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                   ref.read(routeManagerProvider.notifier).updateWaypoints(waypoints);
                 },
                 onWaypointTap: (location) {
-
                 },
               ),
             ),
-
           if (ref.watch(routeManagerProvider)?.alternativeRoutes.isNotEmpty ?? false)
             RouteOptionsSelector(
               routes: ref.watch(routeManagerProvider)!.alternativeRoutes,
@@ -211,7 +194,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                 ref.read(routeManagerProvider.notifier).selectRoute(route);
               },
             ),
-
           Expanded(
             child: locationAsync.when(
               data: (location) {
@@ -231,9 +213,7 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () async {
-
                             await ref.read(locationPermissionControllerProvider.notifier).requestPermission();
-
                             await ref.read(locationControllerProvider.notifier).getCurrentLocation();
                           },
                           icon: const Icon(Icons.location_on),
@@ -243,7 +223,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                     ),
                   );
                 }
-
                 return RouteMapWidget(
                   destination: _destinationLocation,
                   onMapTap: (point) {
@@ -274,7 +253,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                 final isServiceDisabled = errorMessage.contains('Location services are disabled');
                 final isPermissionDenied = errorMessage.contains('permissions are denied');
                 final isPermissionDeniedForever = errorMessage.contains('permanently denied');
-
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
@@ -314,7 +292,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                         if (isServiceDisabled)
                           ElevatedButton.icon(
                             onPressed: () async {
-
                               await Geolocator.openLocationSettings();
                             },
                             icon: const Icon(Icons.settings),
@@ -323,7 +300,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
                         else if (isPermissionDeniedForever)
                           ElevatedButton.icon(
                             onPressed: () async {
-
                               await Geolocator.openAppSettings();
                             },
                             icon: const Icon(Icons.settings),
@@ -350,14 +326,12 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
               },
             ),
           ),
-
           if (!_isNavigating && _startController.text.isNotEmpty && _endController.text.isNotEmpty)
             _buildRouteInfoPanel(),
         ],
       ),
     );
   }
-
   Widget _buildRouteInfoPanel() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -407,7 +381,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       ),
     );
   }
-
   void _useCurrentLocation() async {
     final location = await ref.read(locationControllerProvider.future);
     if (location != null) {
@@ -419,22 +392,18 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       );
     }
   }
-
   void _showMapProviderSelector() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => MapProviderSelector(
         onProviderChanged: () {
-
           setState(() {
-
           });
         },
       ),
     );
   }
-
   void _showPreferences() {
     showModalBottomSheet(
       context: context,
@@ -449,7 +418,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       ),
     );
   }
-
   Future<void> _showRoute() async {
     if (_endController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -457,7 +425,6 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
       );
       return;
     }
-
     if (_destinationLocation == null) {
       final parts = _endController.text.split(',');
       if (parts.length == 2) {
@@ -470,34 +437,26 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
         }
       }
     }
-
     if (_destinationLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please tap on map or enter valid coordinates')),
       );
       return;
     }
-
     await _calculateRoutes();
   }
-
   Future<void> _calculateRoutes() async {
     final location = await ref.read(locationControllerProvider.future);
     if (location == null || _destinationLocation == null) return;
-
     setState(() {
       _isCalculatingRoutes = true;
     });
-
     try {
-
       ref.read(routeManagerProvider.notifier).setRoute(
         LatLng(location.latitude, location.longitude),
         _destinationLocation!,
       );
-
       await ref.read(routeManagerProvider.notifier).calculateRoutes();
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

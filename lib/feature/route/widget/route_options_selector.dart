@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../core/theme/app_color.dart';
 import '../model/route_models.dart';
-
 class RouteOptionsSelector extends ConsumerStatefulWidget {
   final List<RouteResult> routes;
   final RouteResult? selectedRoute;
   final Function(RouteResult) onRouteSelected;
-
   const RouteOptionsSelector({
     super.key,
     required this.routes,
     this.selectedRoute,
     required this.onRouteSelected,
   });
-
   @override
   ConsumerState<RouteOptionsSelector> createState() =>
       _RouteOptionsSelectorState();
 }
-
 class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
   @override
   Widget build(BuildContext context) {
     if (widget.routes.isEmpty) {
       return const SizedBox.shrink();
     }
-
     return Container(
       height: 140,
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -38,7 +32,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
         itemBuilder: (context, index) {
           final route = widget.routes[index];
           final isSelected = widget.selectedRoute?.type == route.type;
-
           return Padding(
             padding: const EdgeInsets.only(right: 12),
             child: _buildRouteCard(route, isSelected),
@@ -47,14 +40,11 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
       ),
     );
   }
-
   Widget _buildRouteCard(RouteResult route, bool isSelected) {
     final distanceKm = (route.distanceMeters / 1000).toStringAsFixed(1);
     final durationMin = (route.durationSeconds / 60).ceil();
-
     IconData icon;
     Color color;
-
     switch (route.type) {
       case RouteType.fastest:
         icon = Icons.speed;
@@ -69,7 +59,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
         color = Colors.orange;
         break;
     }
-
     return GestureDetector(
       onTap: () => widget.onRouteSelected(route),
       child: Container(
@@ -102,7 +91,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-
             Row(
               children: [
                 Icon(
@@ -132,7 +120,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
               ],
             ),
             const SizedBox(height: 8),
-
             Row(
               children: [
                 Icon(
@@ -151,7 +138,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
               ],
             ),
             const SizedBox(height: 4),
-
             Row(
               children: [
                 Icon(
@@ -174,7 +160,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
       ),
     );
   }
-
   String _getRouteName(RouteType type) {
     switch (type) {
       case RouteType.fastest:
@@ -185,7 +170,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
         return 'Balanced';
     }
   }
-
   String _getRouteBadge(RouteType type) {
     switch (type) {
       case RouteType.fastest:
@@ -196,7 +180,6 @@ class _RouteOptionsSelectorState extends ConsumerState<RouteOptionsSelector> {
         return 'Recommended';
     }
   }
-
   String _formatDuration(int minutes) {
     if (minutes < 60) {
       return '$minutes min';
