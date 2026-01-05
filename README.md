@@ -6,13 +6,10 @@
 [![Dart](https://img.shields.io/badge/Dart-3.0%2B-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Android](https://img.shields.io/badge/Android-24%2B-3DDC84?logo=android&logoColor=white)](https://www.android.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Your Personal AI Travel Assistant That Works Completely Offline**
 
 *Intelligent itinerary planning • Smart routing • Voice navigation • Zero internet required*
-
-[Features](#key-features) • [Demo](#demo) • [Installation](#installation) • [Architecture](#architecture) • [Contributing](#contributing)
 
 </div>
 
