@@ -1,6 +1,6 @@
 name: wandermind_llm
 description: An offline AI-powered travel smart planner using local LLM
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
