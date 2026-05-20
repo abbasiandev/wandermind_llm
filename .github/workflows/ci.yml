@@ -48,41 +48,26 @@ jobs:
 
       - name: Get Flutter dependencies
         run: |
-          flutter pub cache clean --force
+          rm -rf ~/.pub-cache/hosted/pub.dev/geolocator_android-4.*
           flutter pub get
 
-      # ── Patch any geolocator_android with broken compileSdk ─────────────────
       - name: Patch geolocator_android build.gradle
         run: |
-          GRADLE_FILE=$(find ~/.pub-cache -path "*/geolocator_android-*/android/build.gradle" | head -1)
-          if [ -z "$GRADLE_FILE" ]; then
-            echo "▶ geolocator_android not found in pub-cache — skipping patch"
-            exit 0
-          fi
-          echo "▶ Found: $GRADLE_FILE"
-          VERSION=$(echo "$GRADLE_FILE" | grep -oP 'geolocator_android-\K[^/]+')
-          echo "▶ geolocator_android version in cache: $VERSION"
-
-          NEEDS_PATCH=false
-          grep -q 'flutter\.compileSdkVersion'  "$GRADLE_FILE" && NEEDS_PATCH=true
-          grep -q 'flutter\.targetSdkVersion'   "$GRADLE_FILE" && NEEDS_PATCH=true
-          grep -q 'flutter\.minSdkVersion'      "$GRADLE_FILE" && NEEDS_PATCH=true
-
-          if [ "$NEEDS_PATCH" = "true" ]; then
-            echo "▶ Patching flutter.* SDK references..."
+          find ~/.pub-cache -path "*/geolocator_android-*/android/build.gradle" | while read GRADLE_FILE; do
+            echo "▶ Patching: $GRADLE_FILE"
             sed -i \
-              -e 's/compileSdk\s\+flutter\.compileSdkVersion/compileSdk 34/g' \
-              -e 's/compileSdkVersion\s\+flutter\.compileSdkVersion/compileSdkVersion 34/g' \
-              -e 's/targetSdk\s\+flutter\.targetSdkVersion/targetSdk 34/g' \
-              -e 's/targetSdkVersion\s\+flutter\.targetSdkVersion/targetSdkVersion 34/g' \
-              -e 's/minSdk\s\+flutter\.minSdkVersion/minSdk 24/g' \
-              -e 's/minSdkVersion\s\+flutter\.minSdkVersion/minSdkVersion 24/g' \
+              -e 's/compileSdk\s*flutter\.compileSdkVersion/compileSdk 34/g' \
+              -e 's/compileSdkVersion\s*flutter\.compileSdkVersion/compileSdkVersion 34/g' \
+              -e 's/targetSdk\s*flutter\.targetSdkVersion/targetSdk 34/g' \
+              -e 's/targetSdkVersion\s*flutter\.targetSdkVersion/targetSdkVersion 34/g' \
+              -e 's/minSdk\s*flutter\.minSdkVersion/minSdk 24/g' \
+              -e 's/minSdkVersion\s*flutter\.minSdkVersion/minSdkVersion 24/g' \
               "$GRADLE_FILE"
-            echo "✅ Patch applied. Result:"
-            cat "$GRADLE_FILE"
-          else
-            echo "✅ No flutter.* SDK references found — no patch needed"
-          fi
+            if ! grep -q 'compileSdk' "$GRADLE_FILE"; then
+              sed -i '/^android\s*{/a\    compileSdk 34' "$GRADLE_FILE"
+            fi
+            echo "✅ Done: $GRADLE_FILE"
+          done
 
       - name: Run code generation
         run: flutter pub run build_runner build --delete-conflicting-outputs
