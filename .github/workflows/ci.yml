@@ -51,6 +51,9 @@ jobs:
           rm -rf ~/.pub-cache/hosted/pub.dev/geolocator_android-4.*
           flutter pub get
 
+      - name: Setup llama.cpp native dependency
+        run: bash android/app/src/main/cpp/setup_llama.sh
+
       - name: Patch geolocator_android build.gradle
         run: |
           find ~/.pub-cache -path "*/geolocator_android-*/android/build.gradle" | while read GRADLE_FILE; do
@@ -122,19 +125,12 @@ jobs:
           github.event_name != 'workflow_dispatch'
         run: flutter build apk --debug
 
-      - name: Build APK (Release — split per ABI)
+      - name: Build APK (Release — arm64)
         if: >
           github.ref == 'refs/heads/main' ||
           startsWith(github.ref, 'refs/tags/') ||
           github.event_name == 'workflow_dispatch'
-        run: flutter build apk --release --split-per-abi
-
-      - name: Build APK (Release — universal)
-        if: >
-          github.ref == 'refs/heads/main' ||
-          startsWith(github.ref, 'refs/tags/') ||
-          github.event_name == 'workflow_dispatch'
-        run: flutter build apk --release
+        run: flutter build apk --release --target-platform android-arm64
 
       # ── Rename APKs ──────────────────────────────────────────────────────────
       - name: Rename APK files
@@ -146,14 +142,14 @@ jobs:
           VERSION="${{ steps.get_version.outputs.version }}"
           DIR="build/app/outputs/flutter-apk"
           cd "$DIR"
-          for ARCH in arm64-v8a armeabi-v7a x86_64; do
-            SRC="app-${ARCH}-release.apk"
-            DST="wandermind-llm-v${VERSION}-${ARCH}.apk"
-            [ -f "$SRC" ] && mv "$SRC" "$DST" && echo "  ✔ $DST"
-          done
-          [ -f "app-release.apk" ] && \
-            mv app-release.apk "wandermind-llm-v${VERSION}-universal.apk" && \
-            echo "  ✔ wandermind-llm-v${VERSION}-universal.apk"
+          DST="wandermind-llm-v${VERSION}-arm64-v8a.apk"
+          if [ -f "app-arm64-v8a-release.apk" ]; then
+            mv app-arm64-v8a-release.apk "$DST" && echo "  ✔ $DST"
+          elif [ -f "app-release.apk" ]; then
+            mv app-release.apk "$DST" && echo "  ✔ $DST"
+          else
+            echo "❌ No release APK found" && ls -lah && exit 1
+          fi
           ls -lah
 
       # ── Upload artifacts ─────────────────────────────────────────────────────
@@ -195,17 +191,15 @@ jobs:
           **Your Personal AI Travel Assistant — Works 100% Offline**
           ${SIGN_NOTE}
 
-          ### 📦 Pick the right APK
+          ### 📦 APK
           | File | For |
           |------|-----|
-          | \`*-arm64-v8a.apk\` | Most modern Android phones ✅ recommended |
-          | \`*-armeabi-v7a.apk\` | Older 32-bit ARM devices |
-          | \`*-x86_64.apk\` | Intel/AMD devices & emulators |
-          | \`*-universal.apk\` | Any device — larger file size |
+          | \`*-arm64-v8a.apk\` | Modern 64-bit Android phones (recommended) |
 
           ### 🔧 Build info
           - Flutter 3.24.0 · Dart 3.x
           - Min SDK 24 (Android 7.0) · Target SDK 34 (Android 14)
+          - arm64-v8a only (required for on-device LLM inference)
 
           ### 📝 Changes
           EOF

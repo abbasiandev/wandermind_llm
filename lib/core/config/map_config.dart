@@ -13,8 +13,15 @@ class MapConfig {
   static Future<void> initialize() async {
     if (_initialized) return;
     try {
-      await dotenv.load(fileName: ".env");
-      _mapboxToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
+      await dotenv.load(fileName: ".env", isOptional: true);
+      const envToken = String.fromEnvironment(
+        'MAPBOX_ACCESS_TOKEN',
+        defaultValue: '',
+      );
+      _mapboxToken = dotenv.env['MAPBOX_ACCESS_TOKEN'] ?? envToken;
+      if (_mapboxToken != null && _mapboxToken!.isEmpty) {
+        _mapboxToken = null;
+      }
       final prefs = await SharedPreferences.getInstance();
       final prefValue = prefs.getString(_prefKey);
       if (prefValue != null) {

@@ -108,18 +108,25 @@
    flutter pub get
    ```
 
-3. **Generate code**
+3. **Set up native LLM dependency**
+   ```bash
+   bash android/app/src/main/cpp/setup_llama.sh
+   ```
+   This clones and pins [llama.cpp](https://github.com/ggerganov/llama.cpp) for the Android native build. Required before the first Android build.
+
+4. **Generate code**
    ```bash
    flutter pub run build_runner build --delete-conflicting-outputs
    ```
 
-4. **Set up environment variables**
+5. **Set up environment variables (optional)**
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration (optional)
+   # Edit .env only if you want Mapbox tiles/routing (OpenStreetMap works without it)
    ```
+   If you use a `.env` file, uncomment the `# - .env` line under `flutter: assets:` in `pubspec.yaml`.
 
-5. **Run the app**
+6. **Run the app**
    ```bash
    flutter run
    ```
@@ -128,7 +135,8 @@
 
 #### Android APK
 ```bash
-flutter build apk --release
+bash android/app/src/main/cpp/setup_llama.sh
+flutter build apk --release --target-platform android-arm64
 ```
 
 #### Android App Bundle (for Play Store)
@@ -249,22 +257,21 @@ WanderMind supports multiple LLM models optimized for mobile devices:
 
 **First Launch**: The app will automatically download the selected model (TinyLlama by default). This may take 5-15 minutes depending on your connection.
 
-### Environment Variables
+### Environment Variables (Optional)
 
-Create a `.env` file in the root directory:
+Maps and routing work out of the box with **OpenStreetMap** and **OSRM** — no configuration required.
+
+To enable **Mapbox** tiles and directions, create a `.env` file in the project root:
 
 ```env
-# Map Configuration
-MAPBOX_ACCESS_TOKEN=your_token_here  # Optional: for MapBox tiles
-OPENROUTE_API_KEY=your_key_here      # Optional: for OpenRouteService
+# Optional: Mapbox tiles and routing (https://account.mapbox.com/)
+MAPBOX_ACCESS_TOKEN=your_token_here
+```
 
-# LLM Configuration
-DEFAULT_MODEL=tinyllama               # Default: tinyllama
-CONTEXT_SIZE=2048                     # Context window size
-NUM_THREADS=4                         # CPU threads for inference
+Then uncomment `# - .env` under `flutter: assets:` in `pubspec.yaml`, or pass the token at build time:
 
-# Debug
-LOG_LEVEL=info                        # debug, info, warning, error
+```bash
+flutter run --dart-define=MAPBOX_ACCESS_TOKEN=pk.your_token_here
 ```
 
 ---

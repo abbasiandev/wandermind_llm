@@ -76,6 +76,8 @@ flutter:
     - assets/fonts/
     - assets/models/
     - assets/data/
+    # Optional — uncomment after creating .env with MAPBOX_ACCESS_TOKEN:
+    # - .env
 
   fonts:
     - family: Poppins
