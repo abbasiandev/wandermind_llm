@@ -29,7 +29,7 @@ dependencies:
   # llama_cpp_dart: ^0.2.1  # Removed - using native Android implementation
   # ffi: ^2.1.0  # Not needed with platform channels
 
-  geolocator: ^13.0.0
+  geolocator: ^13.0.2
   geocoding: ^2.1.1
 
   # Free map alternative using OpenStreetMap
