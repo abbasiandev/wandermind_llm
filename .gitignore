@@ -3,6 +3,9 @@
 *.env
 !.env.example
 
+# Cursor IDE
+.cursor/
+
 # Miscellaneous
 *.class
 *.log
