@@ -9,22 +9,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 LLAMA_CPP_DIR="llama.cpp"
-LLAMA_CPP_COMMIT="7d2ba9b175e5c0897c007bb4e4b32a4bf6c308ff"
+LLAMA_CPP_REPO="https://github.com/ggerganov/llama.cpp.git"
+# Pinned release tag from https://github.com/ggerganov/llama.cpp/releases
+LLAMA_CPP_TAG="b7783"
+LLAMA_CPP_COMMIT="d1e3556481c8b351f9b7b69ba3febf6cb77fffa6"
 
-echo "Setting up llama.cpp for Android (commit ${LLAMA_CPP_COMMIT})..."
+echo "Setting up llama.cpp for Android (tag ${LLAMA_CPP_TAG}, commit ${LLAMA_CPP_COMMIT})..."
 
 if [ -d "$LLAMA_CPP_DIR" ]; then
-    echo "llama.cpp directory already exists. Checking out pinned commit..."
+    echo "llama.cpp directory already exists. Checking out pinned release..."
     cd "$LLAMA_CPP_DIR"
-    git fetch origin
+    git fetch --depth 1 origin tag "$LLAMA_CPP_TAG" 2>/dev/null || git fetch origin
     git checkout "$LLAMA_CPP_COMMIT"
     cd ..
 else
     echo "Cloning llama.cpp..."
-    git clone https://github.com/ggerganov/llama.cpp.git
-    cd "$LLAMA_CPP_DIR"
-    git checkout "$LLAMA_CPP_COMMIT"
-    cd ..
+    git clone --depth 1 --branch "$LLAMA_CPP_TAG" "$LLAMA_CPP_REPO" "$LLAMA_CPP_DIR"
 fi
 
 echo "llama.cpp setup complete!"
