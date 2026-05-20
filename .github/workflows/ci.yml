@@ -14,24 +14,16 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version number to release (e.g. 1.2.0) — leave empty to read from pubspec.yaml'
+        description: 'Version number (e.g. 1.2.0) — leave empty to read from pubspec.yaml'
         required: false
         default: ''
-      force_release:
-        description: 'Force create a GitHub Release even if tag already exists'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
 
 permissions:
   contents: write
 
 jobs:
   build:
-    name: Build APK
+    name: Build & Release APK
     runs-on: ubuntu-latest
 
     outputs:
@@ -71,6 +63,7 @@ jobs:
         run: flutter test
         continue-on-error: true
 
+      # ── Resolve version ──────────────────────────────────────────────────────
       - name: Resolve version
         id: get_version
         run: |
@@ -85,6 +78,68 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "▶ Resolved version: $VERSION"
 
+      # ── Signing setup (only when secrets are present) ────────────────────────
+      - name: Setup signing
+        id: signing
+        run: |
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "▶ Keystore secret found — setting up signed release"
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+            cat >> android/local.properties << EOF
+          storeFile=keystore.jks
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "▶ No keystore secret — building unsigned release"
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Configure build.gradle to read signing from local.properties ─────────
+      - name: Patch build.gradle for signing
+        if: steps.signing.outputs.signed == 'true'
+        run: |
+          # Only patch if signingConfigs block not already present
+          if ! grep -q "signingConfigs" android/app/build.gradle; then
+            python3 - << 'PYEOF'
+          import re
+
+          with open("android/app/build.gradle", "r") as f:
+              content = f.read()
+
+          signing_block = """
+              signingConfigs {
+                  release {
+                      def props = new Properties()
+                      def propFile = rootProject.file('local.properties')
+                      if (propFile.exists()) { props.load(new FileInputStream(propFile)) }
+                      storeFile     props['storeFile'] ? file(props['storeFile']) : null
+                      storePassword props['storePassword']
+                      keyAlias      props['keyAlias']
+                      keyPassword   props['keyPassword']
+                  }
+              }
+          """
+
+          content = content.replace(
+              "buildTypes {",
+              signing_block + "\n    buildTypes {"
+          )
+          content = content.replace(
+              "buildTypes {\n        release {",
+              "buildTypes {\n        release {\n            signingConfig signingConfigs.release"
+          )
+
+          with open("android/app/build.gradle", "w") as f:
+              f.write(content)
+
+          print("✅ build.gradle patched for signing")
+          PYEOF
+          fi
+
+      # ── Debug build ──────────────────────────────────────────────────────────
       - name: Build APK (Debug)
         if: >
           github.ref != 'refs/heads/main' &&
@@ -92,6 +147,7 @@ jobs:
           github.event_name != 'workflow_dispatch'
         run: flutter build apk --debug
 
+      # ── Release builds ───────────────────────────────────────────────────────
       - name: Build APK (Release — split per ABI)
         if: >
           github.ref == 'refs/heads/main' ||
@@ -106,6 +162,7 @@ jobs:
           github.event_name == 'workflow_dispatch'
         run: flutter build apk --release
 
+      # ── Rename APKs ──────────────────────────────────────────────────────────
       - name: Rename APK files
         if: >
           github.ref == 'refs/heads/main' ||
@@ -115,21 +172,17 @@ jobs:
           VERSION="${{ steps.get_version.outputs.version }}"
           DIR="build/app/outputs/flutter-apk"
           cd "$DIR"
-
           for ARCH in arm64-v8a armeabi-v7a x86_64; do
             SRC="app-${ARCH}-release.apk"
             DST="wandermind-llm-v${VERSION}-${ARCH}.apk"
-            [ -f "$SRC" ] && mv "$SRC" "$DST" && echo "  renamed → $DST"
+            [ -f "$SRC" ] && mv "$SRC" "$DST" && echo "  ✔ $DST"
           done
-
-          if [ -f "app-release.apk" ]; then
-            mv app-release.apk "wandermind-llm-v${VERSION}-universal.apk"
-            echo "  renamed → wandermind-llm-v${VERSION}-universal.apk"
-          fi
-
-          echo "── APK directory ──"
+          [ -f "app-release.apk" ] && \
+            mv app-release.apk "wandermind-llm-v${VERSION}-universal.apk" && \
+            echo "  ✔ wandermind-llm-v${VERSION}-universal.apk"
           ls -lah
 
+      # ── Upload artifacts ─────────────────────────────────────────────────────
       - name: Upload debug APK
         if: >
           github.ref != 'refs/heads/main' &&
@@ -152,18 +205,21 @@ jobs:
           path: build/app/outputs/flutter-apk/wandermind-llm-*.apk
           retention-days: 30
 
+      # ── Release notes ────────────────────────────────────────────────────────
       - name: Generate release notes
         if: >
+          github.ref == 'refs/heads/main' ||
           startsWith(github.ref, 'refs/tags/') ||
           github.event_name == 'workflow_dispatch'
-        id: release_notes
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
+          SIGNED="${{ steps.signing.outputs.signed }}"
+          [ "$SIGNED" = "true" ] && SIGN_NOTE="✅ Signed release" || SIGN_NOTE="⚠️ Unsigned release (install requires 'Unknown sources')"
 
           cat > release_notes.md << EOF
           ## 🎉 WanderMind LLM v${VERSION}
-
           **Your Personal AI Travel Assistant — Works 100% Offline**
+          ${SIGN_NOTE}
 
           ### ✨ Highlights
           - On-device LLM powered by Llama.cpp (no cloud, no API key)
@@ -175,10 +231,10 @@ jobs:
 
           | File | For |
           |------|-----|
-          | \`*-arm64-v8a.apk\` | Most modern Android phones (recommended) |
+          | \`*-arm64-v8a.apk\` | Most modern Android phones ✅ recommended |
           | \`*-armeabi-v7a.apk\` | Older 32-bit ARM devices |
           | \`*-x86_64.apk\` | Intel/AMD devices & emulators |
-          | \`*-universal.apk\` | Any device — larger size |
+          | \`*-universal.apk\` | Any device — larger file size |
 
           ### 🔧 Build info
           - Flutter 3.24.0 · Dart 3.x
@@ -189,19 +245,37 @@ jobs:
 
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
-            echo "#### Commits since \`${PREV_TAG}\`" >> release_notes.md
+            echo "#### Since \`${PREV_TAG}\`" >> release_notes.md
             git log "${PREV_TAG}..HEAD" --pretty=format:"- %s (%h)" >> release_notes.md
           else
             echo "#### Recent commits" >> release_notes.md
             git log -15 --pretty=format:"- %s (%h)" >> release_notes.md
           fi
-
           echo -e "\n\n---\nBuilt automatically with GitHub Actions ❤️" >> release_notes.md
-          cat release_notes.md
+
+      # ── Auto-tag (main push OR workflow_dispatch without a tag) ──────────────
+      - name: Auto-tag if needed
+        if: >
+          (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') &&
+          !startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "▶ Tag v${VERSION} already exists — skipping tag creation"
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "v${VERSION}" -m "Release v${VERSION}"
+            git push origin "v${VERSION}"
+            echo "✅ Tag v${VERSION} pushed"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ── Create GitHub Release ────────────────────────────────────────────────
       - name: Create GitHub Release
         if: >
+          github.ref == 'refs/heads/main' ||
           startsWith(github.ref, 'refs/tags/') ||
           github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
@@ -213,57 +287,5 @@ jobs:
           draft: false
           prerelease: false
           make_latest: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ════════════════════════════════════════════════════════════════════════════
-  # Auto-tag job: runs after build on main, creates a vX.Y.Z tag which then
-  # re-triggers this workflow and causes the Release to be created.
-  # ════════════════════════════════════════════════════════════════════════════
-  auto-tag:
-    name: Auto-tag on main
-    runs-on: ubuntu-latest
-    # Only on direct pushes to main (not on PRs, not on tag pushes, not on
-    # workflow_dispatch — that path already creates the release directly above)
-    if: >
-      github.ref == 'refs/heads/main' &&
-      github.event_name == 'push'
-    needs: build
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Read version from pubspec.yaml
-        id: version
-        run: |
-          VERSION=$(grep '^version:' pubspec.yaml \
-            | sed 's/version: //' | tr -d ' ' | cut -d'+' -f1)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "▶ Version: $VERSION"
-
-      - name: Check whether tag already exists
-        id: check_tag
-        run: |
-          if git rev-parse "v${{ steps.version.outputs.version }}" \
-               >/dev/null 2>&1; then
-            echo "exists=true"  >> "$GITHUB_OUTPUT"
-            echo "Tag v${{ steps.version.outputs.version }} already exists — skipping."
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "Tag v${{ steps.version.outputs.version }} not found — will create."
-          fi
-
-      - name: Create and push tag
-        if: steps.check_tag.outputs.exists == 'false'
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v${{ steps.version.outputs.version }}" \
-            -m "Release v${{ steps.version.outputs.version }}"
-          git push origin "v${{ steps.version.outputs.version }}"
-          echo "✅ Tag v${{ steps.version.outputs.version }} pushed."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
